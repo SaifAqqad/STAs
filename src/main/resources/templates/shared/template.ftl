@@ -1,3 +1,4 @@
+<#ftl output_format="HTML">
 <#import "/spring.ftl" as spring />
 <#macro head title>
     <head>

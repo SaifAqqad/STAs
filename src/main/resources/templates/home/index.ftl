@@ -1,5 +1,6 @@
+<#ftl output_format="HTML">
 <#import "/spring.ftl" as spring />
-<#import "../shared/template.ftlh" as default />
+<#import "../shared/template.ftl" as default />
 
 <!DOCTYPE html>
 <html lang="en">
