@@ -28,6 +28,8 @@ public class STAsApplication {
                         "saif@gmail.com",
                         passwordEncoder.encode("s1a2i3f4"),
                         "ADMIN");
+                user1.setId(1L);
+                user1.setEnabled(true);
                 userRepository.save(user1);
             }
         };

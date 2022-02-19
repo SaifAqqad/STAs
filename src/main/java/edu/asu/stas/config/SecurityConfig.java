@@ -1,6 +1,5 @@
 package edu.asu.stas.config;
 
-import edu.asu.stas.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -11,6 +10,8 @@ import org.springframework.security.config.annotation.web.configuration.EnableWe
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.crypto.factory.PasswordEncoderFactories;
 import org.springframework.security.crypto.password.PasswordEncoder;
+
+import edu.asu.stas.service.UserService;
 
 @Configuration
 @EnableWebSecurity
@@ -23,12 +24,25 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     @Override
     protected void configure(HttpSecurity http) throws Exception {
         http
+
                 .authorizeRequests()
-                .mvcMatchers("/", "/login", "/register").permitAll()
+                .mvcMatchers("/login", "/register", "/").permitAll()
+                .mvcMatchers("/webjars**", "/css**", "/js**").permitAll()
                 .mvcMatchers("/logout", "/profile", "/account**").access("hasAnyRole('STUDENT','ADMIN')")
+
                 .and()
                 .formLogin()
+                .loginPage("/login")
                 .usernameParameter("email")
+
+                .and()
+                .rememberMe()
+
+                .and()
+                .logout()
+                .logoutSuccessUrl("/")
+                .deleteCookies("JSESSIONID")
+
         ;
     }
 
