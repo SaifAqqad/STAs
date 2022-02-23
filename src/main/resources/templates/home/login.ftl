@@ -1,11 +1,11 @@
 <#ftl output_format="HTML">
 <#import "/spring.ftl" as spring />
-<#import "../shared/template.ftl" as default />
+<#import "../shared/default.ftl" as default />
 
 <!DOCTYPE html>
 <html lang="en">
 
-<@default.head title="STAs - Login">
+<@default.head title="Login - STAs">
 </@default.head>
 
 <body>
