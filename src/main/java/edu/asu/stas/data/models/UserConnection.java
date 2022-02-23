@@ -3,10 +3,7 @@ package edu.asu.stas.data.models;
 import lombok.*;
 
 
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.Id;
-import javax.persistence.ManyToOne;
+import javax.persistence.*;
 import javax.validation.constraints.NotNull;
 
 @Entity
@@ -14,7 +11,7 @@ import javax.validation.constraints.NotNull;
 @RequiredArgsConstructor
 @Getter
 @Setter
-public class UserConnection{
+public class UserConnection {
     @Id
     @GeneratedValue
     private Long id;

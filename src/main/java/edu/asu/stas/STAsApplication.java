@@ -1,13 +1,15 @@
 package edu.asu.stas;
 
 import edu.asu.stas.data.models.User;
-import edu.asu.stas.data.repositories.UserConnectionRepository;
-import edu.asu.stas.data.repositories.UserRepository;
+import edu.asu.stas.data.dao.UserConnectionRepository;
+import edu.asu.stas.data.dao.UserRepository;
 import org.springframework.boot.ApplicationRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Bean;
 import org.springframework.security.crypto.password.PasswordEncoder;
+
+import java.time.LocalDate;
 
 @SpringBootApplication
 public class STAsApplication {
@@ -27,6 +29,7 @@ public class STAsApplication {
                         "Aqqad",
                         "saif@gmail.com",
                         passwordEncoder.encode("s1a2i3f4"),
+                        LocalDate.of(1999, 10, 14),
                         "ADMIN");
                 user1.setId(1L);
                 user1.setEnabled(true);

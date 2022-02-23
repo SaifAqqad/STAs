@@ -1,5 +1,6 @@
 <#ftl output_format="HTML">
 <#import "/spring.ftl" as spring />
+
 <#macro head title>
     <head>
         <meta charset="UTF-8">
@@ -20,7 +21,7 @@
     <#nested >
 </#macro>
 
-<#macro navbar home="" login="" profile="" dashboard="">
+<#macro navbar home="" login="" profile="" dashboard="" account="">
     <nav class="navbar navbar-expand-md navbar-light bg-light">
         <div class="container-fluid">
             <a class="navbar-brand" href="<@spring.url relativeUrl="/"/>">STAs</a>
@@ -53,13 +54,16 @@
                     <ul class="navbar-nav me-2 mb-2 mb-lg-0">
                         <#-- if the user is authenticated -->
                         <#if SPRING_SECURITY_CONTEXT??>
-                            <li class="nav-item nav-link active">
-                                Hello ${(SPRING_SECURITY_CONTEXT.authentication.getPrincipal().getFirstName())}
+                            <li class="nav-item">
+                                <#local user = SPRING_SECURITY_CONTEXT.authentication.getPrincipal()/>
+                                <a class="nav-link ${account}" href="<@spring.url relativeUrl="/account"/>">
+                                    ${user.getFirstName()} ${user.getLastName()}
+                                </a>
                             </li>
                             <li class="nav-item">
                                 <form action="/logout" method="post" class="d-inline">
                                     <input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}"/>
-                                    <input type="submit" class="btn btn-link nav-link" value="Logout">
+                                    <input type="submit" class="btn btn-link nav-link border-0" value="Logout">
                                 </form>
                             </li>
                         <#else>
@@ -72,6 +76,28 @@
             </div>
         </div>
     </nav>
+</#macro>
+
+<#macro toast>
+    <div class="toast align-items-center text-white bg-primary border-0 position-absolute top-0 end-0 mt-5 me-4"
+         id="notification" role="alert" aria-live="assertive" aria-atomic="true">
+        <div class="d-flex">
+            <div class="toast-body">
+                ${(.data_model.toast)!""}
+            </div>
+            <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast"
+                    aria-label="Close"></button>
+        </div>
+    </div>
+    <script>
+        let state = ${(.data_model.toast??)?then("true", "false")};
+        if (state) {
+            document.addEventListener("DOMContentLoaded", function () {
+                let toastEl = document.getElementById('notification');
+                new bootstrap.Toast(toastEl, {delay: 1500}).show();
+            });
+        }
+    </script>
 </#macro>
 
 <#macro requiredRole Role>
@@ -87,3 +113,21 @@
         <#nested>
     </#if>
 </#macro>
+
+<#macro requiresAnyRole Roles>
+    <#assign authorized = false>
+    <#if SPRING_SECURITY_CONTEXT??>
+        <#list SPRING_SECURITY_CONTEXT.authentication.authorities as authority>
+            <#list Roles as role>
+                <#if authority == role>
+                    <#assign authorized = true>
+                    <#break/>
+                </#if>
+            </#list>
+        </#list>
+    </#if>
+    <#if authorized>
+        <#nested>
+    </#if>
+</#macro>
+
