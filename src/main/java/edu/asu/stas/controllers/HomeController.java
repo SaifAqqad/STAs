@@ -12,6 +12,11 @@ public class HomeController {
         return "home/index";
     }
 
+    @GetMapping("/about")
+    public String getAboutPage() {
+        return "home/about";
+    }
+
     @GetMapping("/login")
     public String getLoginPage(Authentication authentication) {
         if (authentication != null && authentication.isAuthenticated())
