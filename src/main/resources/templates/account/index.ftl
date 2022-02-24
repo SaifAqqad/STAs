@@ -28,20 +28,20 @@
                     <div class="row">
                         <div class="col">
                             <div class="form-floating mt-3">
-                                <@account.formElement path="accountDetails.firstName" label="First Name" attrb="required placeholder='First Name'" />
+                                <@account.formElement path="accountDetails.firstName" label="First Name" attrb="required " placeholder="First Name" />
                             </div>
                         </div>
                         <div class="col">
                             <div class="form-floating mt-3">
-                                <@account.formElement path="accountDetails.lastName" label="Last Name" attrb="required placeholder='Last Name'" />
+                                <@account.formElement path="accountDetails.lastName" label="Last Name" attrb="required" placeholder="Last Name" />
                             </div>
                         </div>
                     </div>
                     <div class="form-floating mt-3">
-                        <@account.formElement path="accountDetails.email" label="Email" type="email" attrb="required placeholder='Email'" />
+                        <@account.formElement path="accountDetails.email" label="Email" type="email" attrb="required" placeholder="Email" />
                     </div>
                     <div class="form-floating mt-3">
-                        <@account.formElement path="accountDetails.dateOfBirth" label="Date of birth" type="date" attrb="required placeholder='Date of birth'" />
+                        <@account.formElement path="accountDetails.dateOfBirth" label="Date of birth" type="date" attrb="required" placeholder="Date of birth" />
                     </div>
                     <input class="btn btn-outline-primary mt-3" value="Save" type="submit">
                 </form>

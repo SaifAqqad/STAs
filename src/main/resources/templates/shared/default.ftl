@@ -21,10 +21,13 @@
     <#nested >
 </#macro>
 
-<#macro navbar home="" login="" profile="" dashboard="" account="">
+<#macro navbar home="" about="" login="" profile="" dashboard="" account="">
     <nav class="navbar navbar-expand-md navbar-light bg-light">
         <div class="container-fluid">
-            <a class="navbar-brand" href="<@spring.url relativeUrl="/"/>">STAs</a>
+            <a class="navbar-brand" href="<@spring.url relativeUrl="/"/>">
+                <img src="<@spring.url "/images/logo.png"/>" alt="" width="30" height="30">
+                STAs
+            </a>
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse"
                     data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent"
                     aria-expanded="false" aria-label="Toggle navigation">
@@ -32,8 +35,12 @@
             </button>
             <div class="collapse navbar-collapse" id="navbarSupportedContent">
                 <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+                    <#-- General links -->
                     <li class="nav-item">
                         <a class="nav-link ${home}" href="<@spring.url relativeUrl="/"/>">Home</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link ${about}" href="<@spring.url relativeUrl="/about"/>">About</a>
                     </li>
                     <#-- STUDENT-only links -->
                     <@requiredRole "STUDENT">

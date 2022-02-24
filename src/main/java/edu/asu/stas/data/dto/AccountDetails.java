@@ -17,9 +17,11 @@ public class AccountDetails {
     private Long id;
 
     @NotBlank(message = "First name is required")
+    @Pattern(regexp = "[^<>()\\[\\]@#$%^&*!;:\\\\/]+", message = "Special characters are not permitted")
     private String firstName;
 
     @NotBlank(message = "Last name is required")
+    @Pattern(regexp = "[^<>()\\[\\]@#$%^&*!;:\\\\/]+", message = "Special characters are not permitted")
     private String lastName;
 
     @NotBlank(message = "Email is required")

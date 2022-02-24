@@ -18,11 +18,11 @@
     </div>
 </#macro>
 
-<#macro formElement path label type="text" attrb="">
+<#macro formElement path label type="text" attrb="" placeholder="">
     <@spring.bind path="${path}"/>
     <input class="form-control <#if spring.status.error>is-invalid</#if>" type="${type}"
            name="${spring.status.expression}" id="${spring.status.expression}"
-           value="${spring.status.value}" ${attrb?no_esc}>
+           value="${spring.status.value}" placeholder="${placeholder}" ${attrb?no_esc}>
     <label class="form-label" for="${spring.status.expression}">${label}</label>
     <span class="invalid-feedback">${spring.status.errorMessage}</span>
 </#macro>
