@@ -21,7 +21,7 @@
         <div class="col-sm-9">
             <div class="container mt-2">
                 <h4>Account information</h4>
-                <form class="w" action="<@spring.url "/account/update"/>" method="post">
+                <form class="" action="<@spring.url "/account/update"/>" method="post">
                     <@spring.bind "accountDetails.id"/>
                     <input type="hidden" name="id" value="${accountDetails.id}"/>
                     <input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}"/>

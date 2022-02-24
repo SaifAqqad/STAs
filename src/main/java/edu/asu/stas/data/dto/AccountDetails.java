@@ -25,7 +25,7 @@ public class AccountDetails {
     private String lastName;
 
     @NotBlank(message = "Email is required")
-    @Email(message = "Email is not valid")
+    @Email(message = "Invalid email")
     private String email;
 
     @Past(message = "Date of birth must be in the past")
