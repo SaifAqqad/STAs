@@ -21,7 +21,7 @@
     <#nested >
 </#macro>
 
-<#macro navbar home="" about="" login="" profile="" dashboard="" account="">
+<#macro navbar home="" about="" login="" register="" profile="" dashboard="" account="">
     <nav class="navbar navbar-expand-md navbar-light bg-light">
         <div class="container-fluid">
             <a class="navbar-brand" href="<@spring.url relativeUrl="/"/>">
@@ -76,6 +76,9 @@
                         <#else>
                             <li class="nav-item">
                                 <a class="nav-link ${login}" href="<@spring.url relativeUrl="/login"/>">Login</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link ${register}" href="<@spring.url relativeUrl="/register"/>">Register</a>
                             </li>
                         </#if>
                     </ul>
