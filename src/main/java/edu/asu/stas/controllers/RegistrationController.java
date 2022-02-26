@@ -1,23 +1,31 @@
 package edu.asu.stas.controllers;
 
 import edu.asu.stas.data.dto.RegistrationForm;
+import edu.asu.stas.service.UserService;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.annotation.Validated;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.ModelAttribute;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
+
+import java.util.Objects;
 
 @Controller
 @RequestMapping("/register")
 public class RegistrationController {
 
+    private final UserService userService;
+
+    @Autowired
+    public RegistrationController(UserService userService) {
+        this.userService = userService;
+    }
+
     @ModelAttribute("registrationForm")
     public RegistrationForm addRegistrationFormToModel() {
-        return new RegistrationForm();
+        return new RegistrationForm("", "", "", "", null);
     }
 
     @GetMapping("")
@@ -26,13 +34,17 @@ public class RegistrationController {
     }
 
     @PostMapping("")
-    public String postRegistrationForm(@Validated @ModelAttribute RegistrationForm registrationForm, BindingResult bindingResult, RedirectAttributes redirectAttributes) {
+    public String postRegistrationForm(
+            @Validated @ModelAttribute RegistrationForm registrationForm,
+            BindingResult bindingResult,
+            RedirectAttributes redirectAttributes
+    ) {
         if (bindingResult.hasErrors()) {
-            redirectAttributes.addFlashAttribute("org.spring.validation.BindingResult.registrationForm", bindingResult);
+            redirectAttributes.addFlashAttribute("org.springframework.validation.BindingResult.registrationForm", bindingResult);
             redirectAttributes.addFlashAttribute("registrationForm", registrationForm);
             return "redirect:/register?error";
         }
-        // TODO: register the user using UserService
+        userService.registerUser(registrationForm);
         redirectAttributes.addFlashAttribute("registrationSuccess", true);
         return "redirect:/register/verify";
     }

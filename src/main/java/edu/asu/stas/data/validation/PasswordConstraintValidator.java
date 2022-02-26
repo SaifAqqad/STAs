@@ -24,6 +24,9 @@ public class PasswordConstraintValidator implements ConstraintValidator<Password
                 // at least one lower-case character
                 new CharacterRule(EnglishCharacterData.LowerCase, 1),
 
+                // at least one digit character
+                new CharacterRule(EnglishCharacterData.Digit, 1),
+
                 // no whitespace
                 new WhitespaceRule(),
 
@@ -37,7 +40,7 @@ public class PasswordConstraintValidator implements ConstraintValidator<Password
         if (result.isValid()) {
             return true;
         }
-        String msgTemplate = String.join(",", validator.getMessages(result));
+        String msgTemplate = String.join("-", validator.getMessages(result));
         context.disableDefaultConstraintViolation();
         context.buildConstraintViolationWithTemplate(msgTemplate).addConstraintViolation();
         return false;

@@ -17,16 +17,23 @@
         <div class="card text-dark bg-light mb-3 w-100 <#if loginError>border-danger</#if>">
             <div class="card-header">Log in with your account</div>
             <div class="card-body">
+                <#if loginError>
+                    <div class="alert alert-danger" role="alert">
+                        An error occurred while logging in, please check your credentials and try again.
+                    </div>
+                </#if>
                 <#-- Login form -->
                 <#-- TODO: Add "sign in with __" buttons -->
                 <form class="w-100" method="post">
                     <input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}"/>
                     <div class="form-floating mb-3">
-                        <input class="form-control" type="email" name="email" id="email" placeholder="Email Address" required/>
+                        <input class="form-control" type="email" name="email" id="email" placeholder="Email Address"
+                               required/>
                         <label class="form-label" for="email">Email address</label>
                     </div>
                     <div class="form-floating mb-3">
-                        <input class="form-control" type="password" name="password" id="password" placeholder="Password" required/>
+                        <input class="form-control" type="password" name="password" id="password" placeholder="Password"
+                               required/>
                         <label class="form-label" for="password">Password</label>
                     </div>
                     <div class="form-check mb-3">
@@ -34,14 +41,13 @@
                         <label class="form-check-label" for="remember-me">Remember Me</label>
                     </div>
                     <input class="btn btn-primary w-100" type="submit" value="Log in">
+                    <hr/>
+                    <#-- Registration button -->
+                    <div class="d-flex justify-content-center w-100">
+                        <a class="btn btn-success w-75" href="<@spring.url "/register"/>">Create a new account</a>
+                    </div>
                 </form>
             </div>
-            <#-- TODO: Add "Register" button -->
-            <#if loginError>
-                <div class="card-footer text-white bg-danger border-danger">
-                    An error occurred while logging in, please check your credentials and try again.
-                </div>
-            </#if>
         </div>
     </div>
 </div>

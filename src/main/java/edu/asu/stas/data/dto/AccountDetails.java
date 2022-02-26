@@ -1,6 +1,7 @@
 package edu.asu.stas.data.dto;
 
 import edu.asu.stas.data.models.User;
+import edu.asu.stas.data.validation.HasUniqueEmail;
 import lombok.*;
 import org.springframework.data.annotation.Id;
 import org.springframework.format.annotation.DateTimeFormat;
@@ -12,6 +13,7 @@ import java.time.LocalDate;
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
+@HasUniqueEmail
 public class AccountDetails {
     @Id
     private Long id;

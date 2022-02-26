@@ -18,11 +18,39 @@
     </div>
 </#macro>
 
-<#macro formElement path label type="text" attrb="" placeholder="">
+<#macro formElement path label bindValue=true type="text" attrb="" placeholder="">
     <@spring.bind path="${path}"/>
     <input class="form-control <#if spring.status.error>is-invalid</#if>" type="${type}"
-           name="${spring.status.expression}" id="${spring.status.expression}"
-           value="${spring.status.value}" placeholder="${placeholder}" ${attrb?no_esc}>
+           name="${spring.status.expression}" id="${spring.status.expression}" ${attrb?no_esc}
+           placeholder="${placeholder}" value="${bindValue?then(spring.status.value,"")}">
     <label class="form-label" for="${spring.status.expression}">${label}</label>
-    <span class="invalid-feedback">${spring.status.errorMessage}</span>
+    <span class="invalid-feedback">
+        <#list (spring.status.errorMessage)?split("-") as error>
+            ${error}<#sep><br/></#sep>
+        </#list>
+    </span>
+</#macro>
+
+<#macro confirmPasswordScript passwordId confirmPasswordId confirmPasswordFeedbackId>
+    <script>
+        const passwordElem = document.getElementById("${passwordId}"),
+            confirmPasswordElem = document.getElementById("${confirmPasswordId}"),
+            confirmPasswordFeedbackElem = document.getElementById("${confirmPasswordFeedbackId}");
+        confirmPasswordElem.addEventListener('input', validatePassword);
+
+        function validatePassword() {
+
+            if (passwordElem.value !== confirmPasswordElem.value) {
+                confirmPasswordElem.setCustomValidity("Passwords don't match");
+                confirmPasswordFeedbackElem.innerText = "Passwords don't match";
+                confirmPasswordElem.classList.add("is-invalid");
+                return false;
+            } else {
+                confirmPasswordElem.setCustomValidity("");
+                confirmPasswordFeedbackElem.innerText = "";
+                confirmPasswordElem.classList.remove("is-invalid");
+                return true;
+            }
+        }
+    </script>
 </#macro>

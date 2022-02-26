@@ -6,11 +6,11 @@
         <meta charset="UTF-8">
         <title>${title}</title>
 
-        <link rel="icon" type="image/png" sizes="32x32" href="<@spring.url "/images/favicon-32x32.png"/>">
-        <link rel="icon" type="image/png" sizes="16x16" href="<@spring.url "/images/favicon-16x16.png"/>">
-        <link rel="manifest" href="<@spring.url "/site.webmanifest"/>">
+        <link rel="icon" type="image/svg+xml" href="<@spring.url "/images/favicon.svg"/>">
+        <link rel="icon" type="image/png" href="<@spring.url "/images/favicon.png"/>">
+        <link rel="manifest" href="<@spring.url "/js/site.webmanifest"/>">
 
-        <link rel="stylesheet" href="<@spring.url "/webjars/bootstrap/css/bootstrap.min.css"/>"/>
+        <link rel="stylesheet" href="<@spring.url "/webjars/bootswatch/dist/zephyr/bootstrap.min.css"/>"/>
         <link rel="stylesheet" href="<@spring.url "/css/styles.css"/>"/>
         <#nested/>
     </head>
@@ -21,11 +21,18 @@
     <#nested >
 </#macro>
 
-<#macro navbar home="" about="" login="" register="" profile="" dashboard="" account="">
+<#macro logo width height color>
+    <svg style="width:${width};height:${height};color: ${color};" viewBox="0 0 24 24">
+        <path fill="currentColor"
+              d="M12,3L1,9L12,15L21,10.09V17H23V9M5,13.18V17.18L12,21L19,17.18V13.18L12,17L5,13.18Z"/>
+    </svg>
+</#macro>
+
+<#macro navbar home="" about="" login="" profile="" dashboard="" account="">
     <nav class="navbar navbar-expand-md navbar-light bg-light">
         <div class="container-fluid">
             <a class="navbar-brand" href="<@spring.url relativeUrl="/"/>">
-                <img src="<@spring.url "/images/logo.png"/>" alt="" width="30" height="30">
+                <@logo width="30px" height="30px" color="#393939"/>
                 STAs
             </a>
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse"
@@ -58,16 +65,16 @@
                 </ul>
                 <#-- Login/Logout links -->
                 <div class="d-flex">
-                    <ul class="navbar-nav me-2 mb-2 mb-lg-0">
+                    <ul class="navbar-nav me-2 mb-2 mb-lg-0 w-100">
                         <#-- if the user is authenticated -->
                         <#if SPRING_SECURITY_CONTEXT??>
-                            <li class="nav-item">
+                            <li class="nav-item"> <#-- user's fName lName -->
                                 <#local user = SPRING_SECURITY_CONTEXT.authentication.getPrincipal()/>
                                 <a class="nav-link ${account}" href="<@spring.url relativeUrl="/account"/>">
                                     ${user.getFirstName()} ${user.getLastName()}
                                 </a>
                             </li>
-                            <li class="nav-item">
+                            <li class="nav-item"> <#-- logout button -->
                                 <form action="/logout" method="post" class="d-inline">
                                     <input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}"/>
                                     <input type="submit" class="btn btn-link nav-link border-0" value="Logout">
@@ -76,9 +83,6 @@
                         <#else>
                             <li class="nav-item">
                                 <a class="nav-link ${login}" href="<@spring.url relativeUrl="/login"/>">Login</a>
-                            </li>
-                            <li class="nav-item">
-                                <a class="nav-link ${register}" href="<@spring.url relativeUrl="/register"/>">Register</a>
                             </li>
                         </#if>
                     </ul>

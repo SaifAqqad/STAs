@@ -26,7 +26,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
                 .authorizeRequests()
                 .mvcMatchers("/webjars/**", "/images/**", "/css/**", "/js/**").permitAll()
-                .mvcMatchers("/login**", "/register**", "/about", "/").permitAll()
+                .mvcMatchers("/login/**", "/login**", "/register/**", "/register**", "/about", "/").permitAll()
                 .anyRequest().authenticated()
 
                 .and()
@@ -54,7 +54,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     }
 
     @Bean
-    public PasswordEncoder passwordEncoder() {
+    public static PasswordEncoder passwordEncoder() {
         return PasswordEncoderFactories.createDelegatingPasswordEncoder();
     }
 }
