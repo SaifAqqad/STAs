@@ -50,10 +50,32 @@ public class RegistrationController {
     }
 
     @GetMapping("verify")
-    public String getVerifyPage(Model model) {
-        // this prevents anyone from opening the page without being redirected by a successful registration
-        if (model.containsAttribute("registrationSuccess")) return "registration/verify";
-        else return "redirect:/";
+    public String getVerifyPage(
+            @RequestParam(required = false) String token,
+            Model model
+    ) {
+        if (Objects.isNull(token)) {
+            // this prevents anyone from opening the page without being redirected by a successful registration
+            if (model.containsAttribute("registrationSuccess"))
+                return "registration/verify";
+            return "redirect:/";
+        }
+        model.addAttribute("verificationSuccess", userService.enableUser(token));
+        return "registration/verify";
     }
 
+    @GetMapping("requestVerification")
+    public String getRequestVerificationPage() {
+        return "registration/requestVerification";
+    }
+
+    @PostMapping("requestVerification")
+    public String postRequestVerificationPage(
+            @RequestParam String email,
+            RedirectAttributes redirectAttributes
+    ) {
+        userService.sendVerificationEmail(email);
+        redirectAttributes.addFlashAttribute("registrationSuccess", true);
+        return "redirect:/register/verify";
+    }
 }
