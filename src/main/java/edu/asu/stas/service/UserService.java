@@ -55,7 +55,7 @@ public class UserService implements UserDetailsService {
         user.setEmail(form.getEmail().trim().toLowerCase());
         user.setDateOfBirth(form.getDateOfBirth());
         user.setPassword(passwordEncoder.encode(form.getPassword()));
-        user.setRole("STUDENT");
+        user.setRole(User.Roles.STUDENT);
         user.setEnabled(false);
         user = userRepository.save(user);
         // generate verification token

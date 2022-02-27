@@ -1,8 +1,7 @@
 package edu.asu.stas;
 
-import edu.asu.stas.data.models.User;
-import edu.asu.stas.data.dao.UserConnectionRepository;
 import edu.asu.stas.data.dao.UserRepository;
+import edu.asu.stas.data.models.User;
 import org.springframework.boot.ApplicationRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
@@ -20,7 +19,6 @@ public class STAsApplication {
 
     @Bean
     public ApplicationRunner seedDataLoader(UserRepository userRepository,
-                                            UserConnectionRepository userConnectionRepository,
                                             PasswordEncoder passwordEncoder) {
         return args -> {
             if (args.containsOption("addSeedData")) {
@@ -30,7 +28,7 @@ public class STAsApplication {
                         "saif@gmail.com",
                         passwordEncoder.encode("s1a2i3f4"),
                         LocalDate.of(1999, 10, 14),
-                        "ADMIN");
+                        User.Roles.ADMIN);
                 user1.setId(1L);
                 user1.setEnabled(true);
                 userRepository.save(user1);

@@ -80,4 +80,10 @@ public class User implements UserDetails {
         return true;
     }
 
+    @NoArgsConstructor(access = AccessLevel.PRIVATE)
+    public static final class Roles {
+        public static final String STUDENT = "ROLE_STUDENT";
+        public static final String ADMIN = "ROLE_ADMIN";
+    }
+
 }

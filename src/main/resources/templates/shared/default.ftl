@@ -1,5 +1,6 @@
 <#ftl output_format="HTML">
 <#import "/spring.ftl" as spring />
+<#global roles = {"student" : "ROLE_STUDENT", "admin": "ROLE_ADMIN"}/>
 
 <#macro head title>
     <head>
@@ -50,13 +51,13 @@
                         <a class="nav-link ${about}" href="<@spring.url relativeUrl="/about"/>">About</a>
                     </li>
                     <#-- STUDENT-only links -->
-                    <@requiredRole "STUDENT">
+                    <@requiredRole roles.student>
                         <li class="nav-item">
                             <a class="nav-link ${profile}" href="<@spring.url relativeUrl="/profile"/>">Profile</a>
                         </li>
                     </@requiredRole>
                     <#-- ADMIN-only links -->
-                    <@requiredRole "ADMIN">
+                    <@requiredRole roles.admin>
                         <li class="nav-item">
                             <a class="nav-link ${dashboard}"
                                href="<@spring.url relativeUrl="/dashboard"/>">Dashboard</a>
