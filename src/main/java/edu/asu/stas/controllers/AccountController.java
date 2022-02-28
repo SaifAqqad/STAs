@@ -1,6 +1,7 @@
 package edu.asu.stas.controllers;
 
 import edu.asu.stas.data.dto.AccountDetails;
+import edu.asu.stas.data.dto.PasswordForm;
 import edu.asu.stas.data.models.User;
 import edu.asu.stas.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,6 +25,8 @@ public class AccountController {
     public AccountController(UserService userService) {
         this.userService = userService;
     }
+
+    //---  Account information page
 
     // adds the authenticated user's accountDetails to the model (when needed)
     @ModelAttribute("accountDetails")
@@ -53,9 +56,34 @@ public class AccountController {
         return "redirect:/account";
     }
 
+    //---  Account security page
+
+    @ModelAttribute("passwordForm")
+    public PasswordForm addPasswordForm() {
+        return new PasswordForm();
+    }
+
     @GetMapping("security")
     public String getSecurityPage() {
         return "account/security";
     }
+
+    @PostMapping("security/update")
+    public String postPasswordForm(
+            @Validated @ModelAttribute PasswordForm passwordForm,
+            BindingResult bindingResult,
+            Authentication authentication,
+            RedirectAttributes redirectAttributes
+    ) {
+        if (bindingResult.hasErrors()) {
+            redirectAttributes.addFlashAttribute("org.springframework.validation.BindingResult.passwordForm", bindingResult);
+            redirectAttributes.addFlashAttribute("passwordForm", passwordForm);
+            return "redirect:/account/security?error";
+        }
+        userService.updateUserPassword((User) authentication.getPrincipal(), passwordForm);
+        redirectAttributes.addFlashAttribute("toast", "Password changed successfully");
+        return "redirect:/account/security";
+    }
+
 
 }

@@ -24,7 +24,7 @@
                 <form class="" action="<@spring.url "/account/update"/>" method="post">
                     <@spring.bind "accountDetails.id"/>
                     <input type="hidden" name="id" value="${accountDetails.id}"/>
-                    <input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}"/>
+                    <@default.csrfInput/>
                     <div class="row">
                         <div class="col">
                             <div class="form-floating mt-3">
@@ -43,7 +43,9 @@
                     <div class="form-floating mt-3">
                         <@account.formElement path="accountDetails.dateOfBirth" label="Date of birth" type="date" attrb="required" placeholder="Date of birth" />
                     </div>
-                    <input class="btn btn-outline-primary mt-3" value="Save" type="submit">
+                    <div class="mt-3">
+                        <input class="btn btn-outline-primary" value="Save" type="submit">
+                    </div>
                 </form>
             </div>
         </div>

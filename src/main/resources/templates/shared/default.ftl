@@ -115,6 +115,10 @@
     </script>
 </#macro>
 
+<#macro csrfInput>
+    <input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}"/>
+</#macro>
+
 <#macro requiredRole Role>
     <#assign authorized = false>
     <#if SPRING_SECURITY_CONTEXT??>

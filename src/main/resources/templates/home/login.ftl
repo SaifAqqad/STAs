@@ -25,7 +25,7 @@
                 <#-- Login form -->
                 <#-- TODO: Add "sign in with __" buttons -->
                 <form class="w-100" method="post">
-                    <input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}"/>
+                    <@default.csrfInput/>
                     <div class="form-floating mb-3">
                         <input class="form-control" type="email" name="email" id="email" placeholder="Email Address"
                                required/>

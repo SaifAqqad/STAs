@@ -15,7 +15,7 @@
             <div class="card-header">Request a verification code</div>
             <div class="card-body">
                 <form method="post">
-                    <input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}">
+                    <@default.csrfInput/>
                     <div class="form-floating mt-3">
                         <input class="form-control" type="email" name="email" id="email" placeholder="Email" required >
                         <label class="form-label" for="email">Email</label>

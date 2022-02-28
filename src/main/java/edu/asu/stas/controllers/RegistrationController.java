@@ -25,7 +25,7 @@ public class RegistrationController {
 
     @ModelAttribute("registrationForm")
     public RegistrationForm addRegistrationFormToModel() {
-        return new RegistrationForm("", "", "", "", null);
+        return new RegistrationForm();
     }
 
     @GetMapping("")
@@ -64,12 +64,12 @@ public class RegistrationController {
         return "registration/verify";
     }
 
-    @GetMapping("requestVerification")
+    @GetMapping("request-verification")
     public String getRequestVerificationPage() {
         return "registration/requestVerification";
     }
 
-    @PostMapping("requestVerification")
+    @PostMapping("request-verification")
     public String postRequestVerificationPage(
             @RequestParam String email,
             RedirectAttributes redirectAttributes

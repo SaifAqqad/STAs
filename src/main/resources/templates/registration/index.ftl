@@ -14,7 +14,7 @@
         <div class="card-header">Create a new account</div>
         <div class="card-body">
             <form class="needs-validation" method="post">
-                <input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}">
+                <@default.csrfInput/>
                 <div class="row">
                     <div class="col">
                         <div class="form-floating mt-3">

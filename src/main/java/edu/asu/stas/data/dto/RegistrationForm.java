@@ -16,19 +16,19 @@ public class RegistrationForm {
 
     @NotBlank(message = "First name is required")
     @Pattern(regexp = "[^<>()\\[\\]@#$%^&*!;:\\\\/]+", message = "Special characters are not permitted")
-    private String firstName;
+    private String firstName="";
 
     @NotBlank(message = "Last name is required")
     @Pattern(regexp = "[^<>()\\[\\]@#$%^&*!;:\\\\/]+", message = "Special characters are not permitted")
-    private String lastName;
+    private String lastName="";
 
     @NotBlank(message = "Email is required")
     @Email(message = "Invalid email")
     @UniqueEmail
-    private String email;
+    private String email="";
 
     @Password
-    private String password;
+    private String password="";
 
     @Past(message = "Date of birth must be in the past")
     @NotNull

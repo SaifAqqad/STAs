@@ -3,6 +3,7 @@ package edu.asu.stas.service;
 import edu.asu.stas.data.dao.UserRepository;
 import edu.asu.stas.data.dao.UserVerificationTokenRepository;
 import edu.asu.stas.data.dto.AccountDetails;
+import edu.asu.stas.data.dto.PasswordForm;
 import edu.asu.stas.data.dto.RegistrationForm;
 import edu.asu.stas.data.models.User;
 import edu.asu.stas.data.models.UserVerificationToken;
@@ -20,14 +21,14 @@ import java.util.Objects;
 @Service
 public class UserService implements UserDetailsService {
     private final UserRepository userRepository;
-
     private final UserVerificationTokenRepository verificationTokenRepository;
     private final PasswordEncoder passwordEncoder;
     private final TokenGenerator tokenGenerator;
     private final MailService mailService;
 
     @Autowired
-    public UserService(UserRepository userRepository, UserVerificationTokenRepository verificationTokenRepository, PasswordEncoder passwordEncoder, TokenGenerator tokenGenerator, MailService mailService) {
+    public UserService(UserRepository userRepository, UserVerificationTokenRepository verificationTokenRepository,
+            PasswordEncoder passwordEncoder, TokenGenerator tokenGenerator, MailService mailService) {
         this.userRepository = userRepository;
         this.verificationTokenRepository = verificationTokenRepository;
         this.passwordEncoder = passwordEncoder;
@@ -35,16 +36,19 @@ public class UserService implements UserDetailsService {
         this.mailService = mailService;
     }
 
-    public User findByEmail(String email) {
-        return userRepository.findByEmail(email).orElse(null);
-    }
-
-
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
         return Objects.requireNonNullElseGet(findByEmail(username.toLowerCase()), () -> {
             throw new UsernameNotFoundException("User not found");
         });
+    }
+
+    public User findByEmail(String email) {
+        return userRepository.findByEmail(email).orElse(null);
+    }
+
+    public User saveUser(User user){
+        return userRepository.save(user);
     }
 
     public void registerUser(RegistrationForm form) {
@@ -107,4 +111,8 @@ public class UserService implements UserDetailsService {
         userRepository.save(user);
     }
 
+    public void updateUserPassword(User user, PasswordForm passwordForm) {
+        user.setPassword(passwordEncoder.encode(passwordForm.getNewPassword()));
+        userRepository.save(user);
+    }
 }
