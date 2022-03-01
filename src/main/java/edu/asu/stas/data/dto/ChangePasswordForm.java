@@ -12,7 +12,7 @@ import javax.validation.constraints.NotBlank;
 @Getter
 @Setter
 @NoArgsConstructor
-public class PasswordForm {
+public class ChangePasswordForm {
 
     @NotBlank(message = "Current password is required")
     @CurrentPassword

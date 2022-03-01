@@ -29,7 +29,6 @@ public class STAsApplication {
                         passwordEncoder.encode("s1a2i3f4"),
                         LocalDate.of(1999, 10, 14),
                         User.Roles.ADMIN);
-                user1.setId(1L);
                 user1.setEnabled(true);
                 userRepository.save(user1);
             }

@@ -18,8 +18,8 @@
 </#macro>
 
 <#macro scripts>
-    <script src="<@spring.url "/webjars/iconify__iconify/dist/iconify.min.js"/>"></script>
     <script src="<@spring.url "/webjars/bootstrap/js/bootstrap.bundle.min.js"/>"></script>
+    <script src="<@spring.url "/webjars/iconify__iconify/dist/iconify.min.js"/>"></script>
     <#nested >
 </#macro>
 
@@ -46,21 +46,21 @@
                 <ul class="navbar-nav me-auto mb-2 mb-lg-0">
                     <#-- General links -->
                     <li class="nav-item">
-                        <a class="nav-link ${home}" href="<@spring.url relativeUrl="/"/>">Home</a>
+                        <a class="nav-link ps-2 ps-sm-p75 ${home}" href="<@spring.url relativeUrl="/"/>">Home</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link ${about}" href="<@spring.url relativeUrl="/about"/>">About</a>
+                        <a class="nav-link ps-2 ps-sm-p75 ${about}" href="<@spring.url relativeUrl="/about"/>">About</a>
                     </li>
                     <#-- STUDENT-only links -->
                     <@requiredRole roles.student>
                         <li class="nav-item">
-                            <a class="nav-link ${profile}" href="<@spring.url relativeUrl="/profile"/>">Profile</a>
+                            <a class="nav-link ps-2 ps-sm-p75 ${profile}" href="<@spring.url relativeUrl="/profile"/>">Profile</a>
                         </li>
                     </@requiredRole>
                     <#-- ADMIN-only links -->
                     <@requiredRole roles.admin>
                         <li class="nav-item">
-                            <a class="nav-link ${dashboard}"
+                            <a class="nav-link ps-2 ps-sm-p75 ${dashboard}"
                                href="<@spring.url relativeUrl="/dashboard"/>">Dashboard</a>
                         </li>
                     </@requiredRole>
@@ -72,19 +72,19 @@
                         <#if SPRING_SECURITY_CONTEXT??>
                             <li class="nav-item"> <#-- user's fName lName -->
                                 <#local user = SPRING_SECURITY_CONTEXT.authentication.getPrincipal()/>
-                                <a class="nav-link ${account}" href="<@spring.url relativeUrl="/account"/>">
+                                <a class="nav-link ps-2 ps-sm-p75 ${account}" href="<@spring.url relativeUrl="/account"/>">
                                     ${user.getFirstName()} ${user.getLastName()}
                                 </a>
                             </li>
                             <li class="nav-item"> <#-- logout button -->
                                 <form action="/logout" method="post" class="d-inline">
                                     <input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}"/>
-                                    <input type="submit" class="btn btn-link nav-link border-0" value="Logout">
+                                    <input type="submit" class="btn btn-link nav-link ps-2 ps-sm-p75 border-0" value="Logout">
                                 </form>
                             </li>
                         <#else>
                             <li class="nav-item">
-                                <a class="nav-link ${login}" href="<@spring.url relativeUrl="/login"/>">Login</a>
+                                <a class="nav-link ps-2 ps-sm-p75 ${login}" href="<@spring.url relativeUrl="/login"/>">Login</a>
                             </li>
                         </#if>
                     </ul>

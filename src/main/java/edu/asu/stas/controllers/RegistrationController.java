@@ -23,6 +23,8 @@ public class RegistrationController {
         this.userService = userService;
     }
 
+    //--- Registration flow
+
     @ModelAttribute("registrationForm")
     public RegistrationForm addRegistrationFormToModel() {
         return new RegistrationForm();
@@ -48,6 +50,8 @@ public class RegistrationController {
         redirectAttributes.addFlashAttribute("registrationSuccess", true);
         return "redirect:/register/verify";
     }
+
+    //--- Account verification flow
 
     @GetMapping("verify")
     public String getVerifyPage(

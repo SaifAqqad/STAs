@@ -1,7 +1,7 @@
 <#ftl output_format="HTML">
 <#import "/spring.ftl" as spring />
 
-<#macro sidebar accountDetails="" accountSecurity="">
+<#macro sidebar accountDetails="" accountSecurity="" accountConnections="">
     <div class="mb-2">
         <span class="fs-4">My Account</span>
         <hr/>
@@ -13,6 +13,10 @@
             <a class="text-decoration-none list-group-item list-group-item-action ${accountSecurity}"
                href="<@spring.url "/account/security"/>">
                 Account security
+            </a>
+            <a class="text-decoration-none list-group-item list-group-item-action ${accountConnections}"
+               href="<@spring.url "/account/connections"/>">
+                Connections
             </a>
         </div>
     </div>
@@ -29,6 +33,11 @@
             ${error}<#sep><br/></#sep>
         </#list>
     </span>
+</#macro>
+
+<#macro hiddenFormElement path>
+    <@spring.bind path="${path}"/>
+    <input type="hidden" name="${(spring.status.expression)!path}" value="${spring.status.value}"/>
 </#macro>
 
 <#macro confirmPasswordScript passwordId confirmPasswordId confirmPasswordFeedbackId>

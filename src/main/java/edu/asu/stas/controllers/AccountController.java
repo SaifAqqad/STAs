@@ -1,22 +1,25 @@
 package edu.asu.stas.controllers;
 
 import edu.asu.stas.data.dto.AccountDetails;
-import edu.asu.stas.data.dto.PasswordForm;
+import edu.asu.stas.data.dto.ChangePasswordForm;
+import edu.asu.stas.data.dto.ResetPasswordForm;
 import edu.asu.stas.data.models.User;
 import edu.asu.stas.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
+import java.util.Objects;
+
 @Controller
-@RequestMapping("/account")
 public class AccountController {
 
     private final UserService userService;
@@ -26,20 +29,71 @@ public class AccountController {
         this.userService = userService;
     }
 
+    //---  Login page
+
+    @GetMapping("/login")
+    public String getLoginPage(Authentication authentication) {
+        if (authentication != null && authentication.isAuthenticated())
+            return "redirect:/";
+        return "account/login";
+    }
+
+    //--- Reset password flow
+
+    @GetMapping("/reset-password")
+    public String getResetPasswordPage(
+            @RequestParam(required = false) String token,
+            Model model
+    ) {
+        if (Objects.nonNull(token) && userService.isResetTokenValid(token)) {
+            if(!model.containsAttribute("resetPasswordForm"))
+                model.addAttribute("resetPasswordForm", new ResetPasswordForm(token));
+            model.addAttribute("showResetForm", true);
+        }
+        return "account/resetPassword";
+    }
+
+    @PostMapping("/reset-password/do")
+    public String postResetPassword(
+            @Validated @ModelAttribute ResetPasswordForm resetPasswordForm,
+            BindingResult bindingResult,
+            RedirectAttributes redirectAttributes
+    ) {
+        if (bindingResult.hasErrors()) {
+            redirectAttributes.addFlashAttribute("org.springframework.validation.BindingResult.resetPasswordForm", bindingResult);
+            redirectAttributes.addFlashAttribute("resetPasswordForm", resetPasswordForm);
+            redirectAttributes.addAttribute("token", resetPasswordForm.getResetToken());
+        }else{
+            userService.resetUserPassword(resetPasswordForm);
+            redirectAttributes.addFlashAttribute("resetSuccess", true);
+        }
+        return "redirect:/reset-password";
+    }
+
+    @PostMapping("/reset-password/request-email")
+    public String postResetPasswordRequest(
+            @RequestParam String email,
+            RedirectAttributes redirectAttributes
+    ) {
+        userService.sendResetPasswordEmail(email);
+        redirectAttributes.addFlashAttribute("requestSuccess", true);
+        return "redirect:/reset-password";
+    }
+
     //---  Account information page
 
     // adds the authenticated user's accountDetails to the model (when needed)
     @ModelAttribute("accountDetails")
     public AccountDetails accountDetails(Authentication authentication) {
-        return new AccountDetails((User) authentication.getPrincipal());
+        return Objects.nonNull(authentication) ? new AccountDetails((User) authentication.getPrincipal()) : null;
     }
 
-    @GetMapping("")
+    @GetMapping("/account")
     public String getAccountDetailsPage() {
         return "account/index";
     }
 
-    @PostMapping("update")
+    @PostMapping("/account/update")
     public String updateAccountDetails(@Validated @ModelAttribute AccountDetails accountDetails,
                                        BindingResult bindingResult,
                                        Authentication authentication,
@@ -59,31 +113,37 @@ public class AccountController {
     //---  Account security page
 
     @ModelAttribute("passwordForm")
-    public PasswordForm addPasswordForm() {
-        return new PasswordForm();
+    public ChangePasswordForm addPasswordForm() {
+        return new ChangePasswordForm();
     }
 
-    @GetMapping("security")
+    @GetMapping("/account/security")
     public String getSecurityPage() {
         return "account/security";
     }
 
-    @PostMapping("security/update")
+    @PostMapping("/account/security/update")
     public String postPasswordForm(
-            @Validated @ModelAttribute PasswordForm passwordForm,
+            @Validated @ModelAttribute ChangePasswordForm changePasswordForm,
             BindingResult bindingResult,
             Authentication authentication,
             RedirectAttributes redirectAttributes
     ) {
         if (bindingResult.hasErrors()) {
             redirectAttributes.addFlashAttribute("org.springframework.validation.BindingResult.passwordForm", bindingResult);
-            redirectAttributes.addFlashAttribute("passwordForm", passwordForm);
+            redirectAttributes.addFlashAttribute("passwordForm", changePasswordForm);
             return "redirect:/account/security?error";
         }
-        userService.updateUserPassword((User) authentication.getPrincipal(), passwordForm);
+        userService.updateUserPassword((User) authentication.getPrincipal(), changePasswordForm);
         redirectAttributes.addFlashAttribute("toast", "Password changed successfully");
         return "redirect:/account/security";
     }
 
+    //---  Connections page
+
+    @GetMapping("/account/connections")
+    public String getConnectionsPage() {
+        return "account/connections";
+    }
 
 }

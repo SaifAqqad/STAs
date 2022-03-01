@@ -1,12 +1,13 @@
 package edu.asu.stas.service;
 
 import edu.asu.stas.data.dao.UserRepository;
-import edu.asu.stas.data.dao.UserVerificationTokenRepository;
+import edu.asu.stas.data.dao.UserTokenRepository;
 import edu.asu.stas.data.dto.AccountDetails;
-import edu.asu.stas.data.dto.PasswordForm;
+import edu.asu.stas.data.dto.ChangePasswordForm;
 import edu.asu.stas.data.dto.RegistrationForm;
+import edu.asu.stas.data.dto.ResetPasswordForm;
 import edu.asu.stas.data.models.User;
-import edu.asu.stas.data.models.UserVerificationToken;
+import edu.asu.stas.data.models.UserToken;
 import edu.asu.stas.lib.TokenGenerator;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -15,22 +16,22 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
-import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.Objects;
 
 @Service
 public class UserService implements UserDetailsService {
     private final UserRepository userRepository;
-    private final UserVerificationTokenRepository verificationTokenRepository;
+    private final UserTokenRepository userTokenRepository;
     private final PasswordEncoder passwordEncoder;
     private final TokenGenerator tokenGenerator;
     private final MailService mailService;
 
     @Autowired
-    public UserService(UserRepository userRepository, UserVerificationTokenRepository verificationTokenRepository,
+    public UserService(UserRepository userRepository, UserTokenRepository userTokenRepository,
                        PasswordEncoder passwordEncoder, TokenGenerator tokenGenerator, MailService mailService) {
         this.userRepository = userRepository;
-        this.verificationTokenRepository = verificationTokenRepository;
+        this.userTokenRepository = userTokenRepository;
         this.passwordEncoder = passwordEncoder;
         this.tokenGenerator = tokenGenerator;
         this.mailService = mailService;
@@ -47,10 +48,6 @@ public class UserService implements UserDetailsService {
         return userRepository.findByEmail(email).orElse(null);
     }
 
-    public User saveUser(User user) {
-        return userRepository.save(user);
-    }
-
     public void registerUser(RegistrationForm form) {
         // create the user
         User user = new User();
@@ -63,11 +60,13 @@ public class UserService implements UserDetailsService {
         user.setEnabled(false);
         user = userRepository.save(user);
         // generate verification token
-        UserVerificationToken token = new UserVerificationToken();
-        token.setToken(tokenGenerator.generateToken(64));
-        token.setUser(user);
-        token.setExpiryDate(LocalDate.now().plusDays(1));
-        token = verificationTokenRepository.save(token);
+        UserToken token = new UserToken(
+                tokenGenerator.generateToken(64),
+                LocalDateTime.now().plusDays(1),
+                UserToken.Type.VERIFICATION,
+                user
+        );
+        token = userTokenRepository.save(token);
         // send verification email
         mailService.sendVerificationEmail(user, token);
     }
@@ -78,29 +77,31 @@ public class UserService implements UserDetailsService {
         if (Objects.isNull(user) || user.isEnabled())
             return;
         // check if the user has an existing verification token
-        var existingToken = verificationTokenRepository.findByUserId(user.getId());
+        UserToken existingToken = userTokenRepository.findByUserIdAndTypeEquals(user.getId(), UserToken.Type.VERIFICATION);
         if (Objects.nonNull(existingToken))
-            verificationTokenRepository.delete(existingToken);
+            userTokenRepository.delete(existingToken);
         // generate a new token
-        UserVerificationToken newToken = new UserVerificationToken();
-        newToken.setToken(tokenGenerator.generateToken(64));
-        newToken.setUser(user);
-        newToken.setExpiryDate(LocalDate.now().plusDays(1));
-        newToken = verificationTokenRepository.save(newToken);
+        UserToken newToken = new UserToken(
+                tokenGenerator.generateToken(64),
+                LocalDateTime.now().plusDays(1),
+                UserToken.Type.VERIFICATION,
+                user
+        );
+        newToken = userTokenRepository.save(newToken);
         // send verification email
         mailService.sendVerificationEmail(user, newToken);
     }
 
     public boolean enableUser(String token) {
         // check if the token exists and is not expired
-        UserVerificationToken verificationToken = verificationTokenRepository.findByToken(token);
-        if (Objects.isNull(verificationToken) || verificationToken.getExpiryDate().isBefore(LocalDate.now())) {
+        UserToken verificationToken = userTokenRepository.findByToken(token);
+        if (Objects.isNull(verificationToken) || verificationToken.getExpiryDate().isBefore(LocalDateTime.now())) {
             return false;
         }
         User user = verificationToken.getUser();
         user.setEnabled(true);
         userRepository.save(user);
-        verificationTokenRepository.delete(verificationToken);
+        userTokenRepository.delete(verificationToken);
         return true;
     }
 
@@ -112,8 +113,44 @@ public class UserService implements UserDetailsService {
         userRepository.save(user);
     }
 
-    public void updateUserPassword(User user, PasswordForm passwordForm) {
-        user.setPassword(passwordEncoder.encode(passwordForm.getNewPassword()));
+    public void updateUserPassword(User user, ChangePasswordForm changePasswordForm) {
+        user.setPassword(passwordEncoder.encode(changePasswordForm.getNewPassword()));
         userRepository.save(user);
+    }
+
+    public void resetUserPassword(ResetPasswordForm resetPasswordForm) {
+        UserToken token = userTokenRepository.findByToken(resetPasswordForm.getResetToken());
+        // if the token doesn't exist or is expired
+        if (Objects.isNull(token) || token.getExpiryDate().isBefore(LocalDateTime.now()))
+            return;
+        User user = token.getUser();
+        user.setPassword(passwordEncoder.encode(resetPasswordForm.getNewPassword()));
+        userRepository.save(user);
+        userTokenRepository.delete(token);
+    }
+
+    public boolean isResetTokenValid(String token) {
+        UserToken userToken = userTokenRepository.findByToken(token);
+        return Objects.nonNull(userToken) && UserToken.Type.RESET_PASSWORD.equals(userToken.getType());
+    }
+
+    public void sendResetPasswordEmail(String email) {
+        User user = findByEmail(email);
+        // if the user exists and is enabled
+        if (Objects.nonNull(user) && user.isEnabled()) {
+            // if an existing reset token exists -> remove it first
+            UserToken existingToken = userTokenRepository.findByUserIdAndTypeEquals(user.getId(), UserToken.Type.RESET_PASSWORD);
+            if (Objects.nonNull(existingToken))
+                userTokenRepository.delete(existingToken);
+            // generate the new token
+            UserToken token = new UserToken();
+            token.setUser(user);
+            token.setExpiryDate(LocalDateTime.now().plusHours(3));
+            token.setType(UserToken.Type.RESET_PASSWORD);
+            token.setToken(tokenGenerator.generateToken(64));
+            token = userTokenRepository.save(token);
+            // send the email
+            mailService.sendResetEmail(user, token);
+        }
     }
 }

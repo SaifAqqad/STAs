@@ -26,7 +26,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
                 .authorizeRequests()
                 .mvcMatchers("/webjars/**", "/images/**", "/css/**", "/js/**").permitAll()
-                .mvcMatchers("/login/**", "/login**", "/register/**", "/register**", "/about", "/").permitAll()
+                .mvcMatchers("/login/**", "/login**", "/register/**", "/register**","/reset-password/**", "/reset-password**", "/about", "/").permitAll()
                 .anyRequest().authenticated()
 
                 .and()

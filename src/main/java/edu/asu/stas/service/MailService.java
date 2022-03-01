@@ -1,7 +1,7 @@
 package edu.asu.stas.service;
 
 import edu.asu.stas.data.models.User;
-import edu.asu.stas.data.models.UserVerificationToken;
+import edu.asu.stas.data.models.UserToken;
 import freemarker.template.Configuration;
 import freemarker.template.Template;
 import freemarker.template.TemplateException;
@@ -16,6 +16,7 @@ import javax.mail.internet.MimeMessage;
 import java.io.IOException;
 import java.io.StringWriter;
 import java.util.Map;
+import java.util.concurrent.CompletableFuture;
 
 import static javax.mail.internet.MimeMessage.RecipientType.TO;
 
@@ -34,23 +35,43 @@ public class MailService {
         this.configuration = configuration;
     }
 
-    public void sendVerificationEmail(User user, UserVerificationToken token) {
+    public void sendVerificationEmail(User user, UserToken token) {
         String baseUrl = ServletUriComponentsBuilder.fromCurrentContextPath().build().toUriString();
         String url = baseUrl + "/register/verify?token=" + token.getToken();
+        CompletableFuture.runAsync(() -> sendMessageFromTemplate(
+                "STAs - Verify your account",
+                user.getEmail(),
+                "email/verify.ftl",
+                Map.of("url", url, "user", user)
+        ));
+    }
+
+    public void sendResetEmail(User user, UserToken token) {
+        String baseUrl = ServletUriComponentsBuilder.fromCurrentContextPath().build().toUriString();
+        String url = baseUrl + "/reset-password?token=" + token.getToken();
+        CompletableFuture.runAsync(() -> sendMessageFromTemplate(
+                "STAs - Reset your password",
+                user.getEmail(),
+                "email/resetPassword.ftl",
+                Map.of("url", url, "user", user)
+        ));
+    }
+
+    private void sendMessageFromTemplate(String subject, String recipient, String templateName, Map<String, Object> params) {
         try {
-            String msg = getMessageFromTemplate("email/verify.ftl", Map.of("url", url, "user", user));
+            String msg = getMessageFromTemplate(templateName, params);
             MimeMessage message = mailSender.createMimeMessage();
             message.setFrom(fromEmail);
-            message.setRecipients(TO, user.getEmail());
-            message.setSubject("STAs - Verify your account");
+            message.setRecipients(TO, recipient);
+            message.setSubject(subject);
             message.setContent(msg, "text/html");
             mailSender.send(message);
         } catch (IOException | MessagingException | TemplateException e) {
-            log.fine("Error while sending verification email: " + e.getMessage());
+            log.fine("Error while sending email: " + e.getMessage());
         }
     }
 
-    public String getMessageFromTemplate(String templateName, Map<String, Object> params) throws IOException, TemplateException {
+    private String getMessageFromTemplate(String templateName, Map<String, Object> params) throws IOException, TemplateException {
         StringWriter stringWriter = new StringWriter();
         Template template = configuration.getTemplate(templateName);
         template.process(params, stringWriter);

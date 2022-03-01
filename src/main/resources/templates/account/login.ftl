@@ -42,7 +42,7 @@
                             <label class="form-check-label" for="remember-me">Remember Me</label>
                         </div>
                         <div class="">
-                            <a class=" link-info text-decoration-none" href="<@spring.url "/login/forgot-password"/>">Forgot password?</a>
+                            <a class=" link-info text-decoration-none" href="<@spring.url "/reset-password"/>">Forgot password?</a>
                         </div>
                     </div>
                     <input class="btn btn-primary w-100" type="submit" value="Log in">

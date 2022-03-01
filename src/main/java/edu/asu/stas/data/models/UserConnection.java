@@ -2,9 +2,10 @@ package edu.asu.stas.data.models;
 
 import lombok.*;
 
-
-import javax.persistence.*;
-import javax.validation.constraints.NotNull;
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.Id;
+import javax.persistence.ManyToOne;
 
 @Entity
 @NoArgsConstructor
@@ -16,15 +17,20 @@ public class UserConnection {
     @GeneratedValue
     private Long id;
 
-    @NotNull
     @NonNull
-    private String name;
-
-    @NotNull
+    private Service service;
+ 
     @NonNull
     private String token;
 
     @ManyToOne(optional = false)
     private User user;
+
+    public enum Service {
+        GITHUB,
+        GOOGLE,
+        FACEBOOK,
+        LINKEDIN,
+    }
 
 }

@@ -11,7 +11,7 @@
 
 <div class="container mt-3">
     <div class="d-flex align-items-center justify-content-center mt-5 mx-md-5">
-        <div class="card border-info mb-3 w-75">
+        <div class="card text-dark bg-light mb-3 w-75">
             <div class="card-header">Request a verification code</div>
             <div class="card-body">
                 <form method="post">

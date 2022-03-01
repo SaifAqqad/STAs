@@ -1,6 +1,5 @@
 package edu.asu.stas.controllers;
 
-import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 
@@ -17,10 +16,4 @@ public class HomeController {
         return "home/about";
     }
 
-    @GetMapping("/login")
-    public String getLoginPage(Authentication authentication) {
-        if (authentication != null && authentication.isAuthenticated())
-            return "redirect:/";
-        return "home/login";
-    }
 }
