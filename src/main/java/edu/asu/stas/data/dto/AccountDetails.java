@@ -1,9 +1,8 @@
 package edu.asu.stas.data.dto;
 
 import edu.asu.stas.data.models.User;
-import edu.asu.stas.data.validation.HasUniqueEmail;
+import edu.asu.stas.data.validation.UniqueEmail;
 import lombok.*;
-import org.springframework.data.annotation.Id;
 import org.springframework.format.annotation.DateTimeFormat;
 
 import javax.validation.constraints.*;
@@ -13,10 +12,7 @@ import java.time.LocalDate;
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
-@HasUniqueEmail
 public class AccountDetails {
-    @Id
-    private Long id;
 
     @NotBlank(message = "First name is required")
     @Pattern(regexp = "[^<>()\\[\\]@#$%^&*!;:\\\\/]+", message = "Special characters are not permitted")
@@ -28,6 +24,7 @@ public class AccountDetails {
 
     @NotBlank(message = "Email is required")
     @Email(message = "Invalid email")
+    @UniqueEmail
     private String email;
 
     @Past(message = "Date of birth must be in the past")
@@ -36,7 +33,6 @@ public class AccountDetails {
     private LocalDate dateOfBirth;
 
     public AccountDetails(@NonNull User user) {
-        this.id = user.getId();
         this.firstName = user.getFirstName();
         this.lastName = user.getLastName();
         this.email = user.getEmail();

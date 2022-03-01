@@ -28,7 +28,7 @@
                 <div class="card-body">
                     <p class="card-text">
                         An error occurred while verifying your account. The verification code might have expired.
-                        Click <a class="link-primary text-decoration-none" href="<@spring.url "/register/requestVerification"/>">here</a> to request a new one.
+                        Click <a class="link-primary text-decoration-none" href="<@spring.url "/register/request-verification"/>">here</a> to request a new one.
                     </p>
                 </div>
             </div>
@@ -41,7 +41,7 @@
                         Please click on the link to verify and enable your account.
                     </p>
                     <p class="card-text">
-                        If you haven't received the email, click <a class="link-primary text-decoration-none" href="<@spring.url "/register/requestVerification"/>">here</a> to request a new one.
+                        If you haven't received the email, click <a class="link-primary text-decoration-none" href="<@spring.url "/register/request-verification"/>">here</a> to request a new one.
                     </p>
                 </div>
             </div>

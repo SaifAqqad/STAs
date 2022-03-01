@@ -22,8 +22,6 @@
             <div class="container mt-2">
                 <h4>Account information</h4>
                 <form class="" action="<@spring.url "/account/update"/>" method="post">
-                    <@spring.bind "accountDetails.id"/>
-                    <input type="hidden" name="id" value="${accountDetails.id}"/>
                     <@default.csrfInput/>
                     <div class="row">
                         <div class="col">
