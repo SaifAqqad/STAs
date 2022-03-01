@@ -3,4 +3,14 @@
         margin-left: 30% !important;
         margin-right: 30% !important;
     }
+    .mx-md-5-5 {
+        margin-left: 25% !important;
+        margin-right: 25% !important;
+    }
+}
+@media (min-width: 992px) {
+    .mx-lg-6 {
+        margin-left: 30% !important;
+        margin-right: 30% !important;
+    }
 }

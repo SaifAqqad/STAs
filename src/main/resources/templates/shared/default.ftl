@@ -3,7 +3,7 @@
 <#global roles = {"student" : "ROLE_STUDENT", "admin": "ROLE_ADMIN"}/>
 
 <#macro head title>
-    <head>
+    <head xmlns="">
         <meta charset="UTF-8">
         <title>${title}</title>
 
@@ -18,6 +18,7 @@
 </#macro>
 
 <#macro scripts>
+    <script src="<@spring.url "/webjars/iconify__iconify/dist/iconify.min.js"/>"></script>
     <script src="<@spring.url "/webjars/bootstrap/js/bootstrap.bundle.min.js"/>"></script>
     <#nested >
 </#macro>
@@ -109,7 +110,7 @@
         if (state) {
             document.addEventListener("DOMContentLoaded", function () {
                 let toastEl = document.getElementById('notification');
-                new bootstrap.Toast(toastEl, {delay: 1500}).show();
+                new bootstrap.Toast(toastEl, {delay: 2000}).show();
             });
         }
     </script>

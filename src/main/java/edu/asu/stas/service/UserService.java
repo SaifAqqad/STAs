@@ -28,7 +28,7 @@ public class UserService implements UserDetailsService {
 
     @Autowired
     public UserService(UserRepository userRepository, UserVerificationTokenRepository verificationTokenRepository,
-            PasswordEncoder passwordEncoder, TokenGenerator tokenGenerator, MailService mailService) {
+                       PasswordEncoder passwordEncoder, TokenGenerator tokenGenerator, MailService mailService) {
         this.userRepository = userRepository;
         this.verificationTokenRepository = verificationTokenRepository;
         this.passwordEncoder = passwordEncoder;
@@ -47,7 +47,7 @@ public class UserService implements UserDetailsService {
         return userRepository.findByEmail(email).orElse(null);
     }
 
-    public User saveUser(User user){
+    public User saveUser(User user) {
         return userRepository.save(user);
     }
 
@@ -92,6 +92,7 @@ public class UserService implements UserDetailsService {
     }
 
     public boolean enableUser(String token) {
+        // check if the token exists and is not expired
         UserVerificationToken verificationToken = verificationTokenRepository.findByToken(token);
         if (Objects.isNull(verificationToken) || verificationToken.getExpiryDate().isBefore(LocalDate.now())) {
             return false;

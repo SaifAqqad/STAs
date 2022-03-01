@@ -46,9 +46,9 @@ public class User implements UserDetails {
     @NonNull
     private String role;
 
-    private String mfaToken;
+    private String token2FA;
 
-    private boolean isUsingMfa;
+    private boolean isUsing2FA;
 
     private boolean isEnabled;
 
