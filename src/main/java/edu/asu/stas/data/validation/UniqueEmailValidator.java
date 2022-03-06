@@ -2,11 +2,12 @@ package edu.asu.stas.data.validation;
 
 import edu.asu.stas.data.dao.UserRepository;
 import edu.asu.stas.data.models.User;
+import edu.asu.stas.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.core.context.SecurityContextHolder;
 
 import javax.validation.ConstraintValidator;
 import javax.validation.ConstraintValidatorContext;
+import java.util.Objects;
 import java.util.Optional;
 
 public class UniqueEmailValidator implements ConstraintValidator<UniqueEmail, String> {
@@ -22,10 +23,11 @@ public class UniqueEmailValidator implements ConstraintValidator<UniqueEmail, St
     @Override
     public boolean isValid(String value, ConstraintValidatorContext context) {
         Optional<User> userWithEmail = userRepository.findByEmail(value.toLowerCase());
-        if (userWithEmail.isEmpty()) // if there's no user with the email
+        if (userWithEmail.isEmpty()) // if there's no user with the email -> valid
             return true;
-        // if there is a user -> check if it's the same as the authenticated user -> still true, else -> false
-        Object authPrinciple = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        return authPrinciple instanceof User authedUser && authedUser.getEmail().equalsIgnoreCase(value.toLowerCase());
+        // else -> get the authenticated user
+        User authedUser = UserService.getAuthenticatedUser();
+        // check if it's the same as the authenticated user -> still valid, else -> invalid
+        return Objects.nonNull(authedUser) && authedUser.getEmail().equalsIgnoreCase(value.toLowerCase());
     }
 }

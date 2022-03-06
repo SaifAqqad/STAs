@@ -21,24 +21,16 @@ public class User implements UserDetails {
     @GeneratedValue
     private Long id;
 
-    @Column(nullable = false)
-    @NonNull
     private String firstName;
 
-    @Column(nullable = false)
-    @NonNull
     private String lastName;
 
     @Column(nullable = false, unique = true)
     @NonNull
     private String email;
 
-    @Column(nullable = false)
-    @NonNull
     private String password;
 
-    @Column(nullable = false)
-    @NonNull
     @DateTimeFormat(pattern = "yyyy-MM-dd")
     private LocalDate dateOfBirth;
 

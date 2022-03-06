@@ -14,7 +14,7 @@ import java.util.Objects;
 
 @Controller
 @RequestMapping("/register")
-public class RegistrationController {
+public class RegistrationController extends RootController{
 
     private final UserService userService;
 

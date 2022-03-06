@@ -22,13 +22,13 @@ public class STAsApplication {
                                             PasswordEncoder passwordEncoder) {
         return args -> {
             if (args.containsOption("addSeedData")) {
-                User user1 = new User(
-                        "Saif",
-                        "Aqqad",
-                        "saif@gmail.com",
-                        passwordEncoder.encode("s1a2i3f4"),
-                        LocalDate.of(1999, 10, 14),
-                        User.Roles.ADMIN);
+                User user1 = new User();
+                user1.setFirstName("Saif");
+                user1.setLastName("Aqqad");
+                user1.setEmail("saif@gmail.com");
+                user1.setPassword(passwordEncoder.encode("s1a2i3f4"));
+                user1.setDateOfBirth(LocalDate.of(1999, 10, 14));
+                user1.setRole(User.Roles.ADMIN);
                 user1.setEnabled(true);
                 userRepository.save(user1);
             }

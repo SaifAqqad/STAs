@@ -20,7 +20,7 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import java.util.Objects;
 
 @Controller
-public class AccountController {
+public class AccountController extends RootController {
 
     private final UserService userService;
 
@@ -38,54 +38,13 @@ public class AccountController {
         return "account/login";
     }
 
-    //--- Reset password flow
-
-    @GetMapping("/reset-password")
-    public String getResetPasswordPage(
-            @RequestParam(required = false) String token,
-            Model model
-    ) {
-        if (Objects.nonNull(token) && userService.isResetTokenValid(token)) {
-            if(!model.containsAttribute("resetPasswordForm"))
-                model.addAttribute("resetPasswordForm", new ResetPasswordForm(token));
-            model.addAttribute("showResetForm", true);
-        }
-        return "account/resetPassword";
-    }
-
-    @PostMapping("/reset-password/do")
-    public String postResetPassword(
-            @Validated @ModelAttribute ResetPasswordForm resetPasswordForm,
-            BindingResult bindingResult,
-            RedirectAttributes redirectAttributes
-    ) {
-        if (bindingResult.hasErrors()) {
-            redirectAttributes.addFlashAttribute("org.springframework.validation.BindingResult.resetPasswordForm", bindingResult);
-            redirectAttributes.addFlashAttribute("resetPasswordForm", resetPasswordForm);
-            redirectAttributes.addAttribute("token", resetPasswordForm.getResetToken());
-        }else{
-            userService.resetUserPassword(resetPasswordForm);
-            redirectAttributes.addFlashAttribute("resetSuccess", true);
-        }
-        return "redirect:/reset-password";
-    }
-
-    @PostMapping("/reset-password/request-email")
-    public String postResetPasswordRequest(
-            @RequestParam String email,
-            RedirectAttributes redirectAttributes
-    ) {
-        userService.sendResetPasswordEmail(email);
-        redirectAttributes.addFlashAttribute("requestSuccess", true);
-        return "redirect:/reset-password";
-    }
-
     //---  Account information page
 
     // adds the authenticated user's accountDetails to the model (when needed)
-    @ModelAttribute("accountDetails")
-    public AccountDetails accountDetails(Authentication authentication) {
-        return Objects.nonNull(authentication) ? new AccountDetails((User) authentication.getPrincipal()) : null;
+    @ModelAttribute
+    public void accountDetails(Model model) {
+        User user = getAuthenticatedUser();
+        model.addAttribute("accountDetails", Objects.nonNull(user) ? new AccountDetails(user) : null);
     }
 
     @GetMapping("/account")
@@ -96,7 +55,6 @@ public class AccountController {
     @PostMapping("/account/update")
     public String updateAccountDetails(@Validated @ModelAttribute AccountDetails accountDetails,
                                        BindingResult bindingResult,
-                                       Authentication authentication,
                                        RedirectAttributes redirectAttributes) {
         if (bindingResult.hasErrors()) {
             // flash attributes are saved and then passed to the next request as model attributes
@@ -105,7 +63,7 @@ public class AccountController {
             redirectAttributes.addFlashAttribute("accountDetails", accountDetails);
             return "redirect:/account?error";
         }
-        userService.updateUserByAccountDetails((User) authentication.getPrincipal(), accountDetails);
+        userService.updateUserByAccountDetails(Objects.requireNonNull(getAuthenticatedUser()), accountDetails);
         redirectAttributes.addFlashAttribute("toast", "Changes saved successfully");
         return "redirect:/account";
     }
@@ -126,7 +84,6 @@ public class AccountController {
     public String postPasswordForm(
             @Validated @ModelAttribute ChangePasswordForm changePasswordForm,
             BindingResult bindingResult,
-            Authentication authentication,
             RedirectAttributes redirectAttributes
     ) {
         if (bindingResult.hasErrors()) {
@@ -134,7 +91,7 @@ public class AccountController {
             redirectAttributes.addFlashAttribute("passwordForm", changePasswordForm);
             return "redirect:/account/security?error";
         }
-        userService.updateUserPassword((User) authentication.getPrincipal(), changePasswordForm);
+        userService.updateUserPassword(Objects.requireNonNull(getAuthenticatedUser()), changePasswordForm);
         redirectAttributes.addFlashAttribute("toast", "Password changed successfully");
         return "redirect:/account/security";
     }
@@ -146,4 +103,45 @@ public class AccountController {
         return "account/connections";
     }
 
+    //--- Reset password flow
+
+    @GetMapping("/reset-password")
+    public String getResetPasswordPage(
+            @RequestParam(required = false) String token,
+            Model model
+    ) {
+        if (Objects.nonNull(token) && userService.isResetTokenValid(token)) {
+            if (!model.containsAttribute("resetPasswordForm"))
+                model.addAttribute("resetPasswordForm", new ResetPasswordForm(token));
+            model.addAttribute("showResetForm", true);
+        }
+        return "account/resetPassword";
+    }
+
+    @PostMapping("/reset-password/do")
+    public String postResetPassword(
+            @Validated @ModelAttribute ResetPasswordForm resetPasswordForm,
+            BindingResult bindingResult,
+            RedirectAttributes redirectAttributes
+    ) {
+        if (bindingResult.hasErrors()) {
+            redirectAttributes.addFlashAttribute("org.springframework.validation.BindingResult.resetPasswordForm", bindingResult);
+            redirectAttributes.addFlashAttribute("resetPasswordForm", resetPasswordForm);
+            redirectAttributes.addAttribute("token", resetPasswordForm.getResetToken());
+        } else {
+            userService.resetUserPassword(resetPasswordForm);
+            redirectAttributes.addFlashAttribute("resetSuccess", true);
+        }
+        return "redirect:/reset-password";
+    }
+
+    @PostMapping("/reset-password/request-email")
+    public String postResetPasswordRequest(
+            @RequestParam String email,
+            RedirectAttributes redirectAttributes
+    ) {
+        userService.sendResetPasswordEmail(email);
+        redirectAttributes.addFlashAttribute("requestSuccess", true);
+        return "redirect:/reset-password";
+    }
 }

@@ -9,4 +9,5 @@ import java.util.List;
 @Repository
 public interface UserConnectionRepository extends CrudRepository<UserConnection, Long> {
     List<UserConnection> findAllByUserId(Long userId);
+    UserConnection findByServiceNameAndServiceUserId(String serviceName, String serviceUserId);
 }
