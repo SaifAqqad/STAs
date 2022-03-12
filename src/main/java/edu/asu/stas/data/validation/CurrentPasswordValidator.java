@@ -21,7 +21,6 @@ public class CurrentPasswordValidator implements ConstraintValidator<CurrentPass
     @Override
     public boolean isValid(String value, ConstraintValidatorContext context) {
         User authedUser = UserService.getAuthenticatedUser();
-
         return Objects.nonNull(authedUser)
                 && (Objects.isNull(authedUser.getPassword()) || passwordEncoder.matches(value, authedUser.getPassword()));
     }

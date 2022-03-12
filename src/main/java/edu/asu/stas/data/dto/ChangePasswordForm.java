@@ -14,7 +14,6 @@ import javax.validation.constraints.NotBlank;
 @NoArgsConstructor
 public class ChangePasswordForm {
 
-    @NotBlank(message = "Current password is required")
     @CurrentPassword
     private String currentPassword="";
 

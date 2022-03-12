@@ -69,17 +69,19 @@
                 <div class="d-flex">
                     <ul class="navbar-nav me-2 mb-2 mb-lg-0 w-100">
                         <#-- if the user is authenticated -->
-                        <#if SPRING_SECURITY_CONTEXT??>
+                        <#if authenticatedUser??>
                             <li class="nav-item"> <#-- user's fName lName -->
-                                <#local user = SPRING_SECURITY_CONTEXT.authentication.getPrincipal()/>
+                                <#local user = authenticatedUser/>
                                 <a class="nav-link ps-2 ps-sm-p75 ${account}" href="<@spring.url relativeUrl="/account"/>">
-                                    ${user.getFirstName()} ${user.getLastName()}
+                                    <#if user.firstName??>
+                                        ${user.getFirstName()} ${user.getLastName()!""}
+                                    </#if>
                                 </a>
                             </li>
                             <li class="nav-item"> <#-- logout button -->
                                 <form action="/logout" method="post" class="d-inline">
                                     <input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}"/>
-                                    <input type="submit" class="btn btn-link nav-link ps-2 ps-sm-p75 border-0" value="Logout">
+                                    <input type="submit" class="btn w-100 text-start nav-link ps-2 ps-sm-p75 border-0" value="Logout">
                                 </form>
                             </li>
                         <#else>
@@ -122,8 +124,8 @@
 
 <#macro requiredRole Role>
     <#assign authorized = false>
-    <#if SPRING_SECURITY_CONTEXT??>
-        <#list SPRING_SECURITY_CONTEXT.authentication.authorities as authority>
+    <#if authenticatedUser??>
+        <#list authenticatedUser.authorities as authority>
             <#if authority == Role>
                 <#assign authorized = true>
             </#if>
@@ -136,8 +138,8 @@
 
 <#macro requiresAnyRole Roles>
     <#assign authorized = false>
-    <#if SPRING_SECURITY_CONTEXT??>
-        <#list SPRING_SECURITY_CONTEXT.authentication.authorities as authority>
+    <#if authenticatedUser??>
+        <#list authenticatedUser.authorities as authority>
             <#list Roles as role>
                 <#if authority == role>
                     <#assign authorized = true>

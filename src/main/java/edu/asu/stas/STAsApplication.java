@@ -6,6 +6,7 @@ import org.springframework.boot.ApplicationRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Bean;
+import org.springframework.dao.DataAccessException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
 import java.time.LocalDate;
@@ -22,15 +23,21 @@ public class STAsApplication {
                                             PasswordEncoder passwordEncoder) {
         return args -> {
             if (args.containsOption("addSeedData")) {
-                User user1 = new User();
-                user1.setFirstName("Saif");
-                user1.setLastName("Aqqad");
-                user1.setEmail("saif@gmail.com");
-                user1.setPassword(passwordEncoder.encode("s1a2i3f4"));
-                user1.setDateOfBirth(LocalDate.of(1999, 10, 14));
-                user1.setRole(User.Roles.ADMIN);
-                user1.setEnabled(true);
-                userRepository.save(user1);
+                try {
+                    User user1 = new User();
+                    user1.setFirstName("Saif");
+                    user1.setLastName("Aqqad");
+                    user1.setEmail("saif@gmail.com");
+                    user1.setPassword(passwordEncoder.encode("s1a2i3f4"));
+                    user1.setDateOfBirth(LocalDate.of(1999, 10, 14));
+                    user1.setRole(User.Roles.ADMIN);
+                    user1.setEnabled(true);
+                    user1.setUsing2FA(true);
+                    user1.setToken2FA("nawe7iztipzn7ksbwkglyx56stl5uet7");
+                    userRepository.save(user1);
+                }catch(DataAccessException ignored){
+                    // do nothing
+                }
             }
         };
     }

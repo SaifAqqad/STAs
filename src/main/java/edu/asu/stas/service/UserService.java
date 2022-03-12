@@ -1,5 +1,6 @@
 package edu.asu.stas.service;
 
+import dev.samstevens.totp.code.CodeVerifier;
 import edu.asu.stas.data.dao.UserConnectionRepository;
 import edu.asu.stas.data.dao.UserRepository;
 import edu.asu.stas.data.dao.UserTokenRepository;
@@ -43,16 +44,19 @@ public class UserService implements UserDetailsService, OAuth2UserService<OAuth2
     private final TokenGenerator tokenGenerator;
     private final MailService mailService;
     private final UserConnectionRepository userConnectionRepository;
+    private final CodeVerifier totpVerifier;
+
 
     @Autowired
     public UserService(UserRepository userRepository, UserTokenRepository userTokenRepository,
-                       PasswordEncoder passwordEncoder, TokenGenerator tokenGenerator, MailService mailService, UserConnectionRepository userConnectionRepository) {
+                       PasswordEncoder passwordEncoder, TokenGenerator tokenGenerator, MailService mailService, UserConnectionRepository userConnectionRepository, CodeVerifier totpVerifier) {
         this.userRepository = userRepository;
         this.userTokenRepository = userTokenRepository;
         this.passwordEncoder = passwordEncoder;
         this.tokenGenerator = tokenGenerator;
         this.mailService = mailService;
         this.userConnectionRepository = userConnectionRepository;
+        this.totpVerifier = totpVerifier;
     }
 
     public static User getAuthenticatedUser() {
@@ -199,10 +203,10 @@ public class UserService implements UserDetailsService, OAuth2UserService<OAuth2
         UserConnection existingUserConnection = userConnectionRepository.findByServiceNameAndServiceUserId(serviceName, serviceUserId);
         if (existingUserConnection != null) {
             // if there is no authenticated user OR the existing userConnection belongs to the authenticated user
-            if(authedUser == null || authedUser.getId().equals(existingUserConnection.getUser().getId()))
+            if (authedUser == null || authedUser.getId().equals(existingUserConnection.getUser().getId()))
                 return updateUserConnection(existingUserConnection, userRequest, userProfile);
             else
-                throw new OAuth2AuthenticationException(new OAuth2Error(OAuth2ErrorCodes.ACCESS_DENIED,"This %s account is already connected to another user.".formatted(serviceName),""));
+                throw new OAuth2AuthenticationException(new OAuth2Error(OAuth2ErrorCodes.ACCESS_DENIED, "This %s account is already connected to another user.".formatted(userRequest.getClientRegistration().getClientName()), ""));
         }
 
         // check if the user is already authenticated and tried to oauth
@@ -246,4 +250,19 @@ public class UserService implements UserDetailsService, OAuth2UserService<OAuth2
         user = userRepository.save(user);
         return createUserConnection(user, userRequest, userProfile);
     }
+
+    public boolean is2FACodeValid(User user, String code) {
+        return isValidLong(code) && totpVerifier.isValidCode(user.getToken2FA(), code);
+    }
+
+    private boolean isValidLong(String code) {
+        try {
+            Long.parseLong(code);
+        } catch (NumberFormatException e) {
+            return false;
+        }
+        return true;
+    }
+
+
 }

@@ -26,7 +26,7 @@
     <@spring.bind path="${path}"/>
     <input class="form-control <#if spring.status.error>is-invalid</#if>" type="${type}"
            name="${spring.status.expression}" id="${spring.status.expression}" ${attrb?no_esc}
-           placeholder="${placeholder}" value="${bindValue?then(spring.status.value,"")}">
+           placeholder="${placeholder}" value="${bindValue?then(spring.status.value!"","")}">
     <label class="form-label" for="${spring.status.expression}">${label}</label>
     <span class="invalid-feedback">
         <#list (spring.status.errorMessage)?split("-") as error>

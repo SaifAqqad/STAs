@@ -3,6 +3,7 @@ package edu.asu.stas.controllers;
 import edu.asu.stas.data.dto.RegistrationForm;
 import edu.asu.stas.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
@@ -14,7 +15,7 @@ import java.util.Objects;
 
 @Controller
 @RequestMapping("/register")
-public class RegistrationController extends RootController{
+public class RegistrationController {
 
     private final UserService userService;
 
@@ -31,7 +32,9 @@ public class RegistrationController extends RootController{
     }
 
     @GetMapping("")
-    public String getRegistrationPage() {
+    public String getRegistrationPage(Authentication authentication) {
+        if (authentication != null && authentication.isAuthenticated())
+            return "redirect:/";
         return "registration/index";
     }
 

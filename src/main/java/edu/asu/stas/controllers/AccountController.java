@@ -6,7 +6,6 @@ import edu.asu.stas.data.dto.ResetPasswordForm;
 import edu.asu.stas.data.models.User;
 import edu.asu.stas.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
@@ -20,7 +19,7 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import java.util.Objects;
 
 @Controller
-public class AccountController extends RootController {
+public class AccountController {
 
     private final UserService userService;
 
@@ -29,22 +28,13 @@ public class AccountController extends RootController {
         this.userService = userService;
     }
 
-    //---  Login page
-
-    @GetMapping("/login")
-    public String getLoginPage(Authentication authentication) {
-        if (authentication != null && authentication.isAuthenticated())
-            return "redirect:/";
-        return "account/login";
-    }
-
     //---  Account information page
 
     // adds the authenticated user's accountDetails to the model (when needed)
     @ModelAttribute
-    public void accountDetails(Model model) {
-        User user = getAuthenticatedUser();
-        model.addAttribute("accountDetails", Objects.nonNull(user) ? new AccountDetails(user) : null);
+    public AccountDetails accountDetails() {
+        User user = UserService.getAuthenticatedUser();
+        return Objects.nonNull(user) ? new AccountDetails(user) : null;
     }
 
     @GetMapping("/account")
@@ -63,7 +53,7 @@ public class AccountController extends RootController {
             redirectAttributes.addFlashAttribute("accountDetails", accountDetails);
             return "redirect:/account?error";
         }
-        userService.updateUserByAccountDetails(Objects.requireNonNull(getAuthenticatedUser()), accountDetails);
+        userService.updateUserByAccountDetails(Objects.requireNonNull(UserService.getAuthenticatedUser()), accountDetails);
         redirectAttributes.addFlashAttribute("toast", "Changes saved successfully");
         return "redirect:/account";
     }
@@ -76,7 +66,10 @@ public class AccountController extends RootController {
     }
 
     @GetMapping("/account/security")
-    public String getSecurityPage() {
+    public String getSecurityPage(Model model) {
+        User user = Objects.requireNonNull(UserService.getAuthenticatedUser());
+        if (Objects.isNull(user.getPassword()))
+            model.addAttribute("currentPasswordDisabled", true);
         return "account/security";
     }
 
@@ -91,7 +84,7 @@ public class AccountController extends RootController {
             redirectAttributes.addFlashAttribute("passwordForm", changePasswordForm);
             return "redirect:/account/security?error";
         }
-        userService.updateUserPassword(Objects.requireNonNull(getAuthenticatedUser()), changePasswordForm);
+        userService.updateUserPassword(Objects.requireNonNull(UserService.getAuthenticatedUser()), changePasswordForm);
         redirectAttributes.addFlashAttribute("toast", "Password changed successfully");
         return "redirect:/account/security";
     }
