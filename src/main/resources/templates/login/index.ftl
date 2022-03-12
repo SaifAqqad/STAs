@@ -10,7 +10,7 @@
 
 <body>
 <@default.navbar login="active"/>
-<#assign loginError = SPRING_SECURITY_LAST_EXCEPTION?? && RequestParameters.error??/>
+<#assign loginError = authError?? && RequestParameters.error??/>
 
 <div class="container">
     <div class="d-flex align-items-center justify-content-center mt-5 mx-md-5-5 mx-lg-6">
@@ -24,7 +24,7 @@
                 </#if>
                 <#-- Login form -->
                 <#-- TODO: Add "sign in with __" buttons -->
-                <form class="w-100" method="post">
+                <form action="<@spring.url"/login/do"/>" class="w-100" method="post">
                     <@default.csrfInput/>
                     <div class="form-floating mb-3">
                         <input class="form-control" type="email" name="email" id="email" placeholder="Email Address"
@@ -36,16 +36,24 @@
                                required/>
                         <label class="form-label" for="password">Password</label>
                     </div>
-                    <div class="d-flex justify-content-between">
-                        <div class="form-check mb-3">
-                            <input class="form-check-input" type="checkbox" id="remember-me" name="remember-me"/>
-                            <label class="form-check-label" for="remember-me">Remember Me</label>
-                        </div>
+                    <div class="d-flex justify-content-end mb-2">
                         <div class="">
-                            <a class=" link-info text-decoration-none" href="<@spring.url "/reset-password"/>">Forgot password?</a>
+                            <a class=" link-info text-decoration-none" href="<@spring.url "/reset-password"/>">Forgot
+                                password?</a>
                         </div>
                     </div>
                     <input class="btn btn-primary w-100" type="submit" value="Log in">
+                    <div class="w-100">
+                        <a class="btn btn-dark w-100 mt-3" href="<@spring.url "/login/oauth/github"/>">
+                            <span class="align-bottom iconify-inline" data-icon="mdi:github" data-width="24"></span>
+                            <span class="align-text-bottom">Log in with GitHub</span>
+                        </a>
+                        <a class="btn btn-linkedin w-100 mt-2" href="<@spring.url "/login/oauth/linkedin"/>">
+                            <span class="align-bottom iconify-inline" data-icon="akar-icons:linkedin-box-fill"
+                                  data-width="24"></span>
+                            <span class="align-text-bottom">Log in with LinkedIn</span>
+                        </a>
+                    </div>
                     <hr/>
                     <#-- Registration button -->
                     <div class="d-flex justify-content-center w-100">
