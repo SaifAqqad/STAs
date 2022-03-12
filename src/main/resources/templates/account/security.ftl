@@ -25,7 +25,7 @@
                             <form action="<@spring.url "/account/security/update"/>" method="post">
                                 <@default.csrfInput/>
                                 <div class="form-floating mt-3">
-                                    <@account.formElement path="passwordForm.currentPassword" label="Current password" type="password" attrb="required" placeholder="Current password" bindValue=false />
+                                    <@account.formElement path="passwordForm.currentPassword" label="Current password" type="password" attrb=(currentPasswordDisabled??)?then("disabled","") placeholder="Current password" bindValue=false />
                                 </div>
                                 <div class="form-floating mt-3">
                                     <@account.formElement path="passwordForm.newPassword" label="New password" type="password" attrb="required" placeholder="New password" bindValue=false/>
@@ -43,21 +43,21 @@
                             </form>
                         </div>
                     </div>
-                    <div class="card mt-3">
-                        <div class="card-body">
-                            <h6>Two-factor authentication</h6>
-                            <form id="" action="<@spring.url "/account/security/set-2fa"/>" method="post">
-                                <@default.csrfInput/>
-                                <div class="form-check form-switch">
-                                    <input class="form-check-input" type="checkbox" role="switch"
-                                           ${(twoFactorState??)?then("checked","")} name="twoFactorState"
-                                           id="twoFactorState">
-                                    <label class="form-check-label" for="twoFactorState">Enabled</label>
-                                </div>
-                            </form>
-                            <div></div>
-                        </div>
-                    </div>
+<#--                    <div class="card mt-3">-->
+<#--                        <div class="card-body">-->
+<#--                            <h6>Two-factor authentication</h6>-->
+<#--                            <form id="" action="<@spring.url "/account/security/set-2fa"/>" method="post">-->
+<#--                                <@default.csrfInput/>-->
+<#--                                <div class="form-check form-switch">-->
+<#--                                    <input class="form-check-input" type="checkbox" role="switch"-->
+<#--                                           ${(twoFactorState??)?then("checked","")} name="twoFactorState"-->
+<#--                                           id="twoFactorState">-->
+<#--                                    <label class="form-check-label" for="twoFactorState">Enabled</label>-->
+<#--                                </div>-->
+<#--                            </form>-->
+<#--                            <div></div>-->
+<#--                        </div>-->
+<#--                    </div>-->
                 </div>
             </div>
         </div>
