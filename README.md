@@ -10,46 +10,48 @@ You will need the following:
 To install them, run the following in powershell
 
 1. Install scoop
-```Powershell
+    ```Powershell
     Set-ExecutionPolicy RemoteSigned -scope CurrentUser;
     iwr -useb get.scoop.sh | iex;
-```
+    ```
 
 2. Install git and add the java bucket
-```powershell
+    ```powershell
     scoop install git gh sudo;
     scoop bucket add java
-```
+    ```
 
 3. Install the dependencies
-```powershell
+    ```powershell
     scoop install temurin17-jdk maven nodejs-lts mysql mysql-workbench;
-```
+    ```
 
 4. Install MailDev
-```powershell
+    ```powershell
     npm install -g maildev
-```
+    ```
 
 5. Install MySQL service
-```powershell
-    sudo mysqld.exe --install-manual mysql
-```
+    ```powershell
+    sudo mysqld.exe --install-manual mysql --defaults-file="$env:userprofile\scoop\apps\mysql\current\my.ini"
+    ```
 
 7. Sign in to GitHub with gh
-```powershell
+
+    <sub><b>You need to use the `SSH` protocol</b></sub>
+    ```powershell
     gh auth login;
     gh auth setup-git;
-```
+    ```
 
 6. Clone the repo
-```powershell
+    ```powershell
     gh repo clone SaifAqqad/STAs
-```
+    ```
 
 ### Run MySQL service:
 ```powershell
-   sudo sc.exe start mysql
+sudo sc.exe start mysql
 ```
 
 * <sub>MySQL default port: `3306`</sub>
@@ -58,5 +60,14 @@ To install them, run the following in powershell
 
 ### Run MailDev:
 ```powershell
-    ~\scoop\apps\nodejs-lts\current\bin\maildev.cmd
+maildev
+```
+
+### Run the application from powershell:
+```powershell
+mvn spring-boot:run
+```
+#### or to add the seed data
+```powershell
+mvn spring-boot:run "-Dspring-boot.run.arguments=--addSeedData"
 ```
