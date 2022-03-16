@@ -44,7 +44,11 @@
                     </div>
                     <input class="btn btn-primary w-100" type="submit" value="Log in">
                     <div class="w-100">
-                        <a class="btn btn-dark w-100 mt-3" href="<@spring.url "/login/oauth/github"/>">
+                        <a class="btn btn-outline-light w-100 mt-3" href="<@spring.url "/login/oauth/google"/>">
+                            <span class="align-bottom iconify-inline" data-icon="flat-color-icons:google" data-width="24"></span>
+                            <span class="align-text-bottom">Log in with Google</span>
+                        </a>
+                        <a class="btn btn-dark w-100 mt-2" href="<@spring.url "/login/oauth/github"/>">
                             <span class="align-bottom iconify-inline" data-icon="mdi:github" data-width="24"></span>
                             <span class="align-text-bottom">Log in with GitHub</span>
                         </a>

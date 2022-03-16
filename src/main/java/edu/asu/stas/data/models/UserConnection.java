@@ -59,6 +59,7 @@ public class UserConnection implements OAuth2User {
     public static final class Type {
         public static final String GITHUB = "github";
         public static final String LINKEDIN = "linkedin";
+        public static final String GOOGLE = "google";
     }
 
 }

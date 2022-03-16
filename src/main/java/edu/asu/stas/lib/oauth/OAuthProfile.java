@@ -13,6 +13,14 @@ public interface OAuthProfile {
     static OAuthProfile getOAuthProfile(OAuth2UserRequest request, OAuth2User user) {
         String serviceName = request.getClientRegistration().getRegistrationId();
         return switch (serviceName) {
+            // Map Google users
+            case UserConnection.Type.GOOGLE -> {
+                String[] fullName = requireNonNull((String) user.getAttribute("name")).split("\\s", 2);
+                String firstName = fullName[0];
+                String lastName = fullName.length > 1 ? fullName[1] : "";
+                String email = requireNonNull(user.getAttribute("email"));
+                yield new GoogleProfile(user.getName(), firstName, lastName, email, user.getAttributes());
+            }
             // Map GitHub users
             case UserConnection.Type.GITHUB -> {
                 String[] fullName = requireNonNull((String) user.getAttribute("name")).split("\\s", 2);
