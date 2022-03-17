@@ -10,7 +10,7 @@
 <body>
 <@default.navbar account="active"/>
 
-<div class="container-fluid mt-3">
+<div class="container-fluid my-3">
     <div class="row">
         <div class="col-sm-3">
             <@account.sidebar accountSecurity="active"/>
@@ -43,21 +43,37 @@
                             </form>
                         </div>
                     </div>
-<#--                    <div class="card mt-3">-->
-<#--                        <div class="card-body">-->
-<#--                            <h6>Two-factor authentication</h6>-->
-<#--                            <form id="" action="<@spring.url "/account/security/set-2fa"/>" method="post">-->
-<#--                                <@default.csrfInput/>-->
-<#--                                <div class="form-check form-switch">-->
-<#--                                    <input class="form-check-input" type="checkbox" role="switch"-->
-<#--                                           ${(twoFactorState??)?then("checked","")} name="twoFactorState"-->
-<#--                                           id="twoFactorState">-->
-<#--                                    <label class="form-check-label" for="twoFactorState">Enabled</label>-->
-<#--                                </div>-->
-<#--                            </form>-->
-<#--                            <div></div>-->
-<#--                        </div>-->
-<#--                    </div>-->
+                    <div class="card mt-3">
+                        <div class="card-body">
+                            <h6 class="mb-0">
+                                Two-factor authentication
+                                <span class="form-check-inline form-switch mx-2 mb-1">
+                                      <input class="form-check-input" type="checkbox" role="switch"
+                                             id="twoFactorSwitch" aria-label="Two-factor authentication">
+                                </span>
+                            </h6>
+                            <#if twoFactorSecret??>
+                                <div class="card-text">
+                                    Scan this QR code with your authenticator app (e.g. Google Authenticator).
+                                    <br>
+                                    If you can't scan the QR code, click the button below it to reveal the secret then
+                                    enter it in the authenticator app.
+                                </div>
+                                <div class="card text-center mt-3" style="width: 256px;">
+                                    <img src="https://chart.googleapis.com/chart?cht=qr&chs=256x256&chld=H|0&chl=FDSHJ476DJKJ2438RFJ534535fdfgfdgdg"
+                                         class="img-fluid rounded" width="256" alt="QR Code">
+                                    <button class="btn btn-primary rounded-0 rounded-bottom">Reveal secret</button>
+                                </div>
+                            </#if>
+                            <form id="form_2fa" action="<@spring.url "/account/security/set-2fa"/>"
+                                  class="visually-hidden"
+                                  action="<@spring.url "/account/security/set-2fa"/>" method="post">
+                                <@default.csrfInput/>
+                                <input type="hidden" id="twoFactorState" name="state"/>
+                                <input type="hidden" id="twoFactorCode" name="code"/>
+                            </form>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
@@ -69,8 +85,9 @@
 <@default.toast />
 <script>
     const twoFactorSwitch = document.getElementById("twoFactorState");
-    twoFactorSwitch.addEventListener("click", function () {
-        twoFactorSwitch.form.submit();
+    twoFactorSwitch.addEventListener("click", function (e) {
+
+
     })
 </script>
 </body>
