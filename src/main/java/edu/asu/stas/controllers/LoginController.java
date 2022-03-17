@@ -5,6 +5,7 @@ import edu.asu.stas.data.models.User;
 import edu.asu.stas.data.models.UserConnection;
 import edu.asu.stas.service.UserService;
 import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.DisabledException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
@@ -74,6 +75,8 @@ public class LoginController {
             );
         } catch (AuthenticationException e) {
             redirectAttributes.addFlashAttribute("authError", true);
+            if(e instanceof DisabledException)
+                redirectAttributes.addFlashAttribute("errorType", 1);
             return "redirect:/login?error";
         }
         if (isUsing2FA(authentication)) {

@@ -19,7 +19,13 @@
             <div class="card-body">
                 <#if loginError>
                     <div class="alert alert-danger" role="alert">
-                        An error occurred while logging in, please check your credentials and try again.
+                        <#switch errorType!0>
+                            <#case 1>
+                                Your account is unverified, click the link in the email we sent to verify your account, or click <a class="link-danger" href="<@spring.url "/register/request-verification"/>">here</a> to request a new link.
+                                <#break>
+                            <#default >
+                            An error occurred while logging in, please check your credentials and try again.
+                        </#switch>
                     </div>
                 </#if>
                 <#-- Login form -->
