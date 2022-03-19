@@ -22,10 +22,10 @@
                     <div class="card mt-3">
                         <div class="card-body">
                             <h6>Change your password</h6>
-                            <form action="<@spring.url "/account/security/update"/>" method="post">
+                            <form action="<@spring.url "/account/security/update-password"/>" method="post">
                                 <@default.csrfInput/>
                                 <div class="form-floating mt-3">
-                                    <@account.formElement path="passwordForm.currentPassword" label="Current password" type="password" attrb=(currentPasswordDisabled??)?then("disabled","") placeholder="Current password" bindValue=false />
+                                    <@account.formElement path="passwordForm.currentPassword" label="Current password" type="password" attrb=(isCurrentPasswordDisabled??)?then("disabled","") placeholder="Current password" bindValue=false />
                                 </div>
                                 <div class="form-floating mt-3">
                                     <@account.formElement path="passwordForm.newPassword" label="New password" type="password" attrb="required" placeholder="New password" bindValue=false/>
@@ -49,6 +49,7 @@
                                 Two-factor authentication
                                 <span class="form-check-inline form-switch mx-2 mb-1">
                                       <input class="form-check-input" type="checkbox" role="switch"
+                                             ${(twoFactorState!false)?then("checked","")}
                                              id="twoFactorSwitch" aria-label="Two-factor authentication">
                                 </span>
                             </h6>
@@ -59,22 +60,65 @@
                                     If you can't scan the QR code, click the button below it to reveal the secret then
                                     enter it in the authenticator app.
                                 </div>
+                                <div class="text-danger fw-bold">The secret will disappear if you refresh or leave this
+                                    page
+                                </div>
                                 <div class="card text-center mt-3" style="width: 256px;">
-                                    <img src="https://chart.googleapis.com/chart?cht=qr&chs=256x256&chld=H|0&chl=FDSHJ476DJKJ2438RFJ534535fdfgfdgdg"
-                                         class="img-fluid rounded" width="256" alt="QR Code">
-                                    <button class="btn btn-primary rounded-0 rounded-bottom">Reveal secret</button>
+                                    <div class="ratio ratio-1x1">
+                                        <img src="${twoFactorSecretQR!""}" class="img-fluid rounded" width="256"
+                                             alt="QR Code">
+                                    </div>
+                                    <button class="btn btn-primary rounded-0 rounded-bottom" id="revealSecretButton">
+                                        Reveal secret
+                                    </button>
                                 </div>
                             </#if>
-                            <form id="form_2fa" action="<@spring.url "/account/security/set-2fa"/>"
-                                  class="visually-hidden"
-                                  action="<@spring.url "/account/security/set-2fa"/>" method="post">
-                                <@default.csrfInput/>
-                                <input type="hidden" id="twoFactorState" name="state"/>
-                                <input type="hidden" id="twoFactorCode" name="code"/>
-                            </form>
                         </div>
                     </div>
                 </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="twoFactorModal" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Two-factor authentication</h5>
+            </div>
+            <div class="modal-body">
+                <div>Open the two-factor authenticator (TOTP) app on your mobile device to view your authentication
+                    code.
+                </div>
+                <form id="form2fa" action="<@spring.url "/account/security/update-2fa"/>" method="post">
+                    <@default.csrfInput/>
+                    <input type="hidden" id="twoFactorState" value="${(twoFactorState!false)?c}" name="state"/>
+                    <div class="form-floating my-3">
+                        <input class="form-control" type="text" name="code" id="twoFactorCode"
+                               placeholder="Authentication code" required/>
+                        <label class="form-label" for="twoFactorCode">Authentication code</label>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-primary" data-bs-dismiss="modal">Cancel</button>
+                <input class="btn btn-danger" type="submit" value="Verify and turn off" form="form2fa"/>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="revealSecretModal" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Two-factor authentication secret</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div>Copy the following code and paste it into your TOTP app</div>
+                <code>${twoFactorSecret!""}</code>
             </div>
         </div>
     </div>
@@ -84,11 +128,28 @@
 <@default.scripts />
 <@default.toast />
 <script>
-    const twoFactorSwitch = document.getElementById("twoFactorState");
-    twoFactorSwitch.addEventListener("click", function (e) {
+    const twoFactorSwitch = document.getElementById("twoFactorSwitch");
+    const twoFactorForm = document.getElementById("form2fa");
+    const twoFactorState = document.getElementById("twoFactorState");
+    const twoFactorModal = document.getElementById("twoFactorModal")
+    const revealSecretModal = document.getElementById("revealSecretModal")
+    const revealSecretButton = document.getElementById("revealSecretButton");
 
+    twoFactorSwitch.addEventListener("click", () => {
+        const switchState = twoFactorSwitch.checked;
+        twoFactorState.value = switchState;
+        if (switchState)
+            return twoFactorForm.submit();
+        let modal = new bootstrap.Modal(twoFactorModal);
+        twoFactorModal.addEventListener("shown.bs.modal", () => document.getElementById("twoFactorCode").focus());
+        twoFactorModal.addEventListener("hide.bs.modal", () => twoFactorState.value = twoFactorSwitch.checked = !switchState);
+        modal.show(null);
+    });
 
-    })
+    revealSecretButton.addEventListener("click", () => {
+        let modal = new bootstrap.Modal(revealSecretModal);
+        modal.show(null);
+    });
 </script>
 </body>
 </html>

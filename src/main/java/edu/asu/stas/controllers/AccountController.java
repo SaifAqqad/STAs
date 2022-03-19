@@ -2,6 +2,7 @@ package edu.asu.stas.controllers;
 
 import edu.asu.stas.data.dto.AccountDetails;
 import edu.asu.stas.data.dto.ChangePasswordForm;
+import edu.asu.stas.data.dto.MfaSecret;
 import edu.asu.stas.data.dto.ResetPasswordForm;
 import edu.asu.stas.data.models.User;
 import edu.asu.stas.service.UserService;
@@ -60,20 +61,25 @@ public class AccountController {
 
     //---  Account security page
 
-    @ModelAttribute("passwordForm")
-    public ChangePasswordForm addPasswordForm() {
-        return new ChangePasswordForm();
+    private void setupSecurityPage(Model model) {
+        // add empty password form
+        model.addAttribute("passwordForm", new ChangePasswordForm());
+
+        User user = Objects.requireNonNull(UserService.getAuthenticatedUser());
+        // check if the user has a current password
+        if (Objects.isNull(user.getPassword()))
+            model.addAttribute("isCurrentPasswordDisabled", true);
+        // add 2FA state
+        model.addAttribute("twoFactorState", user.isUsing2FA());
     }
 
     @GetMapping("/account/security")
     public String getSecurityPage(Model model) {
-        User user = Objects.requireNonNull(UserService.getAuthenticatedUser());
-        if (Objects.isNull(user.getPassword()))
-            model.addAttribute("currentPasswordDisabled", true);
+        setupSecurityPage(model);
         return "account/security";
     }
 
-    @PostMapping("/account/security/update")
+    @PostMapping("/account/security/update-password")
     public String postPasswordForm(
             @Validated @ModelAttribute ChangePasswordForm changePasswordForm,
             BindingResult bindingResult,
@@ -87,6 +93,30 @@ public class AccountController {
         userService.updateUserPassword(Objects.requireNonNull(UserService.getAuthenticatedUser()), changePasswordForm);
         redirectAttributes.addFlashAttribute("toast", "Password changed successfully");
         return "redirect:/account/security";
+    }
+
+    @PostMapping("/account/security/update-2fa")
+    public String post2FAState(
+            boolean state,
+            String code,
+            RedirectAttributes redirectAttributes
+    ) {
+        User user = Objects.requireNonNull(UserService.getAuthenticatedUser());
+        if (state) { // turned on 2FA
+            MfaSecret secret = userService.enable2FA(user);
+            redirectAttributes.addFlashAttribute("twoFactorSecret", secret.getSecret());
+            redirectAttributes.addFlashAttribute("twoFactorSecretQR", secret.getQrImageData());
+            return "redirect:/account/security";
+        } else { // turned off 2FA
+            if (Objects.nonNull(code) && userService.is2FACodeValid(user, code)) {
+                userService.disable2FA(user);
+                redirectAttributes.addFlashAttribute("toast", "Two-factor authentication disabled successfully");
+                return "redirect:/account/security";
+            }
+            redirectAttributes.addFlashAttribute("toastColor", "danger");
+            redirectAttributes.addFlashAttribute("toast", "Authentication code invalid");
+            return "redirect:/account/security?error";
+        }
     }
 
     //---  Connections page

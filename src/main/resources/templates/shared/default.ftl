@@ -97,7 +97,7 @@
 </#macro>
 
 <#macro toast>
-    <div class="toast align-items-center text-white bg-primary border-0 position-absolute top-0 end-0 mt-5 me-4"
+    <div class="toast align-items-center text-white bg-${(.data_model.toastColor)!"primary"} border-0 position-absolute top-0 end-0 mt-5 me-4"
          id="notification" role="alert" aria-live="assertive" aria-atomic="true">
         <div class="d-flex">
             <div class="toast-body">

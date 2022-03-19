@@ -1,13 +1,16 @@
 package edu.asu.stas.service;
 
 import dev.samstevens.totp.code.CodeVerifier;
+import dev.samstevens.totp.exceptions.QrGenerationException;
+import dev.samstevens.totp.qr.QrData;
+import dev.samstevens.totp.qr.QrDataFactory;
+import dev.samstevens.totp.qr.QrGenerator;
+import dev.samstevens.totp.secret.SecretGenerator;
+import dev.samstevens.totp.util.Utils;
 import edu.asu.stas.data.dao.UserConnectionRepository;
 import edu.asu.stas.data.dao.UserRepository;
 import edu.asu.stas.data.dao.UserTokenRepository;
-import edu.asu.stas.data.dto.AccountDetails;
-import edu.asu.stas.data.dto.ChangePasswordForm;
-import edu.asu.stas.data.dto.RegistrationForm;
-import edu.asu.stas.data.dto.ResetPasswordForm;
+import edu.asu.stas.data.dto.*;
 import edu.asu.stas.data.models.User;
 import edu.asu.stas.data.models.UserConnection;
 import edu.asu.stas.data.models.UserToken;
@@ -45,11 +48,14 @@ public class UserService implements UserDetailsService, OAuth2UserService<OAuth2
     private final MailService mailService;
     private final UserConnectionRepository userConnectionRepository;
     private final CodeVerifier totpVerifier;
+    private final SecretGenerator secretGenerator;
+    private final QrDataFactory qrDataFactory;
+    private final QrGenerator qrGenerator;
 
 
     @Autowired
     public UserService(UserRepository userRepository, UserTokenRepository userTokenRepository,
-                       PasswordEncoder passwordEncoder, TokenGenerator tokenGenerator, MailService mailService, UserConnectionRepository userConnectionRepository, CodeVerifier totpVerifier) {
+                       PasswordEncoder passwordEncoder, TokenGenerator tokenGenerator, MailService mailService, UserConnectionRepository userConnectionRepository, CodeVerifier totpVerifier, SecretGenerator secretGenerator, QrDataFactory qrDataFactory, QrGenerator qrGenerator) {
         this.userRepository = userRepository;
         this.userTokenRepository = userTokenRepository;
         this.passwordEncoder = passwordEncoder;
@@ -57,6 +63,9 @@ public class UserService implements UserDetailsService, OAuth2UserService<OAuth2
         this.mailService = mailService;
         this.userConnectionRepository = userConnectionRepository;
         this.totpVerifier = totpVerifier;
+        this.secretGenerator = secretGenerator;
+        this.qrDataFactory = qrDataFactory;
+        this.qrGenerator = qrGenerator;
     }
 
     public static User getAuthenticatedUser() {
@@ -264,5 +273,37 @@ public class UserService implements UserDetailsService, OAuth2UserService<OAuth2
         return true;
     }
 
+    public MfaSecret enable2FA(User user) {
+        String secret = secretGenerator.generate();
+        user.setUsing2FA(true);
+        user.setToken2FA(secret);
+        userRepository.save(user);
+        return new MfaSecret(
+                secret,
+                generateQrUri(secret, user.getEmail())
+        );
+    }
 
+    private String generateQrUri(String secret, String label) {
+        QrData data = qrDataFactory.newBuilder()
+                .label(label)
+                .secret(secret)
+                .issuer("STAs")
+                .build();
+
+        try {
+            return Utils.getDataUriForImage(
+                    qrGenerator.generate(data),
+                    qrGenerator.getImageMimeType()
+            );
+        } catch (QrGenerationException e) {
+            return null;
+        }
+    }
+
+    public void disable2FA(User user) {
+        user.setToken2FA(null);
+        user.setUsing2FA(false);
+        userRepository.save(user);
+    }
 }
