@@ -26,10 +26,14 @@
                                     <span class="iconify-inline" data-icon="mdi:github" data-width="38"></span>
                                     <span class="align-text-bottom ">GitHub</span>
                                 </div>
-                                <a class="h-50 btn btn-primary align-baseline visually-hidden" href="<@spring.url "/"/>">Connect</a>
-                                <a class="h-50 btn btn-danger align-baseline" href="<@spring.url "/"/>">Disconnect</a>
+                                <#if service_github??>
+                                    <a class="h-50 btn btn-danger align-baseline"
+                                       href="<@spring.url "/account/connections/disconnect/github"/>">Disconnect</a>
+                                <#else>
+                                    <a class="h-50 btn btn-primary align-baseline"
+                                       href="<@spring.url "/connect/github?redirectUri=" + springMacroRequestContext.requestUri/>">Connect</a>
+                                </#if>
                             </div>
-                            <span class="card-subtitle text-muted">Connected: SaifAqqad</span>
                         </div>
                     </div>
                     <div class="card mt-3">
@@ -39,7 +43,13 @@
                                     <span class="iconify-inline" data-icon="mdi:linkedin" data-width="38"></span>
                                     <span class="align-text-bottom">Linkedin</span>
                                 </div>
-                                <a class="h-50 btn btn-primary align-baseline" href="<@spring.url "/"/>">Connect</a>
+                                <#if service_linkedin??>
+                                    <a class="h-50 btn btn-danger align-baseline"
+                                       href="<@spring.url "/account/connections/disconnect/linkedin"/>">Disconnect</a>
+                                <#else>
+                                    <a class="h-50 btn btn-primary align-baseline"
+                                       href="<@spring.url "/connect/linkedin?redirectUri=" + springMacroRequestContext.requestUri/>">Connect</a>
+                                </#if>
                             </div>
                         </div>
                     </div>
@@ -50,18 +60,13 @@
                                     <span class="iconify-inline" data-icon="mdi:google" data-width="38"></span>
                                     <span class="align-text-bottom">Google</span>
                                 </div>
-                                <a class="h-50 btn btn-primary align-baseline" href="<@spring.url "/"/>">Connect</a>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="card mt-3">
-                        <div class="card-body">
-                            <div class="d-flex align-items-center justify-content-between">
-                                <div class="fs-4">
-                                    <span class="iconify-inline" data-icon="mdi:facebook" data-width="38"></span>
-                                    <span class="align-text-bottom">Facebook</span>
-                                </div>
-                                <a class="h-50 btn btn-primary align-baseline" href="<@spring.url "/"/>">Connect</a>
+                                <#if service_google??>
+                                    <a class="h-50 btn btn-danger align-baseline"
+                                       href="<@spring.url "/account/connections/disconnect/google"/>">Disconnect</a>
+                                <#else>
+                                    <a class="h-50 btn btn-primary align-baseline"
+                                       href="<@spring.url "/connect/google?redirectUri=" + springMacroRequestContext.requestUri/>">Connect</a>
+                                </#if>
                             </div>
                         </div>
                     </div>
