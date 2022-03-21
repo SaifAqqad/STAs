@@ -1,32 +1,35 @@
 package edu.asu.stas.controllers;
 
+import edu.asu.stas.data.dao.UserConnectionRepository;
 import edu.asu.stas.data.dto.AccountDetails;
 import edu.asu.stas.data.dto.ChangePasswordForm;
 import edu.asu.stas.data.dto.MfaSecret;
 import edu.asu.stas.data.dto.ResetPasswordForm;
 import edu.asu.stas.data.models.User;
+import edu.asu.stas.data.models.UserConnection;
 import edu.asu.stas.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.util.StringUtils;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.annotation.Validated;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.ModelAttribute;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import java.util.Objects;
+import java.util.stream.Collectors;
 
 @Controller
 public class AccountController {
 
     private final UserService userService;
+    private final UserConnectionRepository userConnectionRepository;
 
     @Autowired
-    public AccountController(UserService userService) {
+    public AccountController(UserService userService, UserConnectionRepository userConnectionRepository) {
         this.userService = userService;
+        this.userConnectionRepository = userConnectionRepository;
     }
 
     //---  Account information page
@@ -122,8 +125,27 @@ public class AccountController {
     //---  Connections page
 
     @GetMapping("/account/connections")
-    public String getConnectionsPage() {
+    public String getConnectionsPage(Model model) {
+        User user = Objects.requireNonNull(UserService.getAuthenticatedUser());
+        model.addAllAttributes(userConnectionRepository
+                .findAllByUser(user)
+                .stream()
+                .collect(Collectors.toMap(conn-> "service_" + conn.getServiceName(), conn -> conn)));
         return "account/connections";
+    }
+
+    @GetMapping("/account/connections/disconnect/{serviceName}")
+    public String disconnectService(@PathVariable String serviceName, RedirectAttributes redirectAttributes) {
+        User user = Objects.requireNonNull(UserService.getAuthenticatedUser());
+        UserConnection userConnection = userConnectionRepository.findByUserAndServiceName(user, serviceName);
+        if (Objects.isNull(userConnection)) {
+            redirectAttributes.addFlashAttribute("toastColor", "danger");
+            redirectAttributes.addFlashAttribute("toast", "An error occurred");
+            return "redirect:/account/connections?error";
+        }
+        userConnectionRepository.delete(userConnection);
+        redirectAttributes.addFlashAttribute("toast", StringUtils.capitalize(serviceName) + " account disconnected successfully");
+        return "redirect:/account/connections";
     }
 
     //--- Reset password flow

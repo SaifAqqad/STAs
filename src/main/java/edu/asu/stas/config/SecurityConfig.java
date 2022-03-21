@@ -48,7 +48,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
         http
 
                 .authorizeRequests()
-                    .mvcMatchers("/account/**").authenticated()
+                    .mvcMatchers("/account/**", "/connect/**").authenticated()
                     .mvcMatchers(HttpMethod.POST, "/login").denyAll()
                 .and()
 
@@ -73,9 +73,9 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                     .authorizationEndpoint()
                         .baseUri("/login/oauth/")
                     .and()
-                    // set redirect url to {baseUrl}/login/oauth/redirect/{registrationId}
+                    // set redirect url to {baseUrl}/oauth/redirect/{registrationId}
                     .redirectionEndpoint()
-                        .baseUri("/login/oauth/redirect/*")
+                        .baseUri("/oauth/redirect/*")
                     .and()
 
                     .tokenEndpoint()
