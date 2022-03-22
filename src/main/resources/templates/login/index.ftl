@@ -59,7 +59,7 @@
                             <span class="align-text-bottom">Log in with GitHub</span>
                         </a>
                         <a class="btn btn-linkedin w-100 mt-2" href="<@spring.url "/login/oauth/linkedin"/>">
-                            <span class="align-bottom iconify-inline" data-icon="akar-icons:linkedin-box-fill"
+                            <span class="align-bottom iconify-inline" data-icon="ion:logo-linkedin"
                                   data-width="24"></span>
                             <span class="align-text-bottom">Log in with LinkedIn</span>
                         </a>

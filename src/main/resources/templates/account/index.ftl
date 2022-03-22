@@ -11,7 +11,7 @@
 <body>
 <@default.navbar account="active"/>
 
-<div class="container-fluid mt-3">
+<div class="container-fluid my-3">
     <div class="row">
         <#-- Sidebar -->
         <div class="col-sm-3">
@@ -20,7 +20,7 @@
         <#-- Main page -->
         <div class="col-sm-9">
             <div class="container mt-2">
-                <h4>Account information</h4>
+                <div class="fs-4">Account information</div>
                 <form class="" action="<@spring.url "/account/update"/>" method="post">
                     <@default.csrfInput/>
                     <div class="row">

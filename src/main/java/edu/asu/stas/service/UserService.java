@@ -219,8 +219,13 @@ public class UserService implements UserDetailsService, OAuth2UserService<OAuth2
         }
 
         // check if the user is already authenticated and tried to oauth
-        if (authedUser != null)
-            return createUserConnection(authedUser, userRequest, userProfile);
+        if (authedUser != null) {
+            // check if the user is already connected to another account from the service
+            if (Objects.nonNull(userConnectionRepository.findByUserAndServiceName(authedUser, serviceName)))
+                throw new OAuth2AuthenticationException(new OAuth2Error(OAuth2ErrorCodes.ACCESS_DENIED, "You can only connect a single %s account.".formatted(userRequest.getClientRegistration().getClientName()), ""));
+            else
+                return createUserConnection(authedUser, userRequest, userProfile);
+        }
 
         // check if there's an existing user with a matching email address
         User existingUser = findByEmail(userProfile.getEmail());

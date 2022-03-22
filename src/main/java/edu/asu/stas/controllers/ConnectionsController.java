@@ -15,6 +15,8 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.bind.support.SessionStatus;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
+import java.util.Objects;
+
 
 @Controller
 @SessionAttributes({"clientRegistration", "state", "redirectUri"})
@@ -54,8 +56,10 @@ public class ConnectionsController {
 
     @GetMapping("/oauth/redirect/{registrationId}/connect")
     public String redirectFromService(
-            @RequestParam String code,
+            @RequestParam(required = false) String code,
             @RequestParam String state,
+            @RequestParam(required = false) String error,
+            @RequestParam(required = false, name = "error_description") String errorDesc,
             @PathVariable(name = "registrationId") String registrationId,
             @SessionAttribute("state") String savedState,
             @SessionAttribute("redirectUri") String redirectUri,
@@ -69,6 +73,12 @@ public class ConnectionsController {
         if (!state.equals(savedState) || !registrationId.equalsIgnoreCase(clientRegistration.getClientName())) {
             redirectAttributes.addFlashAttribute("toastColor", "danger");
             redirectAttributes.addFlashAttribute("toast", "An error occurred during redirection");
+            return "redirect:" + (redirectUri + "?error");
+        }
+        // check for an oauth-provider error
+        if(Objects.nonNull(error)){
+            redirectAttributes.addFlashAttribute("toastColor", "danger");
+            redirectAttributes.addFlashAttribute("toast", errorDesc);
             return "redirect:" + (redirectUri + "?error");
         }
         // Exchange the temp code for an OAuth2UserRequest

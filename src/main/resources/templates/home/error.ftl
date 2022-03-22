@@ -16,9 +16,12 @@
                     <span class="iconify-inline" data-icon="emojione:sad-but-relieved-face" data-width="28"></span>
                 </div>
             </div>
-            <div class="card-body">
-                ${oauthError!authError!error!""}
-            </div>
+            <#assign errorMessage = oauthError!authError!error!""/>
+            <#if errorMessage?has_content>
+                <div class="card-body">
+                    ${errorMessage}
+                </div>
+            </#if>
         </div>
     </div>
 </div>

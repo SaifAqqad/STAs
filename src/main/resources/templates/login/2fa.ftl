@@ -23,7 +23,7 @@
                     <@default.csrfInput/>
                     <div class="form-floating my-3">
                         <input class="form-control <#if auth2FAError??>is-invalid</#if>" type="text" name="code" id="code" placeholder="Authentication code"
-                               required/>
+                               autofocus required/>
                         <label class="form-label" for="code">Authentication code</label>
                         <#if auth2FAError??>
                             <span class="invalid-feedback">

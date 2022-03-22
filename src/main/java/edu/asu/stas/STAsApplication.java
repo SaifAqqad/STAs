@@ -32,8 +32,6 @@ public class STAsApplication {
                     user1.setDateOfBirth(LocalDate.of(1999, 10, 14));
                     user1.setRole(User.Roles.ADMIN);
                     user1.setEnabled(true);
-                    user1.setUsing2FA(true);
-                    user1.setToken2FA("nawe7iztipzn7ksbwkglyx56stl5uet7");
                     userRepository.save(user1);
                 }catch(DataAccessException ignored){
                     // do nothing

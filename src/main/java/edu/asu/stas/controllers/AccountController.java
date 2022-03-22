@@ -66,7 +66,8 @@ public class AccountController {
 
     private void setupSecurityPage(Model model) {
         // add empty password form
-        model.addAttribute("passwordForm", new ChangePasswordForm());
+        if(!model.containsAttribute("changePasswordForm"))
+            model.addAttribute("changePasswordForm", new ChangePasswordForm());
 
         User user = Objects.requireNonNull(UserService.getAuthenticatedUser());
         // check if the user has a current password
@@ -89,8 +90,8 @@ public class AccountController {
             RedirectAttributes redirectAttributes
     ) {
         if (bindingResult.hasErrors()) {
-            redirectAttributes.addFlashAttribute("org.springframework.validation.BindingResult.passwordForm", bindingResult);
-            redirectAttributes.addFlashAttribute("passwordForm", changePasswordForm);
+            redirectAttributes.addFlashAttribute("org.springframework.validation.BindingResult.changePasswordForm", bindingResult);
+            redirectAttributes.addFlashAttribute("changePasswordForm", changePasswordForm);
             return "redirect:/account/security?error";
         }
         userService.updateUserPassword(Objects.requireNonNull(UserService.getAuthenticatedUser()), changePasswordForm);

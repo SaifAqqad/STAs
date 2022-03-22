@@ -17,18 +17,18 @@
         </div>
         <div class="col-sm-9">
             <div class="container mt-2">
-                <h4>Account security</h4>
-                <div class="container">
+                <div class="fs-4">Account security</div>
+                <div class="container px-0">
                     <div class="card mt-3">
                         <div class="card-body">
                             <h6>Change your password</h6>
                             <form action="<@spring.url "/account/security/update-password"/>" method="post">
                                 <@default.csrfInput/>
                                 <div class="form-floating mt-3">
-                                    <@account.formElement path="passwordForm.currentPassword" label="Current password" type="password" attrb=(isCurrentPasswordDisabled??)?then("disabled","") placeholder="Current password" bindValue=false />
+                                    <@account.formElement path="changePasswordForm.currentPassword" label="Current password" type="password" attrb=(isCurrentPasswordDisabled??)?then("disabled","") placeholder="Current password" bindValue=false />
                                 </div>
                                 <div class="form-floating mt-3">
-                                    <@account.formElement path="passwordForm.newPassword" label="New password" type="password" attrb="required" placeholder="New password" bindValue=false/>
+                                    <@account.formElement path="changePasswordForm.newPassword" label="New password" type="password" attrb="required" placeholder="New password" bindValue=false/>
                                 </div>
                                 <div class="form-floating mt-3">
                                     <input class="form-control" name="confirmNewPassword" id="confirmNewPassword"
