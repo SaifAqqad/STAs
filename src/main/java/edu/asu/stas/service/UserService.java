@@ -33,6 +33,7 @@ import org.springframework.security.oauth2.core.endpoint.OAuth2ParameterNames;
 import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.stereotype.Service;
 
+import javax.transaction.Transactional;
 import java.time.Duration;
 import java.time.Instant;
 import java.time.LocalDateTime;
@@ -198,6 +199,7 @@ public class UserService implements UserDetailsService, OAuth2UserService<OAuth2
     }
 
     @Override
+    @Transactional
     public OAuth2User loadUser(OAuth2UserRequest userRequest) throws OAuth2AuthenticationException {
         // use the default service to get the user's info
         DefaultOAuth2UserService defaultService = new DefaultOAuth2UserService();
