@@ -2,6 +2,7 @@ package edu.asu.stas.lib.oauth;
 
 import edu.asu.stas.config.CustomAccessTokenResponseConverter;
 import edu.asu.stas.lib.HttpClientHelper;
+import edu.asu.stas.lib.JsonHelper;
 import org.springframework.security.oauth2.client.registration.ClientRegistration;
 import org.springframework.security.oauth2.client.userinfo.OAuth2UserRequest;
 import org.springframework.security.oauth2.core.endpoint.OAuth2AccessTokenResponse;
@@ -70,7 +71,7 @@ public class OAuthClientHelper {
             return null;
 
         // convert the response map to an OAuth2AccessTokenResponse and then create a new OAuth2UserRequest
-        Map<String, Object> responseMap = HttpClientHelper.jsonToMap(response);
+        Map<String, Object> responseMap = JsonHelper.jsonToMap(response);
         if (Objects.isNull(responseMap))
             return null;
         OAuth2AccessTokenResponse accessTokenResponse = Objects.requireNonNull(new CustomAccessTokenResponseConverter().convert(responseMap));
