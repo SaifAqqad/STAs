@@ -2,12 +2,14 @@ package edu.asu.stas.data.models;
 
 import edu.asu.stas.lib.oauth.OAuthProfile;
 import lombok.*;
+import org.hibernate.annotations.Type;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.oauth2.core.user.OAuth2User;
 
 import javax.persistence.*;
 import java.time.LocalDateTime;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.Map;
 
 @Entity
@@ -34,7 +36,8 @@ public class UserConnection implements OAuth2User {
 
     private LocalDateTime serviceTokenExpiry;
 
-    @Transient
+    @Type(type = "json")
+    @Column(columnDefinition = "json")
     private OAuthProfile serviceUserProfile;
 
     @ManyToOne(optional = false, fetch = FetchType.EAGER)
@@ -42,7 +45,7 @@ public class UserConnection implements OAuth2User {
 
     @Override
     public Map<String, Object> getAttributes() {
-        return serviceUserProfile.getAttributes();
+        return Collections.emptyMap();
     }
 
     @Override
@@ -56,7 +59,7 @@ public class UserConnection implements OAuth2User {
     }
 
     @NoArgsConstructor(access = AccessLevel.PRIVATE)
-    public static final class Type {
+    public static final class SupportedTypes {
         public static final String GITHUB = "github";
         public static final String LINKEDIN = "linkedin";
         public static final String GOOGLE = "google";

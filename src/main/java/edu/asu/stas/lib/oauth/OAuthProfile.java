@@ -1,15 +1,27 @@
 package edu.asu.stas.lib.oauth;
 
+import com.fasterxml.jackson.annotation.JsonSubTypes;
+import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import edu.asu.stas.data.models.UserConnection;
 import org.springframework.security.oauth2.client.userinfo.OAuth2UserRequest;
 import org.springframework.security.oauth2.core.user.OAuth2User;
 
-import java.util.Map;
+import java.io.Serializable;
 
+import static com.fasterxml.jackson.annotation.JsonSubTypes.Type;
 import static java.util.Objects.requireNonNull;
 import static java.util.Objects.requireNonNullElse;
 
-public interface OAuthProfile {
+@JsonTypeInfo(
+        use = JsonTypeInfo.Id.NAME,
+        property = "profileType"
+)
+@JsonSubTypes({
+        @Type(value = GithubProfile.class, name = "github"),
+        @Type(value = GoogleProfile.class, name = "google"),
+        @Type(value = LinkedInProfile.class, name = "linkedin")
+})
+public interface OAuthProfile extends Serializable {
     static OAuthProfile getOAuthProfile(OAuth2UserRequest request, OAuth2User user) {
         String serviceName = request.getClientRegistration().getRegistrationId();
         return switch (serviceName) {
