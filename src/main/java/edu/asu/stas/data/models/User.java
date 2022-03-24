@@ -8,6 +8,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 
 import javax.persistence.*;
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
@@ -45,7 +46,8 @@ public class User implements UserDetails {
     private boolean isEnabled;
 
     @OneToMany(mappedBy = "user")
-    private List<UserConnection> connections;
+    @Setter(value = AccessLevel.NONE)
+    private final List<UserConnection> connections = new ArrayList<>();
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
