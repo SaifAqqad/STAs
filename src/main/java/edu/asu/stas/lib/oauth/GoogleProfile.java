@@ -1,29 +1,18 @@
 package edu.asu.stas.lib.oauth;
 
 import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NonNull;
-import lombok.Setter;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
-import java.util.Map;
-
-@Getter
-@Setter
+@Data
+@NoArgsConstructor(force = true)
 @AllArgsConstructor
-public class GoogleProfile implements OAuthProfile{
-    @NonNull
+public class GoogleProfile implements OAuthProfile {
     private String uniqueId;
 
-    @NonNull
     private String firstName;
 
-    @NonNull
     private String lastName;
 
-    @NonNull
     private String email;
-
-    @NonNull
-    private Map<String, Object> attributes;
-
 }
