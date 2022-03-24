@@ -26,27 +26,31 @@ public interface OAuthProfile extends Serializable {
         String serviceName = request.getClientRegistration().getRegistrationId();
         return switch (serviceName) {
             // Map Google users
-            case UserConnection.Type.GOOGLE -> {
+            case UserConnection.SupportedTypes.GOOGLE -> {
                 String[] fullName = requireNonNull((String) user.getAttribute("name")).split("\\s", 2);
                 String firstName = fullName[0];
                 String lastName = fullName.length > 1 ? fullName[1] : "";
                 String email = requireNonNull(user.getAttribute("email"));
-                yield new GoogleProfile(user.getName(), firstName, lastName, email, user.getAttributes());
+                yield new GoogleProfile(user.getName(), firstName, lastName, email);
             }
             // Map GitHub users
-            case UserConnection.Type.GITHUB -> {
+            case UserConnection.SupportedTypes.GITHUB -> {
+                GithubProfile profile = new GithubProfile();
                 String[] fullName = requireNonNull((String) user.getAttribute("name")).split("\\s", 2);
-                String firstName = fullName[0];
-                String lastName = fullName.length > 1 ? fullName[1] : "";
-                String email = requireNonNull(user.getAttribute("email"));
-                yield new GithubProfile(user.getName(), firstName, lastName, email, user.getAttributes());
+                var repos = GithubProfile.fetchUserRepositories(request.getAccessToken());
+                profile.setUniqueId(user.getName());
+                profile.setFirstName(fullName[0]);
+                profile.setLastName(fullName.length > 1 ? fullName[1] : "");
+                profile.setEmail(requireNonNull(user.getAttribute("email")));
+                profile.getRepositories().addAll(repos);
+                yield profile;
             }
             // Map LinkedIn users
-            case UserConnection.Type.LINKEDIN -> {
+            case UserConnection.SupportedTypes.LINKEDIN -> {
                 String firstName = requireNonNull(user.getAttribute("localizedFirstName"));
                 String lastName = requireNonNullElse(user.getAttribute("localizedLastName"), "");
                 String email = requireNonNull(LinkedInProfile.fetchEmail(request.getAccessToken()));
-                yield new LinkedInProfile(user.getName(), firstName, lastName, email, user.getAttributes());
+                yield new LinkedInProfile(user.getName(), firstName, lastName, email);
             }
             default -> null;
         };
@@ -59,6 +63,4 @@ public interface OAuthProfile extends Serializable {
     String getFirstName();
 
     String getLastName();
-
-    Map<String, Object> getAttributes();
 }
