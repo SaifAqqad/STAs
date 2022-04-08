@@ -28,6 +28,8 @@ public class StudentProfile implements Serializable {
     @NonNull
     private String contactEmail;
 
+    private String location;
+
     private String about;
 
     private String contactPhone;
