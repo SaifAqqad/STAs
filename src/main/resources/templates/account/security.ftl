@@ -24,6 +24,11 @@
                             <h6>Change your password</h6>
                             <form action="<@spring.url "/account/security/update-password"/>" method="post">
                                 <@default.csrfInput/>
+                                <#if isCurrentPasswordDisabled??>
+                                    <div class="text-danger fw-bold fs-6">
+                                        Please set up a new password for your account
+                                    </div>
+                                </#if>
                                 <div class="form-floating mt-3">
                                     <@account.formElement path="changePasswordForm.currentPassword" label="Current password" type="password" attrb=(isCurrentPasswordDisabled??)?then("disabled","") placeholder="Current password" bindValue=false />
                                 </div>
