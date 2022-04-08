@@ -18,5 +18,7 @@ public class Project {
 
     private String url;
 
+    private String imageUri;
+
     private GithubProfile.Repository repository;
 }

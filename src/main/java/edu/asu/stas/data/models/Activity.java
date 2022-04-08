@@ -1,6 +1,10 @@
 package edu.asu.stas.data.models;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.*;
+
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 
 
 @AllArgsConstructor
@@ -13,5 +17,14 @@ public class Activity {
     private String name;
 
     private String description;
+
+    private LocalDate date;
+
+    private String imageUri;
+
+    @JsonIgnore
+    public String getFormattedDate(){
+        return date.format(DateTimeFormatter.ofPattern("dd MMMM, yyyy"));
+    }
 
 }

@@ -7,7 +7,9 @@ import javax.persistence.*;
 import java.io.Serial;
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @Entity
 @NoArgsConstructor
@@ -38,6 +40,8 @@ public class StudentProfile implements Serializable {
 
     private String major;
 
+    private String imagerUri="/images/generic_profile.png";
+
     @Type(type = "json")
     @Column(columnDefinition = "json")
     private final List<Course> courses = new ArrayList<>();
@@ -49,6 +53,14 @@ public class StudentProfile implements Serializable {
     @Type(type = "json")
     @Column(columnDefinition = "json")
     private final List<Project> projects = new ArrayList<>();
+
+    @Type(type = "json")
+    @Column(columnDefinition = "json")
+    private final List<Experience> experiences = new ArrayList<>();
+
+    @Type(type = "json")
+    @Column(columnDefinition = "json")
+    private final Map<String, String> links = new HashMap<>();
 
     @OneToOne(targetEntity = User.class, fetch = FetchType.LAZY, optional = false)
     private User user;
