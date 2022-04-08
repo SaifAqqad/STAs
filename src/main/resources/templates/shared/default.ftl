@@ -72,7 +72,8 @@
                         <#if authenticatedUser??>
                             <li class="nav-item"> <#-- user's fName lName -->
                                 <#local user = authenticatedUser/>
-                                <a class="nav-link ps-2 ps-sm-p75 ${account}" href="<@spring.url relativeUrl="/account"/>">
+                                <a class="nav-link ps-2 ps-sm-p75 ${account}"
+                                   href="<@spring.url relativeUrl="/account"/>">
                                     <#if user.firstName??>
                                         ${user.getFirstName()} ${user.getLastName()!""}
                                     </#if>
@@ -81,7 +82,8 @@
                             <li class="nav-item"> <#-- logout button -->
                                 <form action="/logout" method="post" class="d-inline">
                                     <input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}"/>
-                                    <input type="submit" class="btn w-100 text-start nav-link ps-2 ps-sm-p75 border-0" value="Logout">
+                                    <input type="submit" class="btn w-100 text-start nav-link ps-2 ps-sm-p75 border-0"
+                                           value="Logout">
                                 </form>
                             </li>
                         <#else>
@@ -116,6 +118,14 @@
             });
         }
     </script>
+</#macro>
+
+<#macro externalLinkIcon>
+    <#compress>
+        <sup>
+            <span class="iconify-inline" data-icon="mdi:open-in-new"></span>
+        </sup>
+    </#compress>
 </#macro>
 
 <#macro csrfInput>

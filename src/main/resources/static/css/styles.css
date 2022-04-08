@@ -27,6 +27,61 @@
     }
 }
 
+.text-hover-dark:hover {
+    color: #555 !important;
+}
+
+.bg-hover:hover {
+    background-color: #FAFAFA;
+}
+
+.object-fit {
+    object-fit: contain;
+}
+
+.min-h-100{
+    min-height: 100px;
+}
+
+.w-fc{
+    width: fit-content;
+}
+
+.cursor-pointer{
+    cursor: pointer;
+}
+
+.img-fill{
+    width: 200px;
+    height: 160px;
+    object-fit: cover;
+}
+
+.limit-lines-4 {
+    line-clamp: 4;
+    display: -webkit-box;
+    -webkit-line-clamp: 4;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+}
+
+.card-border-grey {
+    background-color: white;
+    border: 1px solid #CED4DA !important;
+    box-shadow: none !important;
+}
+
+.img-w-100 {
+    width: 100px;
+    height: 100%;
+}
+
+.img-w-limit{
+    min-width: 130px;
+    max-width: 280px;
+}
+
+
 .btn-linkedin {
     color: #ffffff;
     background-color: #0A66C2;
