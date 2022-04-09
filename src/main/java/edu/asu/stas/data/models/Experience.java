@@ -15,6 +15,8 @@ public class Experience {
 
     private String jobTitle;
 
+    private String description;
+
     private LocalDate startDate;
 
     private LocalDate endDate;

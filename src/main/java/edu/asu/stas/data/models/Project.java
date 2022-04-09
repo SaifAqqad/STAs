@@ -3,6 +3,8 @@ package edu.asu.stas.data.models;
 import edu.asu.stas.lib.oauth.GithubProfile;
 import lombok.*;
 
+import java.time.LocalDate;
+
 @AllArgsConstructor
 @NoArgsConstructor
 @Getter
@@ -19,6 +21,10 @@ public class Project {
     private String url;
 
     private String imageUri;
+
+    private LocalDate startDate;
+
+    private LocalDate endDate;
 
     private GithubProfile.Repository repository;
 }
