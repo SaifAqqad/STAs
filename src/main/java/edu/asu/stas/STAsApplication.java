@@ -49,8 +49,18 @@ public class STAsApplication {
                     profile.getCourses().add(course);
                     Activity activity = new Activity("Hash Code 2021", "Team programming competition, organized by Google, for students and professionals around the world. You pick your team and programming language and we pick an engineering problem for you to solve.", LocalDate.of(2021, 2, 25), "https://geeksgod.com/wp-content/uploads/2021/02/Google-Hash-Code.jpg");
                     profile.getActivities().add(activity);
-                    Project project = new Project("AHK_MicMute", "Desktop application", "open-source program that allows you to mute your microphone with a pre-defined hotkey. It supports custom mute sounds, profiles, push-to-talk, AFK timeout, and more.", "https://github.com/SaifAqqad/AHK_MicMute", "https://github.com/SaifAqqad/AHK_MicMute/raw/master/screenshots/configwindow_1.png", null);
+                    Project project = new Project("AHK_MicMute", "Desktop application", "open-source program that allows you to mute your microphone with a pre-defined hotkey. It supports custom mute sounds, profiles, push-to-talk, AFK timeout, and more.", "https://github.com/SaifAqqad/AHK_MicMute", "https://github.com/SaifAqqad/AHK_MicMute/raw/master/screenshots/configwindow_1.png", LocalDate.of(2020, 5, 9), null, null);
                     profile.getProjects().add(project);
+                    Experience experience = new Experience("Amazon", "Software Development Engineer", """
+                            - Implement, deploy highly available and highly scalable reverse proxy keeping security, performance and robustness in mind.
+                            - Work in a multi-regional team and maintain clear communication across different time-zones using agile principles.
+                            - Collaborate with a variety of other services, teams and APIs.\s
+                            - Design and create scalable API’s for internal and public consumption.
+                            - Conduct interviews with stakeholders for setting expectations.
+                            """, LocalDate.of(2020, 5, 19), null);
+                    Experience experience2 = new Experience("Google", "Software Engineering Intern", null, LocalDate.of(2019, 11, 20), LocalDate.of(2020, 2, 13));
+                    profile.getExperiences().add(experience);
+                    profile.getExperiences().add(experience2);
                     studentProfileRepository.save(profile);
                 } catch (DataAccessException ignored) {
                     // do nothing
