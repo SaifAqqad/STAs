@@ -1,10 +1,28 @@
 <#ftl output_format="HTML">
 <#import "/spring.ftl" as spring />
 <#global roles = {"student" : "ROLE_STUDENT", "admin": "ROLE_ADMIN"}/>
+<#global knownIcons = {
+    "github"        : "mdi:github",
+    "linkedin"      : "mdi:linkedin",
+    "google"        : "ant-design:google-outlined",
+    "facebook"      : "akar-icons:facebook-fill",
+    "phone"         : "mdi:phone",
+    "email"         : "mdi:email",
+    "university"    : "mdi:school",
+    "location"      : "mdi:map-marker",
+    "web"           : "mdi:web",
+    "externalLink"  : "mdi:open-in-new",
+    "work"          : "ic:baseline-work",
+    "group"         : "fa:group",
+    "project"       : "ant-design:project-filled",
+    "course"        : "dashicons:book",
+    "personInfo"    : "bi:person-lines-fill"
+} />
 
 <#macro head title>
     <head xmlns="">
         <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
         <title>${title}</title>
 
         <link rel="icon" type="image/svg+xml" href="<@spring.url "/images/favicon.svg"/>">
@@ -31,7 +49,7 @@
 </#macro>
 
 <#macro navbar home="" about="" login="" profile="" dashboard="" account="">
-    <nav class="navbar navbar-expand-md navbar-light bg-light">
+    <nav class="navbar navbar-expand-md navbar-light bg-white">
         <div class="container-fluid">
             <a class="navbar-brand" href="<@spring.url relativeUrl="/"/>">
                 <@logo width="30px" height="30px" color="#393939"/>
@@ -123,8 +141,20 @@
 <#macro externalLinkIcon>
     <#compress>
         <sup>
-            <span class="iconify-inline" data-icon="mdi:open-in-new"></span>
+            <@icon name="externalLink"/>
         </sup>
+    </#compress>
+</#macro>
+
+<#macro icon name isInline=true fallback="" class="">
+    <#compress>
+        <#if name?contains(":")>
+            <#assign iconName = name/>
+        <#else>
+            <#assign iconName = knownIcons[name]!knownIcons[fallback]!""/>
+        </#if>
+        <span class="iconify<#if isInline>-inline</#if> ${class?no_esc}"
+              <#if iconName?has_content>data-icon="${iconName}"</#if>></span>
     </#compress>
 </#macro>
 
