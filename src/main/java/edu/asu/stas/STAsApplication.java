@@ -1,7 +1,6 @@
 package edu.asu.stas;
 
-import edu.asu.stas.data.dao.StudentProfileRepository;
-import edu.asu.stas.data.dao.UserRepository;
+import edu.asu.stas.data.dao.*;
 import edu.asu.stas.data.models.*;
 import org.springframework.boot.ApplicationRunner;
 import org.springframework.boot.SpringApplication;
@@ -20,9 +19,15 @@ public class STAsApplication {
     }
 
     @Bean
-    public ApplicationRunner seedDataLoader(UserRepository userRepository,
-                                            PasswordEncoder passwordEncoder,
-                                            StudentProfileRepository studentProfileRepository) {
+    public ApplicationRunner seedDataLoader(
+            UserRepository userRepository,
+            PasswordEncoder passwordEncoder,
+            StudentProfileRepository studentProfileRepository,
+            CourseRepository courseRepository,
+            ActivityRepository activityRepository,
+            ProjectRepository projectRepository,
+            ExperienceRepository experienceRepository
+    ) {
         return args -> {
             if (args.containsOption("addSeedData")) {
 
@@ -36,6 +41,7 @@ public class STAsApplication {
                     user1.setRole(User.Roles.STUDENT);
                     user1.setEnabled(true);
                     user1 = userRepository.save(user1);
+
                     StudentProfile profile = new StudentProfile();
                     profile.setName("Saif Alaqqad");
                     profile.setUniversity("Applied Science University");
@@ -45,23 +51,56 @@ public class STAsApplication {
                     profile.setContactPhone("+962799545922");
                     profile.setLocation("Amman, Jordan");
                     profile.setUser(user1);
-                    Course course = new Course("The Java workshop", "The Workshop starts by showing you how to use classes, methods, and the built-in Collections API to manipulate data structures effortlessly. You'll dive right into learning about object-oriented programming by creating classes and interfaces and making use of inheritance and polymorphism. After learning how to handle exceptions, you'll study the modules, packages, and libraries that help you organize your code. As you progress, you'll discover how to connect to external databases and web servers, work with regular expressions, and write unit tests to validate your code. You'll also be introduced to functional programming and see how to implement it using lambda functions.", "This book helped me learn Java in-depth, it covers a lot of great topics like IO, encryption and functional programming", "https://www.packtpub.com/product/the-java-workshop/9781838986698", "https://static.packt-cdn.com/products/9781838986698/cover/smaller");
-                    profile.getCourses().add(course);
-                    Activity activity = new Activity("Hash Code 2021", "Team programming competition, organized by Google, for students and professionals around the world. You pick your team and programming language and we pick an engineering problem for you to solve.", LocalDate.of(2021, 2, 25), "https://geeksgod.com/wp-content/uploads/2021/02/Google-Hash-Code.jpg");
-                    profile.getActivities().add(activity);
-                    Project project = new Project("AHK_MicMute", "Desktop application", "open-source program that allows you to mute your microphone with a pre-defined hotkey. It supports custom mute sounds, profiles, push-to-talk, AFK timeout, and more.", "https://github.com/SaifAqqad/AHK_MicMute", "https://github.com/SaifAqqad/AHK_MicMute/raw/master/screenshots/configwindow_1.png", LocalDate.of(2020, 5, 9), null, null);
-                    profile.getProjects().add(project);
-                    Experience experience = new Experience("Amazon", "Software Development Engineer", """
+                    profile = studentProfileRepository.save(profile);
+
+                    Course course = new Course();
+                    course.setName("The Java workshop");
+                    course.setDescription("The Workshop starts by showing you how to use classes, methods, and the built-in Collections API to manipulate data structures effortlessly. You'll dive right into learning about object-oriented programming by creating classes and interfaces and making use of inheritance and polymorphism. After learning how to handle exceptions, you'll study the modules, packages, and libraries that help you organize your code. As you progress, you'll discover how to connect to external databases and web servers, work with regular expressions, and write unit tests to validate your code. You'll also be introduced to functional programming and see how to implement it using lambda functions.");
+                    course.setStudentComment("This book helped me learn Java in-depth, it covers a lot of great topics like IO, encryption and functional programming");
+                    course.setImageUri("https://static.packt-cdn.com/products/9781838986698/cover/smaller");
+                    course.setUrl("https://www.packtpub.com/product/the-java-workshop/9781838986698");
+                    course.setProfile(profile);
+                    courseRepository.save(course);
+
+                    Activity activity = new Activity();
+                    activity.setName("Hash Code 2021");
+                    activity.setDescription("Team programming competition, organized by Google, for students and professionals around the world. You pick your team and programming language and we pick an engineering problem for you to solve.");
+                    activity.setDate(LocalDate.of(2021, 2, 25));
+                    activity.setImageUri("https://geeksgod.com/wp-content/uploads/2021/02/Google-Hash-Code.jpg");
+                    activity.setProfile(profile);
+                    activityRepository.save(activity);
+
+                    Project project = new Project();
+                    project.setName("AHK_MicMute");
+                    project.setCategory("Desktop application");
+                    project.setDescription("open-source program that allows you to mute your microphone with a pre-defined hotkey. It supports custom mute sounds, profiles, push-to-talk, AFK timeout, and more.");
+                    project.setUrl("https://github.com/SaifAqqad/AHK_MicMute");
+                    project.setImageUri("https://github.com/SaifAqqad/AHK_MicMute/raw/master/screenshots/configwindow_1.png");
+                    project.setStartDate(LocalDate.of(2020, 5, 9));
+                    project.setProfile(profile);
+                    projectRepository.save(project);
+
+                    Experience experience = new Experience();
+                    experience.setCompanyName("Amazon");
+                    experience.setJobTitle("Software Development Engineer");
+                    experience.setDescription("""
                             - Implement, deploy highly available and highly scalable reverse proxy keeping security, performance and robustness in mind.
                             - Work in a multi-regional team and maintain clear communication across different time-zones using agile principles.
                             - Collaborate with a variety of other services, teams and APIs.\s
                             - Design and create scalable API’s for internal and public consumption.
                             - Conduct interviews with stakeholders for setting expectations.
-                            """, LocalDate.of(2020, 5, 19), null);
-                    Experience experience2 = new Experience("Google", "Software Engineering Intern", null, LocalDate.of(2019, 11, 20), LocalDate.of(2020, 2, 13));
-                    profile.getExperiences().add(experience);
-                    profile.getExperiences().add(experience2);
-                    studentProfileRepository.save(profile);
+                            """);
+                    experience.setStartDate(LocalDate.of(2020, 5, 19));
+                    experience.setProfile(profile);
+                    experienceRepository.save(experience);
+
+                    Experience experience2 = new Experience();
+                    experience2.setCompanyName("Google");
+                    experience2.setJobTitle("Software Engineering Intern");
+                    experience2.setStartDate(LocalDate.of(2019, 11, 20));
+                    experience2.setEndDate(LocalDate.of(2020, 2, 13));
+                    experience2.setProfile(profile);
+                    experienceRepository.save(experience2);
                 } catch (DataAccessException ignored) {
                     // do nothing
                 }

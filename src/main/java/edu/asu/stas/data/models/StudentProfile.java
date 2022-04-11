@@ -40,22 +40,18 @@ public class StudentProfile implements Serializable {
 
     private String major;
 
-    private String imagerUri="/images/generic_profile.png";
+    private String imagerUri = "/images/generic_profile.png";
 
-    @Type(type = "json")
-    @Column(columnDefinition = "json")
+    @OneToMany(mappedBy = "profile", orphanRemoval = true)
     private final List<Course> courses = new ArrayList<>();
 
-    @Type(type = "json")
-    @Column(columnDefinition = "json")
+    @OneToMany(mappedBy = "profile", orphanRemoval = true)
     private final List<Activity> activities = new ArrayList<>();
 
-    @Type(type = "json")
-    @Column(columnDefinition = "json")
+    @OneToMany(mappedBy = "profile", orphanRemoval = true)
     private final List<Project> projects = new ArrayList<>();
 
-    @Type(type = "json")
-    @Column(columnDefinition = "json")
+    @OneToMany(mappedBy = "profile", orphanRemoval = true)
     private final List<Experience> experiences = new ArrayList<>();
 
     @Type(type = "json")

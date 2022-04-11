@@ -1,17 +1,24 @@
 package edu.asu.stas.data.models;
 
-import lombok.*;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+
+import javax.persistence.*;
 
 
-@AllArgsConstructor
+@Entity
 @NoArgsConstructor
 @Getter
 @Setter
-@EqualsAndHashCode
 public class Course {
+    @Id
+    @GeneratedValue
+    private Long id;
 
     private String name;
 
+    @Column(length = 5000)
     private String description;
 
     private String studentComment;
@@ -19,5 +26,8 @@ public class Course {
     private String url;
 
     private String imageUri;
+
+    @ManyToOne(optional = false, targetEntity = StudentProfile.class)
+    private StudentProfile profile;
 
 }
