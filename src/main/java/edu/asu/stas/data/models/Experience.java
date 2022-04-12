@@ -2,39 +2,32 @@ package edu.asu.stas.data.models;
 
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import lombok.NonNull;
 import lombok.Setter;
 
 import javax.persistence.*;
 import java.time.LocalDate;
-import java.time.format.DateTimeFormatter;
-
 
 @Entity
 @NoArgsConstructor
 @Getter
 @Setter
-public class Activity {
+public class Experience {
     @Id
     @GeneratedValue
     private Long id;
 
-    @NonNull
-    private String name;
+    private String companyName;
+
+    private String jobTitle;
 
     @Column(length = 5000)
     private String description;
 
-    private LocalDate date;
+    private LocalDate startDate;
 
-    private String imageUri;
+    private LocalDate endDate;
 
     @ManyToOne(optional = false, targetEntity = StudentProfile.class)
     private StudentProfile profile;
-
-    @Transient
-    public String getFormattedDate() {
-        return date.format(DateTimeFormatter.ofPattern("dd MMMM, yyyy"));
-    }
 
 }

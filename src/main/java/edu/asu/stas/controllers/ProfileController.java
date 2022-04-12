@@ -21,19 +21,22 @@ public class ProfileController {
         this.studentProfileService = studentProfileService;
     }
 
-    public StudentProfile getStudentProfile(){
+    public StudentProfile getStudentProfile() {
         User user = Objects.requireNonNull(UserService.getAuthenticatedUser());
         return studentProfileService.getProfileByUser(user);
     }
 
     @GetMapping("/profile")
-    public String getProfile(Model model){
+    public String getProfilePage(Model model) {
         StudentProfile profile = getStudentProfile();
-        if(Objects.nonNull(profile)){
-            model.addAttribute("profile", profile);
-            return "profile/index";
-        }else{
-            return "profile/create";
-        }
+        if (Objects.isNull(profile))
+            return "redirect:/profile/create";
+        model.addAttribute("profile", profile);
+        return "profile/index";
+    }
+
+    @GetMapping("/profile/create")
+    public String getCreatePage() {
+        return "profile/create";
     }
 }

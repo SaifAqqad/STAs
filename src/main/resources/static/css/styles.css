@@ -1,4 +1,3 @@
-
 @media (min-width: 576px) {
     .ps-sm-p75 {
         padding-left: 0.75rem !important;
@@ -27,6 +26,116 @@
         margin-right: 30% !important;
     }
 }
+
+.fs-115{
+    font-size: 1.15rem;
+}
+
+.text-hover-dark:hover {
+    color: #555 !important;
+}
+
+.bg-hover:hover {
+    background-color: #FAFAFA;
+}
+
+.smooth{
+    transition: color .15s ease-in-out,background-color .15s ease-in-out,border-color .15s ease-in-out,box-shadow .15s ease-in-out;
+}
+
+.preserve-lines{
+    white-space: pre-line;
+}
+
+.object-fit {
+    object-fit: contain;
+}
+
+.min-h-100{
+    min-height: 100px;
+}
+
+.w-fc{
+    width: fit-content;
+}
+
+.cursor-pointer{
+    cursor: pointer;
+}
+
+.img-fill{
+    width: 200px;
+    height: 160px;
+    object-fit: cover;
+}
+
+.limit-lines-4 {
+    line-clamp: 4;
+    display: -webkit-box;
+    -webkit-line-clamp: 4;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+}
+
+.card-border-grey {
+    background-color: white;
+    border: 1px solid #CED4DA;
+    box-shadow: none ;
+}
+
+.img-w-100 {
+    width: 100px;
+    height: 100%;
+}
+
+.img-w-limit{
+    min-width: 130px;
+    max-width: 280px;
+}
+
+/* Timeline css */
+.timeline-sm {
+    padding-left: 130px;
+}
+
+.timeline-sm .timeline-sm-item {
+    position: relative;
+    padding-bottom: 20px;
+    padding-left: 40px;
+    border-left: 2px solid #dee2e6;
+}
+
+.timeline-sm .timeline-sm-item:after {
+    content: "";
+    display: block;
+    position: absolute;
+    top: 3px;
+    left: -7px;
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    background: #fff;
+    border: 2px solid #7D8893;
+}
+
+.timeline-sm .timeline-sm-item .timeline-sm-date {
+    position: absolute;
+    left: -130px;
+}
+
+@media (max-width: 420px) {
+    .timeline-sm {
+        padding-left: 0;
+    }
+    .timeline-sm .timeline-sm-date {
+        position: relative !important;
+        display: block;
+        left: 0 !important;
+        margin-bottom: 10px;
+    }
+}
+
+/* Linkedin button */
 
 .btn-linkedin {
     color: #ffffff;
