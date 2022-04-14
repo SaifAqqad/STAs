@@ -1,5 +1,6 @@
 package edu.asu.stas.data.models;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -28,6 +29,7 @@ public class Experience {
     private LocalDate endDate;
 
     @ManyToOne(optional = false, targetEntity = StudentProfile.class)
+    @JsonIgnore
     private StudentProfile profile;
 
 }
