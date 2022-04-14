@@ -1,5 +1,6 @@
 package edu.asu.stas.data.models;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import edu.asu.stas.lib.oauth.GithubProfile.Repository;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -36,6 +37,7 @@ public class Project {
     private LocalDate endDate;
 
     @ManyToOne(optional = false, targetEntity = StudentProfile.class)
+    @JsonIgnore
     private StudentProfile profile;
 
     @Type(type = "json")
