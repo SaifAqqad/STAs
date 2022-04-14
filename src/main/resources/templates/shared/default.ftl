@@ -38,6 +38,24 @@
 <#macro scripts>
     <script src="<@spring.url "/webjars/bootstrap/js/bootstrap.bundle.min.js"/>"></script>
     <script src="<@spring.url "/webjars/iconify__iconify/dist/iconify.min.js"/>"></script>
+    <script>
+        function _clearForm(form){
+            form.querySelectorAll("input").forEach((elem) => elem.value = "")
+            form.querySelectorAll("textarea").forEach((elem) => elem.textContent = "")
+            form.querySelectorAll("img").forEach((elem) => elem.src = "")
+            form.querySelectorAll("select").forEach((elem) => elem.innerHTML = "")
+            form.reset()
+        }
+        function _applyJsonToForm(formId, json) {
+            for (const prop in json) {
+                console.log()
+                const elem = document.getElementById(formId + "_" + prop)
+                if (elem) {
+                    elem.value = json[prop]
+                }
+            }
+        }
+    </script>
     <#nested >
 </#macro>
 
@@ -117,8 +135,8 @@
 </#macro>
 
 <#macro toast>
-    <div class="toast align-items-center text-white bg-${(.data_model.toastColor)!"primary"} border-0 position-absolute top-0 end-0 mt-5 me-4"
-         id="notification" role="alert" aria-live="assertive" aria-atomic="true">
+    <div class="toast align-items-center text-white bg-${(.data_model.toastColor)!"primary"} border-0 position-fixed top-0 end-0 mt-5 me-4"
+         id="notification" role="alert" aria-live="assertive" aria-atomic="true" style="z-index: 7000">
         <div class="d-flex">
             <div class="toast-body">
                 ${(.data_model.toast)!""}
@@ -132,7 +150,7 @@
         if (state) {
             document.addEventListener("DOMContentLoaded", function () {
                 let toastEl = document.getElementById('notification');
-                new bootstrap.Toast(toastEl, {delay: 2000}).show();
+                bootstrap.Toast.getOrCreateInstance(toastEl, {delay: 2000}).show();
             });
         }
     </script>

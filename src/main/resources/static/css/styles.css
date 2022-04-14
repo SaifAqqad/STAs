@@ -21,13 +21,14 @@
         margin-left: 25% !important;
         margin-right: 25% !important;
     }
+
     .mx-lg-6 {
         margin-left: 30% !important;
         margin-right: 30% !important;
     }
 }
 
-.fs-115{
+.fs-115 {
     font-size: 1.15rem;
 }
 
@@ -39,11 +40,11 @@
     background-color: #FAFAFA;
 }
 
-.smooth{
-    transition: color .15s ease-in-out,background-color .15s ease-in-out,border-color .15s ease-in-out,box-shadow .15s ease-in-out;
+.smooth {
+    transition: color .15s ease-in-out, background-color .15s ease-in-out, border-color .15s ease-in-out, box-shadow .15s ease-in-out;
 }
 
-.preserve-lines{
+.preserve-lines {
     white-space: pre-line;
 }
 
@@ -51,19 +52,19 @@
     object-fit: contain;
 }
 
-.min-h-100{
+.min-h-100 {
     min-height: 100px;
 }
 
-.w-fc{
+.w-fc {
     width: fit-content;
 }
 
-.cursor-pointer{
+.cursor-pointer {
     cursor: pointer;
 }
 
-.img-fill{
+.img-fill {
     width: 200px;
     height: 160px;
     object-fit: cover;
@@ -80,7 +81,7 @@
 .card-border-grey {
     background-color: white;
     border: 1px solid #CED4DA;
-    box-shadow: none ;
+    box-shadow: none;
 }
 
 .img-w-100 {
@@ -88,9 +89,13 @@
     height: 100%;
 }
 
-.img-w-limit{
+.img-w-limit {
     min-width: 130px;
     max-width: 280px;
+}
+
+.form-floating > textarea.form-control {
+    height: 100px;
 }
 
 /* Timeline css */
@@ -127,6 +132,7 @@
     .timeline-sm {
         padding-left: 0;
     }
+
     .timeline-sm .timeline-sm-date {
         position: relative !important;
         display: block;
@@ -182,6 +188,7 @@ fieldset[disabled] .btn-linkedin.active {
     color: #0A66C2;
     background-color: #ffffff;
 }
+
 .form-control:focus {
     box-shadow: none;
     border-color: #BA68C8
@@ -216,7 +223,7 @@ fieldset[disabled] .btn-linkedin.active {
     font-size: 11px
 }
 
-.add-experience:hover {-
+.add-experience:hover {
     background: #BA68C8;
     color: #fff;
     cursor: pointer;

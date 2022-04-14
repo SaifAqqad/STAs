@@ -39,7 +39,7 @@
                                     <input class="form-control" name="confirmNewPassword" id="confirmNewPassword"
                                            required
                                            placeholder="Confirm password" type="password"/>
-                                    <label class="form-label" for="confirmNewPassword">Confirm password</label>
+                                    <label class="form-label text-muted" for="confirmNewPassword">Confirm password</label>
                                     <span class="invalid-feedback" id="confirmNewPasswordFeedback"></span>
                                 </div>
                                 <div class="mt-3">
@@ -102,7 +102,7 @@
                     <div class="form-floating my-3">
                         <input class="form-control" type="text" name="code" id="twoFactorCode"
                                placeholder="Authentication code" required/>
-                        <label class="form-label" for="twoFactorCode">Authentication code</label>
+                        <label class="form-label text-muted" for="twoFactorCode">Authentication code</label>
                     </div>
                 </form>
             </div>

@@ -36,7 +36,7 @@
                 <div class="form-floating mt-3">
                     <input class="form-control" name="confirmPassword" id="confirmPassword" required
                            placeholder="Confirm password" type="password"/>
-                    <label class="form-label" for="confirmPassword">Confirm password</label>
+                    <label class="form-label text-muted" for="confirmPassword">Confirm password</label>
                     <span class="invalid-feedback" id="confirmPasswordFeedback"></span>
                 </div>
                 <div class="form-floating mt-3">
