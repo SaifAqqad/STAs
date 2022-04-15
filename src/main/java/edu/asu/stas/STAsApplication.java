@@ -1,7 +1,17 @@
 package edu.asu.stas;
 
-import edu.asu.stas.data.dao.*;
-import edu.asu.stas.data.models.*;
+import edu.asu.stas.studentprofile.StudentProfile;
+import edu.asu.stas.studentprofile.StudentProfileRepository;
+import edu.asu.stas.studentprofile.activity.Activity;
+import edu.asu.stas.studentprofile.activity.ActivityRepository;
+import edu.asu.stas.studentprofile.course.Course;
+import edu.asu.stas.studentprofile.course.CourseRepository;
+import edu.asu.stas.studentprofile.experience.Experience;
+import edu.asu.stas.studentprofile.experience.ExperienceRepository;
+import edu.asu.stas.studentprofile.project.Project;
+import edu.asu.stas.studentprofile.project.ProjectRepository;
+import edu.asu.stas.user.User;
+import edu.asu.stas.user.UserRepository;
 import org.springframework.boot.ApplicationRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;

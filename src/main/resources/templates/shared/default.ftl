@@ -66,7 +66,7 @@
     </svg>
 </#macro>
 
-<#macro navbar home="" about="" login="" profile="" dashboard="" account="">
+<#macro navbar home="" login="" profile="" dashboard="" account="">
     <nav class="navbar navbar-expand-md navbar-light bg-white">
         <div class="container-fluid">
             <a class="navbar-brand" href="<@spring.url relativeUrl="/"/>">
@@ -83,9 +83,6 @@
                     <#-- General links -->
                     <li class="nav-item">
                         <a class="nav-link ps-2 ps-sm-p75 ${home}" href="<@spring.url relativeUrl="/"/>">Home</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link ps-2 ps-sm-p75 ${about}" href="<@spring.url relativeUrl="/about"/>">About</a>
                     </li>
                     <#-- STUDENT-only links -->
                     <@requiredRole roles.student>
