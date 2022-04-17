@@ -172,7 +172,7 @@
     </@formPopup>
 </#macro>
 
-<#macro formPopup addPopup detailsPopup popupId formId uriBase isMultiPartForm=false applyMethod="_applyJsonToForm">
+<#macro formPopup detailsPopup popupId formId uriBase addPopup="" isMultiPartForm=false applyMethod="_applyJsonToForm">
     <div class="modal fade" id="${popupId?no_esc}" tabindex="-1">
         <div class="modal-dialog modal-dialog-centered">
             <div class="modal-content">
@@ -232,30 +232,17 @@
                     // show the delete button
                     detailsPopup.deleteButton.classList.remove("visually-hidden")
                     // set the form action
-                    formElement.setAttribute("action", `${uriBase}/update`)
+                    formElement.setAttribute("action", `${uriBase}/${elementId}`)
                     modal.show(element)
                 })
             })
             // set up delete button
             detailsPopup.deleteButton.addEventListener("click", async () => {
-                // get the data id from the input
-                let currentId = document.getElementById(`${formId}_id`).value
-                // execute DELETE request
-                fetch(`${uriBase}/${currentId}`, {method: "DELETE"})
-                    .then(async response => {
-                        if (response.ok) {
-                            // hide the popup
-                            modal.hide()
-                            // refresh the page
-                            location.reload()
-                        } else {
-                            // display an error toast
-                            let toastEl = document.getElementById('notification');
-                            toastEl.querySelector(".toast-body").textContent = "An error has occurred"
-                            toastEl.classList.add("bg-danger")
-                            bootstrap.Toast.getOrCreateInstance(toastEl, {delay: 2000}).show();
-                        }
-                    });
+                // set the form action to './delete'
+                formElement.setAttribute("action", `${uriBase}/delete`)
+                // submit the form and hide the popup
+                formElement.submit()
+                modal.hide()
             })
             // set up 'add new' popup
             addPopup.addButton.addEventListener("click", () => {
@@ -266,7 +253,7 @@
                 // hide the delete button
                 detailsPopup.deleteButton.classList.add("visually-hidden")
                 // set the form action
-                formElement.setAttribute("action", `${uriBase}/add`)
+                formElement.setAttribute("action", `${uriBase}`)
                 modal.show(null)
             })
             </#noparse>
