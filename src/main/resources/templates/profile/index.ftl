@@ -55,7 +55,7 @@
                 <div id="profileExperience" class="mb-3">
                     <@profileCard>
                     <#-- Title -->
-                        <div class="d-flex justify-content-between">
+                        <div class="d-flex justify-content-between align-items-center">
                             <h5 class="card-title"><@default.icon name="work" class="me-2"/>Experience</h5>
                             <button class="btn btn-outline-primary mb-2" id="addExperienceButton">Add</button>
                         </div>
@@ -85,7 +85,7 @@
                 <div id="profileActivity" class="mb-3">
                     <@profileCard>
                     <#-- Title -->
-                        <div class="d-flex justify-content-between">
+                        <div class="d-flex justify-content-between align-items-center">
                             <h5 class="card-title"><@default.icon name="group" class="me-2"/>Activities</h5>
                             <button class="btn btn-outline-primary mb-2" id="addActivityButton">Add</button>
                         </div>
@@ -106,7 +106,7 @@
                 <div id="profileProjects" class="mb-3">
                     <@profileCard>
                     <#-- Title -->
-                        <div class="d-flex justify-content-between">
+                        <div class="d-flex justify-content-between align-items-center">
                             <h5 class="card-title"><@default.icon name="project" class="me-2"/>Projects</h5>
                             <button class="btn btn-outline-primary mb-2" id="addProjectButton">Add</button>
                         </div>
@@ -128,7 +128,7 @@
                 <div id="profileCourses" class="mb-3">
                     <@profileCard>
                     <#-- Title -->
-                        <div class="d-flex justify-content-between">
+                        <div class="d-flex justify-content-between align-items-center">
                             <h5 class="card-title"><@default.icon name="course" class="me-2"/>Courses</h5>
                             <button class="btn btn-outline-primary mb-2" id="addCourseButton">Add</button>
                         </div>

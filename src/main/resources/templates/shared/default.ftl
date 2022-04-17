@@ -23,6 +23,8 @@
     <head xmlns="">
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1">
+        <meta name="_csrf" content="${_csrf.token}"/>
+        <meta name="_csrf_header" content="${_csrf.headerName}"/>
         <title>${title}</title>
 
         <link rel="icon" type="image/svg+xml" href="<@spring.url "/images/favicon.svg"/>">
@@ -39,13 +41,13 @@
     <script src="<@spring.url "/webjars/bootstrap/js/bootstrap.bundle.min.js"/>"></script>
     <script src="<@spring.url "/webjars/iconify__iconify/dist/iconify.min.js"/>"></script>
     <script>
-        function _clearForm(form){
-            form.querySelectorAll("input").forEach((elem) => elem.value = "")
-            form.querySelectorAll("textarea").forEach((elem) => elem.textContent = "")
+        function _clearForm(form) {
+            form.querySelectorAll("input:not([name='_csrf'])").forEach((elem) => elem.value = "")
+            form.querySelectorAll("textarea").forEach((elem) => elem.value = "")
             form.querySelectorAll("img").forEach((elem) => elem.src = "")
             form.querySelectorAll("select").forEach((elem) => elem.innerHTML = "")
-            form.reset()
         }
+
         function _applyJsonToForm(formId, json) {
             for (const prop in json) {
                 console.log()
