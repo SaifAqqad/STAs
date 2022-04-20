@@ -1,5 +1,6 @@
 package edu.asu.stas.studentprofile.activity;
 
+import edu.asu.stas.content.ContentService;
 import edu.asu.stas.studentprofile.StudentProfileService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -8,6 +9,7 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import org.springframework.web.servlet.view.RedirectView;
 
 import javax.transaction.Transactional;
+import java.io.IOException;
 import java.util.Objects;
 
 @RestController
@@ -15,10 +17,12 @@ import java.util.Objects;
 public class ActivityController {
     private final StudentProfileService studentProfileService;
     private final ActivityRepository activityRepository;
+    private final ContentService contentService;
 
-    public ActivityController(StudentProfileService studentProfileService, ActivityRepository activityRepository) {
+    public ActivityController(StudentProfileService studentProfileService, ActivityRepository activityRepository, ContentService contentService) {
         this.studentProfileService = studentProfileService;
         this.activityRepository = activityRepository;
+        this.contentService = contentService;
     }
 
     // GET /profile/activities/{id}
@@ -48,15 +52,22 @@ public class ActivityController {
 
     // POST /profile/activities/{id}
     @PostMapping("{id}")
+    @Transactional
     public RedirectView updateById(
             @PathVariable Long id,
             Activity activity,
             @RequestParam MultipartFile imageUriData,
             RedirectAttributes redirectAttributes
-    ) {
+    ) throws IOException {
         var profile = studentProfileService.getAuthenticatedUserProfile();
         if (id.equals(activity.getId()) && activityRepository.existsByProfileAndId(profile, activity.getId())) {
             activity.setProfile(profile);
+            if (!imageUriData.isEmpty())
+                activity.setImageUri(contentService.storeResource(
+                        imageUriData.getResource(),
+                        "activity",
+                        activity.getId().toString()
+                ));
             activityRepository.save(activity);
             redirectAttributes.addFlashAttribute("toast", "Activity updated successfully");
         } else {
@@ -68,14 +79,23 @@ public class ActivityController {
 
     // POST /profile/activities
     @PostMapping
+    @Transactional
     public RedirectView addNew(
             Activity activity,
             @RequestParam MultipartFile imageUriData,
             RedirectAttributes redirectAttributes
-    ) {
+    ) throws IOException {
         var profile = studentProfileService.getAuthenticatedUserProfile();
         activity.setProfile(profile);
-        activityRepository.save(activity);
+        activity = activityRepository.save(activity);
+        if (!imageUriData.isEmpty()) {
+            activity.setImageUri(contentService.storeResource(
+                    imageUriData.getResource(),
+                    "activity",
+                    activity.getId().toString()
+            ));
+            activityRepository.save(activity);
+        }
         redirectAttributes.addFlashAttribute("toast", "Activity added successfully");
         return new RedirectView("/profile");
     }
