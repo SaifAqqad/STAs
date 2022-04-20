@@ -6,15 +6,13 @@ import edu.asu.stas.studentprofile.experience.Experience;
 import edu.asu.stas.studentprofile.project.Project;
 import edu.asu.stas.user.User;
 import lombok.*;
+import org.hibernate.Hibernate;
 import org.hibernate.annotations.Type;
 
 import javax.persistence.*;
 import java.io.Serial;
 import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 @Entity
 @NoArgsConstructor
@@ -65,4 +63,17 @@ public class StudentProfile implements Serializable {
 
     @OneToOne(targetEntity = User.class, fetch = FetchType.LAZY, optional = false)
     private User user;
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || Hibernate.getClass(this) != Hibernate.getClass(o)) return false;
+        StudentProfile profile = (StudentProfile) o;
+        return id != null && Objects.equals(id, profile.id);
+    }
+
+    @Override
+    public int hashCode() {
+        return getClass().hashCode();
+    }
 }

@@ -1,12 +1,15 @@
 package edu.asu.stas.studentprofile.course;
 
+import edu.asu.stas.content.ContentService;
 import edu.asu.stas.studentprofile.StudentProfileService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import org.springframework.web.servlet.view.RedirectView;
 
 import javax.transaction.Transactional;
+import java.io.IOException;
 import java.util.Objects;
 
 @RestController
@@ -14,10 +17,13 @@ import java.util.Objects;
 public class CourseController {
     private final StudentProfileService studentProfileService;
     private final CourseRepository courseRepository;
+    private final ContentService contentService;
 
-    public CourseController(StudentProfileService studentProfileService, CourseRepository courseRepository) {
+
+    public CourseController(StudentProfileService studentProfileService, CourseRepository courseRepository, ContentService contentService) {
         this.studentProfileService = studentProfileService;
         this.courseRepository = courseRepository;
+        this.contentService = contentService;
     }
 
     // GET /profile/courses/{id}
@@ -45,12 +51,24 @@ public class CourseController {
         return new RedirectView("/profile");
     }
 
-    // POST /profile/courses/{id}
+    // POST /profile/activities/{id}
     @PostMapping("{id}")
-    public RedirectView updateById(@PathVariable Long id, Course course, RedirectAttributes redirectAttributes) {
+    @Transactional
+    public RedirectView updateById(
+            @PathVariable Long id,
+            Course course,
+            @RequestParam MultipartFile imageUriData,
+            RedirectAttributes redirectAttributes
+    ) throws IOException {
         var profile = studentProfileService.getAuthenticatedUserProfile();
         if (id.equals(course.getId()) && courseRepository.existsByProfileAndId(profile, course.getId())) {
             course.setProfile(profile);
+            if (!imageUriData.isEmpty())
+                course.setImageUri(contentService.storeResource(
+                        imageUriData.getResource(),
+                        "course",
+                        course.getId().toString()
+                ));
             courseRepository.save(course);
             redirectAttributes.addFlashAttribute("toast", "Course updated successfully");
         } else {
@@ -60,12 +78,25 @@ public class CourseController {
         return new RedirectView("/profile");
     }
 
-    // POST /profile/courses
+    // POST /profile/activities
     @PostMapping
-    public RedirectView addNew(Course course, RedirectAttributes redirectAttributes) {
+    @Transactional
+    public RedirectView addNew(
+            Course course,
+            @RequestParam MultipartFile imageUriData,
+            RedirectAttributes redirectAttributes
+    ) throws IOException {
         var profile = studentProfileService.getAuthenticatedUserProfile();
         course.setProfile(profile);
-        courseRepository.save(course);
+        course = courseRepository.save(course);
+        if (!imageUriData.isEmpty()) {
+            course.setImageUri(contentService.storeResource(
+                    imageUriData.getResource(),
+                    "course",
+                    course.getId().toString()
+            ));
+            courseRepository.save(course);
+        }
         redirectAttributes.addFlashAttribute("toast", "Course added successfully");
         return new RedirectView("/profile");
     }

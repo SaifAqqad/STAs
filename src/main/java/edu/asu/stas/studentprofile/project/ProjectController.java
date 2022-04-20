@@ -1,12 +1,15 @@
 package edu.asu.stas.studentprofile.project;
 
+import edu.asu.stas.content.ContentService;
 import edu.asu.stas.studentprofile.StudentProfileService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import org.springframework.web.servlet.view.RedirectView;
 
 import javax.transaction.Transactional;
+import java.io.IOException;
 import java.util.Objects;
 
 @RestController
@@ -14,10 +17,12 @@ import java.util.Objects;
 public class ProjectController {
     private final StudentProfileService studentProfileService;
     private final ProjectRepository projectRepository;
+    private final ContentService contentService;
 
-    public ProjectController(StudentProfileService studentProfileService, ProjectRepository projectRepository) {
+    public ProjectController(StudentProfileService studentProfileService, ProjectRepository projectRepository, ContentService contentService) {
         this.studentProfileService = studentProfileService;
         this.projectRepository = projectRepository;
+        this.contentService = contentService;
     }
 
     // GET /profile/projects/{id}
@@ -45,12 +50,24 @@ public class ProjectController {
         return new RedirectView("/profile");
     }
 
-    // POST /profile/projects/{id}
+    // POST /profile/activities/{id}
     @PostMapping("{id}")
-    public RedirectView updateById(@PathVariable Long id, Project project, RedirectAttributes redirectAttributes) {
+    @Transactional
+    public RedirectView updateById(
+            @PathVariable Long id,
+            Project project,
+            @RequestParam MultipartFile imageUriData,
+            RedirectAttributes redirectAttributes
+    ) throws IOException {
         var profile = studentProfileService.getAuthenticatedUserProfile();
         if (id.equals(project.getId()) && projectRepository.existsByProfileAndId(profile, project.getId())) {
             project.setProfile(profile);
+            if (!imageUriData.isEmpty())
+                project.setImageUri(contentService.storeResource(
+                        imageUriData.getResource(),
+                        "project",
+                        project.getId().toString()
+                ));
             projectRepository.save(project);
             redirectAttributes.addFlashAttribute("toast", "Project updated successfully");
         } else {
@@ -60,12 +77,25 @@ public class ProjectController {
         return new RedirectView("/profile");
     }
 
-    // POST /profile/projects
+    // POST /profile/activities
     @PostMapping
-    public RedirectView addNew(Project project, RedirectAttributes redirectAttributes) {
+    @Transactional
+    public RedirectView addNew(
+            Project project,
+            @RequestParam MultipartFile imageUriData,
+            RedirectAttributes redirectAttributes
+    ) throws IOException {
         var profile = studentProfileService.getAuthenticatedUserProfile();
         project.setProfile(profile);
-        projectRepository.save(project);
+        project = projectRepository.save(project);
+        if (!imageUriData.isEmpty()) {
+            project.setImageUri(contentService.storeResource(
+                    imageUriData.getResource(),
+                    "project",
+                    project.getId().toString()
+            ));
+            projectRepository.save(project);
+        }
         redirectAttributes.addFlashAttribute("toast", "Project added successfully");
         return new RedirectView("/profile");
     }
