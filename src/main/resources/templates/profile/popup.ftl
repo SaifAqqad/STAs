@@ -41,7 +41,7 @@
             imageElem.src = imageUri.value
         }
     </script>
-    <@formPopup addPopup=addPopup detailsPopup=detailsPopup popupId=popupId formId=formId uriBase=uriBase isMultiPartForm=true applyMethod="_applyActivityToForm">
+    <@formPopup addPopup=addPopup detailsPopup=detailsPopup popupId=popupId formId=formId uriBase=uriBase isMultiPartForm=true imageInputId=["${formId}_imageUri", "${formId}_imageUriData"] applyMethod="_applyActivityToForm">
         <input type="hidden" name="id" id="${formId}_id"/>
         <div class="form-floating">
             <input class="form-control" required type="text" name="name" id="${formId}_name"
@@ -64,7 +64,8 @@
                 <img id="${formId}_image" class="card-img-top" alt="" src="">
                 <div class="card-body">
                     <input type="hidden" name="imageUri" id="${formId}_imageUri"/>
-                    <input class="form-control" type="file" name="imageUriData" id="${formId}_imageUriData"
+                    <input class="form-control" type="file" accept="image/*" name="imageUriData"
+                           id="${formId}_imageUriData"
                            placeholder="Activity image">
                 </div>
             </div>
@@ -81,7 +82,7 @@
             imageElem.src = imageUri.value
         }
     </script>
-    <@formPopup addPopup=addPopup detailsPopup=detailsPopup popupId=popupId formId=formId uriBase=uriBase isMultiPartForm=true applyMethod="_applyProjectToForm">
+    <@formPopup addPopup=addPopup detailsPopup=detailsPopup popupId=popupId formId=formId uriBase=uriBase isMultiPartForm=true imageInputId=["${formId}_imageUri", "${formId}_imageUriData"] applyMethod="_applyProjectToForm">
         <input type="hidden" name="id" id="${formId}_id"/>
         <div class="form-floating">
             <input class="form-control" required type="text" name="name" id="${formId}_name"
@@ -118,7 +119,8 @@
                 <img id="${formId}_image" class="card-img-top" alt="" src="">
                 <div class="card-body">
                     <input type="hidden" name="imageUri" id="${formId}_imageUri"/>
-                    <input class="form-control" type="file" name="imageUriData" id="${formId}_imageUriData"
+                    <input class="form-control" type="file" accept="image/*" name="imageUriData"
+                           id="${formId}_imageUriData"
                            placeholder="Project image">
                 </div>
             </div>
@@ -136,7 +138,7 @@
             imageElem.src = imageUri.value
         }
     </script>
-    <@formPopup addPopup=addPopup detailsPopup=detailsPopup popupId=popupId formId=formId uriBase=uriBase isMultiPartForm=true applyMethod="_applyCourseToForm">
+    <@formPopup addPopup=addPopup detailsPopup=detailsPopup popupId=popupId formId=formId uriBase=uriBase isMultiPartForm=true imageInputId=["${formId}_imageUri", "${formId}_imageUriData"] applyMethod="_applyCourseToForm">
         <input type="hidden" name="id" id="${formId}_id"/>
         <div class="form-floating">
             <input class="form-control" required type="text" name="name" id="${formId}_name"
@@ -164,7 +166,8 @@
                 <img id="${formId}_image" class="card-img-top" alt="" src="">
                 <div class="card-body">
                     <input type="hidden" name="imageUri" id="${formId}_imageUri"/>
-                    <input class="form-control" type="file" name="imageUriData" id="${formId}_imageUriData"
+                    <input class="form-control" type="file" accept="image/*" name="imageUriData"
+                           id="${formId}_imageUriData"
                            placeholder="Course image"/>
                 </div>
             </div>
@@ -172,7 +175,7 @@
     </@formPopup>
 </#macro>
 
-<#macro formPopup detailsPopup popupId formId uriBase addPopup="" isMultiPartForm=false applyMethod="_applyJsonToForm">
+<#macro formPopup detailsPopup popupId formId uriBase addPopup="" isMultiPartForm=false imageInputId=[] applyMethod="_applyJsonToForm">
     <div class="modal fade" id="${popupId?no_esc}" tabindex="-1">
         <div class="modal-dialog modal-dialog-centered">
             <div class="modal-content">
@@ -215,6 +218,7 @@
                 addButton: document.getElementById("${addPopup.buttonId?no_esc}"),
                 popupTitle: "${addPopup.popupTitle?no_esc}",
             }
+            const imageInputSelector = "<#list imageInputId as id>#${id}<#sep>,</#list>";
             <#noparse>
             // set up details popup
             document.querySelectorAll(detailsPopup.elementSelector).forEach(element => {
@@ -256,6 +260,20 @@
                 formElement.setAttribute("action", `${uriBase}`)
                 modal.show(null)
             })
+            if (imageInputSelector) {
+                document.querySelectorAll(imageInputSelector).forEach(input => {
+                    input.addEventListener("change", event => {
+                        let imageElement = document.getElementById(formId + "_image")
+                        if (event.target.files) {
+                            let imageData = URL.createObjectURL(event.target.files[0])
+                            imageElement.src = imageData
+                            URL.revokeObjectURL(imageData)
+                        } else {
+                            imageElement.src = event.target.value
+                        }
+                    })
+                })
+            }
             </#noparse>
         })();
     </script>
