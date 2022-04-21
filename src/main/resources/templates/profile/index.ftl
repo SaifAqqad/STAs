@@ -49,7 +49,35 @@
             <div id="profileContent" class="col-md-8 col-lg-9">
 
                 <div id="profileAbout" class="mb-3">
-                    <@profileCard title="About me" icon="personInfo" text="${profile.about}"/>
+                    <@profileCard class="view-card">
+                    <#-- Title -->
+                        <div class="d-flex justify-content-between align-items-center">
+                            <h5 class="card-title"><@default.icon name="personInfo" class="me-2"/>About me</h5>
+                            <button class="btn btn-outline-primary mb-2" id="editAboutButton">Edit</button>
+                        </div>
+                    <#-- Content -->
+                        <p class="card-text limit-lines-4">
+                            ${profile.about}
+                        </p>
+                    </@profileCard>
+                    <@profileCard class="edit-card visually-hidden">
+                    <#-- Title -->
+                        <div class="d-flex justify-content-between align-items-center">
+                            <h5 class="card-title"><@default.icon name="personInfo" class="me-2"/>About me</h5>
+                            <div class="mb-2">
+                                <button class="btn btn-outline-danger cancel-btn">Cancel</button>
+                                <button class="btn btn-outline-primary save-btn">Save</button>
+                            </div>
+                        </div>
+                    <#-- Content -->
+                        <form action="<@spring.url "/profile/about"/>" method="post">
+                            <@default.csrfInput/>
+                            <div class="mt-2">
+                                <#--noinspection HtmlFormInputWithoutLabel-->
+                                <textarea rows="4" class="form-control" name="about"></textarea>
+                            </div>
+                        </form>
+                    </@profileCard>
                 </div>
 
                 <div id="profileExperience" class="mb-3">
@@ -155,50 +183,78 @@
 
 <@default.scripts/>
 <@default.toast/>
+<script>
+    <#-- About card script -->
+    (() => {
+        const view = {card: document.querySelector("#profileAbout div.card.view-card")}
+        view.textElement = view.card.querySelector("p")
+        const edit = {card: document.querySelector("#profileAbout div.card.edit-card")}
+        edit.textArea = edit.card.querySelector("textarea[name='about']")
+        edit.form = edit.card.querySelector("form")
+
+        view.card.querySelector("#editAboutButton").addEventListener("click", () => {
+            // hide view card
+            view.card.classList.add("visually-hidden")
+            // show edit card
+            edit.card.classList.remove("visually-hidden")
+            // set edit card text
+            edit.textArea.value = view.textElement.textContent.trim()
+        })
+        edit.card.querySelector("button.cancel-btn").addEventListener("click", () => {
+            // hide edit card
+            edit.card.classList.add("visually-hidden")
+            // show view card
+            view.card.classList.remove("visually-hidden")
+        })
+        edit.card.querySelector("button.save-btn").addEventListener("click", () => {
+            edit.form.submit()
+        })
+    })()
+</script>
 
 <@popups.experiencePopup popupId="experiencePopup" formId="experienceForm" uriBase="/profile/experiences"
-    detailsPopup={
-        "popupTitle" : "Experience details",
-        "deleteButtonId" : "experienceDelete",
-        "elementSelector" : "#profileExperience li"
-    }
-    addPopup={
-        "popupTitle" : "Add a new experience",
-        "buttonId" : "addExperienceButton"
-    }
+detailsPopup={
+"popupTitle" : "Experience details",
+"deleteButtonId" : "experienceDelete",
+"elementSelector" : "#profileExperience li"
+}
+addPopup={
+"popupTitle" : "Add a new experience",
+"buttonId" : "addExperienceButton"
+}
 />
 <@popups.activityPopup popupId="activityPopup" formId="activityForm" uriBase="/profile/activities"
-    detailsPopup={
-        "popupTitle" : "Activity details",
-        "deleteButtonId" : "activityDelete",
-        "elementSelector" : "#profileActivity .card.btn"
-    }
-    addPopup={
-        "popupTitle" : "Add a new activity",
-        "buttonId" : "addActivityButton"
-    }
+detailsPopup={
+"popupTitle" : "Activity details",
+"deleteButtonId" : "activityDelete",
+"elementSelector" : "#profileActivity .card.btn"
+}
+addPopup={
+"popupTitle" : "Add a new activity",
+"buttonId" : "addActivityButton"
+}
 />
 <@popups.projectPopup popupId="projectPopup" formId="projectForm" uriBase="/profile/projects"
-    detailsPopup={
-        "popupTitle" : "Project details",
-        "deleteButtonId" : "projectDelete",
-        "elementSelector" : "#profileProjects .card.btn"
-    }
-    addPopup={
-        "popupTitle" : "Add a new project",
-        "buttonId" : "addProjectButton"
-    }
+detailsPopup={
+"popupTitle" : "Project details",
+"deleteButtonId" : "projectDelete",
+"elementSelector" : "#profileProjects .card.btn"
+}
+addPopup={
+"popupTitle" : "Add a new project",
+"buttonId" : "addProjectButton"
+}
 />
 <@popups.coursePopup popupId="coursePopup" formId="courseForm" uriBase="/profile/courses"
-    detailsPopup={
-        "popupTitle" : "Course details",
-        "deleteButtonId" : "courseDelete",
-        "elementSelector" : "#profileCourses .card.btn"
-    }
-    addPopup={
-        "popupTitle" : "Add a new course",
-        "buttonId" : "addCourseButton"
-    }
+detailsPopup={
+"popupTitle" : "Course details",
+"deleteButtonId" : "courseDelete",
+"elementSelector" : "#profileCourses .card.btn"
+}
+addPopup={
+"popupTitle" : "Add a new course",
+"buttonId" : "addCourseButton"
+}
 />
 </body>
 </html>

@@ -60,6 +60,10 @@ public class StudentProfileService {
         return getProfileByUser(user);
     }
 
+    public StudentProfile saveProfile(StudentProfile profile) {
+        return studentProfileRepository.save(profile);
+    }
+
     public Activity getActivityById(Long id) {
         return activityRepository.findById(id).orElse(null);
     }

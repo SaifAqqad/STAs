@@ -35,6 +35,7 @@ public class StudentProfile implements Serializable {
 
     private String location;
 
+    @Column(length = 5000)
     private String about;
 
     private String contactPhone;
