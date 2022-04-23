@@ -43,6 +43,8 @@ public class CourseController {
         var profile = studentProfileService.getAuthenticatedUserProfile();
         if (courseRepository.existsByProfileAndId(profile, course.getId())) {
             courseRepository.deleteByProfileAndId(profile, course.getId());
+            String imageName = course.getImageUri().substring(course.getImageUri().lastIndexOf('/') + 1);
+            contentService.removeResource("course", course.getId().toString() + "_" + imageName);
             redirectAttributes.addFlashAttribute("toast", "Course deleted successfully");
         } else {
             redirectAttributes.addFlashAttribute("toastColor", "danger");

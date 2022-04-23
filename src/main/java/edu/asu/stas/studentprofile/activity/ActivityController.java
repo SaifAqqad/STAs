@@ -42,6 +42,8 @@ public class ActivityController {
         var profile = studentProfileService.getAuthenticatedUserProfile();
         if (activityRepository.existsByProfileAndId(profile, activity.getId())) {
             activityRepository.deleteByProfileAndId(profile, activity.getId());
+            String imageName = activity.getImageUri().substring(activity.getImageUri().lastIndexOf('/') + 1);
+            contentService.removeResource("activity", activity.getId().toString() + "_" + imageName);
             redirectAttributes.addFlashAttribute("toast", "Activity deleted successfully");
         } else {
             redirectAttributes.addFlashAttribute("toastColor", "danger");

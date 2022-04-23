@@ -57,6 +57,15 @@ public class ContentService {
         return null;
     }
 
+    public boolean removeResource(String type, String name) {
+        Path filePath = Path.of(basePath, type, name);
+        try {
+            return Files.deleteIfExists(filePath);
+        } catch (IOException ignored) {
+            return false;
+        }
+    }
+
     private String generateResourceUri(String resourceType, String resourceName) {
         return baseUri + "/" + resourceType + "/" + resourceName.replaceFirst("_", "/");
     }
