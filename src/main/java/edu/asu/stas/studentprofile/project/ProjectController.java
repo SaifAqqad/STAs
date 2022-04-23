@@ -42,6 +42,8 @@ public class ProjectController {
         var profile = studentProfileService.getAuthenticatedUserProfile();
         if (projectRepository.existsByProfileAndId(profile, project.getId())) {
             projectRepository.deleteByProfileAndId(profile, project.getId());
+            String imageName = project.getImageUri().substring(project.getImageUri().lastIndexOf('/') + 1);
+            contentService.removeResource("course", project.getId().toString() + "_" + imageName);
             redirectAttributes.addFlashAttribute("toast", "Project deleted successfully");
         } else {
             redirectAttributes.addFlashAttribute("toastColor", "danger");
