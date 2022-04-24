@@ -10,7 +10,7 @@
 <body>
 <@default.navbar account="active"/>
 
-<div class="container-fluid my-3">
+<div class="container-fluid container-md my-3">
     <div class="row">
         <div class="col-sm-3">
             <@account.sidebar accountConnections="active"/>

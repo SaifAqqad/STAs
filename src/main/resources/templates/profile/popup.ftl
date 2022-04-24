@@ -194,8 +194,8 @@
                         <button id="${detailsPopup.deleteButtonId}" class="btn btn-outline-danger">Delete</button>
                     </div>
                     <div>
-                        <button class="btn btn-outline-primary" data-bs-dismiss="modal">Cancel</button>
                         <input class="btn btn-primary" type="submit" value="Save" form="${formId}"/>
+                        <button class="btn btn-outline-primary" data-bs-dismiss="modal">Cancel</button>
                     </div>
                 </div>
             </div>

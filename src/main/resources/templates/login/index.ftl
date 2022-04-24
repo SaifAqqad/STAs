@@ -35,12 +35,12 @@
                     <div class="form-floating mb-3">
                         <input class="form-control" type="email" name="email" id="email" placeholder="Email Address"
                                required/>
-                        <label class="form-label" for="email">Email address</label>
+                        <label class="form-label text-muted" for="email">Email address</label>
                     </div>
                     <div class="form-floating mb-3">
                         <input class="form-control" type="password" name="password" id="password" placeholder="Password"
                                required/>
-                        <label class="form-label" for="password">Password</label>
+                        <label class="form-label text-muted" for="password">Password</label>
                     </div>
                     <div class="d-flex justify-content-end mb-2">
                         <div class="">
