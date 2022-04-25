@@ -15,6 +15,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.Comparator;
+import java.util.Map;
 import java.util.Objects;
 
 @SuppressWarnings("ClassCanBeRecord")
@@ -80,4 +81,15 @@ public class StudentProfileService {
         return projectRepository.findById(id).orElse(null);
     }
 
+    public void updateProfileInfo(StudentProfile profile, ProfileInfo profileInfo, Map<String, String> links) {
+        profile.setName(profileInfo.getName());
+        profile.setMajor(profileInfo.getMajor());
+        profile.setLocation(profileInfo.getLocation());
+        profile.setUniversity(profileInfo.getUniversity());
+        profile.setContactEmail(profileInfo.getContactEmail());
+        profile.setContactPhone(profileInfo.getContactPhone());
+        profile.getLinks().clear();
+        profile.getLinks().putAll(links);
+        studentProfileRepository.save(profile);
+    }
 }

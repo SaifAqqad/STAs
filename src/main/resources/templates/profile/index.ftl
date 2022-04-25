@@ -59,7 +59,7 @@
                             <@profileViewItem text=profile.contactPhone name="contactPhone" icon="phone" link="tel:${profile.contactPhone}"/>
                             <div class="profile-view-links">
                                 <#list profile.links as linkName, linkUrl>
-                                    <@profileViewItem text=linkName name="link_${linkName}" icon=linkName?lower_case link=linkUrl showLinkIcon=true/>
+                                    <@profileViewItem text=linkName name="link_${linkName}" icon=linkName?lower_case link=linkUrl showLinkIcon=true includeUrl=true/>
                                 </#list>
                             </div>
                         </div>
@@ -69,7 +69,7 @@
                         </div>
 
                         <div class="ps-3 profile-edit-items d-none ">
-                            <form action="<@spring.url "/profile/info"/>" method="post">
+                            <form action="<@spring.url "/profile/info"/>" method="post" enctype="multipart/form-data">
                                 <@default.csrfInput/>
                                 <input class="hidden-profile-edit-item" type="hidden" name="name"
                                        value="${profile.name}">
@@ -79,7 +79,13 @@
                                 <@profileEditItem icon="university" name="university" label="University" value=profile.university/>
                                 <@profileEditItem icon="email" name="contactEmail" label="Contact email" value=profile.contactEmail/>
                                 <@profileEditItem icon="phone" name="contactPhone" label="Contact phone" value=profile.contactPhone/>
+                                <#list profile.links as linkName, linkUrl>
+                                    <@profileEditItem icon=linkName?lower_case name="link_${linkName}" label=linkName value=linkUrl showLabel=true/>
+                                </#list>
                             </form>
+                            <div class="mx-3 mt-2 d-flex justify-content-end">
+                                <button class="btn btn-sm btn-outline-primary">Add link</button>
+                            </div>
                         </div>
                         <div class="mx-3 mt-3 d-flex justify-content-end profile-edit-items d-none">
                             <button class="btn btn-sm btn-primary me-1" id="saveInfoBtn">Save</button>
@@ -324,15 +330,15 @@
             // copy view values onto edit inputs
             edit.items.forEach(item => {
                 const propName = item.getAttribute("data-prop")
-                const propViewValue = document.querySelector(`.profile-view-item[data-prop=${propName}]`).textContent
-                item.value = propViewValue.trim()
+                const propValue = document.querySelector(`.profile-view-item[data-prop=${propName}]`)
+                item.value = propValue.getAttribute("data-url") || propValue.textContent.trim();
             })
         });
         edit.saveButton.addEventListener("click", () => {
             // copy edit values onto hidden form inputs
             edit.form.querySelectorAll("input.hidden-profile-edit-item").forEach(hiddenInput => {
                 let name = hiddenInput.getAttribute("name")
-                hiddenInput.value = document.querySelector(`.profile-edit-item[data-prop=${name}]`)
+                hiddenInput.value = document.querySelector(`.profile-edit-item[data-prop=${name}]`).value
             });
             edit.form.submit();
             // hide edit items
@@ -421,12 +427,12 @@ addPopup={
     </div>
 </#macro>
 
-<#macro profileViewItem text name icon="" link="" showLinkIcon=false>
+<#macro profileViewItem text name icon="" link="" showLinkIcon=false includeUrl=false>
     <div class="text-muted fs-6 text-truncate">
         <#if link?has_content>
             <a href="${link?no_esc}" target="_blank" class="text-decoration-none text-muted text-hover-dark">
                 <@default.icon name=icon fallback="web" class="mx-1"/>
-                <span data-prop="${name}" data-url="${link}"
+                <span data-prop="${name}" <#if includeUrl>data-url="${link}"</#if>
                       class="profile-view-item">${text}<#if showLinkIcon><@default.externalLinkIcon/></#if></span>
             </a>
         <#else>
@@ -436,9 +442,13 @@ addPopup={
     </div>
 </#macro>
 
-<#macro profileEditItem icon name label value>
+<#macro profileEditItem icon name label value showLabel=false>
     <div class="mt-1 mx-1 d-flex align-items-center text-muted">
-        <@default.icon name=icon fallback="web" class="me-2" width="20"/>
+        <#if showLabel>
+            <span class="me-2">${label}</span>
+        <#else>
+            <@default.icon name=icon fallback="web" class="me-2" width="20"/>
+        </#if>
         <input class="form-control form-control-sm flex-grow-1 rounded-3 profile-edit-item" type="text" name="${name}"
                data-prop="${name}" placeholder="${label}" value="${value}" aria-label="${label}">
     </div>

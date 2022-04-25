@@ -7,9 +7,12 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
+import java.util.Map;
 import java.util.Objects;
+import java.util.stream.Collectors;
 
 @Controller
 public class StudentProfileController {
@@ -40,13 +43,29 @@ public class StudentProfileController {
     }
 
     @PostMapping("/profile/about")
-    public String updateProfileAbout(String about, RedirectAttributes redirectAttributes){
+    public String updateProfileAbout(String about, RedirectAttributes redirectAttributes) {
         StudentProfile profile = getStudentProfile();
-        if(Objects.nonNull(profile)){
+        if (Objects.nonNull(profile)) {
             profile.setAbout(about.trim());
             studentProfileService.saveProfile(profile);
             redirectAttributes.addFlashAttribute("toast", "Profile updated successfully");
         }
+        return "redirect:/profile";
+    }
+
+    @PostMapping("/profile/info")
+    public String updateProfileInfo(ProfileInfo profileInfo, @RequestParam Map<String, String> links, RedirectAttributes redirectAttributes) {
+        StudentProfile profile = Objects.requireNonNull(getStudentProfile());
+        studentProfileService.updateProfileInfo(
+                profile,
+                profileInfo,
+                links.entrySet().stream()
+                        .filter(entry -> entry.getKey().startsWith("link_") && !entry.getValue().isBlank())
+                        .collect(Collectors.toMap(
+                                entry -> entry.getKey().replaceFirst("link_", ""),
+                                Map.Entry::getValue))
+        );
+        redirectAttributes.addFlashAttribute("toast", "Profile updated successfully");
         return "redirect:/profile";
     }
 
