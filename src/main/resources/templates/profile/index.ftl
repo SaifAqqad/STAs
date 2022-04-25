@@ -56,27 +56,28 @@
                             <button class="btn btn-outline-primary mb-2" id="editAboutButton">Edit</button>
                         </div>
                     <#-- Content -->
-                        <p class="card-text limit-lines-4">
-                            ${profile.about}
-                        </p>
+                        <div class="card-text" id="aboutContent"></div>
                     </@profileCard>
-                    <@profileCard class="edit-card visually-hidden">
+                    <@profileCard class="edit-card d-none">
                     <#-- Title -->
                         <div class="d-flex justify-content-between align-items-center">
                             <h5 class="card-title"><@default.icon name="personInfo" class="me-2"/>About me</h5>
                             <div class="mb-2">
-                                <button class="btn btn-outline-danger cancel-btn">Cancel</button>
-                                <button class="btn btn-outline-primary save-btn">Save</button>
+                                <button class="btn btn-primary save-btn">Save</button>
+                                <button class="btn btn-outline-primary cancel-btn">Cancel</button>
                             </div>
                         </div>
                     <#-- Content -->
-                        <form action="<@spring.url "/profile/about"/>" method="post">
+                        <form action="<@spring.url "/profile/about"/>" method="post" enctype="multipart/form-data">
                             <@default.csrfInput/>
                             <div class="mt-2">
-                                <#--noinspection HtmlFormInputWithoutLabel-->
-                                <textarea rows="4" class="form-control" name="about"></textarea>
+                                <textarea aria-label="About me" class="form-control" name="about"
+                                          maxlength="5000"></textarea>
                             </div>
                         </form>
+                        <div class="clearfix">
+                            <div class="float-end text-muted" id="aboutCharCount">0/5000</div>
+                        </div>
                     </@profileCard>
                 </div>
 
@@ -187,27 +188,52 @@
     <#-- About card script -->
     (() => {
         const view = {card: document.querySelector("#profileAbout div.card.view-card")}
-        view.textElement = view.card.querySelector("p")
+        view.textElement = view.card.querySelector("#aboutContent")
+        view.content = "${profile.about?js_string}"
         const edit = {card: document.querySelector("#profileAbout div.card.edit-card")}
         edit.textArea = edit.card.querySelector("textarea[name='about']")
         edit.form = edit.card.querySelector("form")
+        edit.charCount = edit.card.querySelector("#aboutCharCount")
+        edit.charLimit = 5000
 
+        // set initial textarea height
+        edit.textArea.setAttribute("style", "height:" + (edit.textArea.scrollHeight) + "px;overflow-y:hidden;")
+        // set initial content
+        view.textElement.innerHTML = marked.parse(view.content, {sanitizer: DOMPurify.sanitizeFn})
+
+        // view card edit button
         view.card.querySelector("#editAboutButton").addEventListener("click", () => {
             // hide view card
-            view.card.classList.add("visually-hidden")
+            _showElems([view.card], false)
             // show edit card
-            edit.card.classList.remove("visually-hidden")
-            // set edit card text
-            edit.textArea.value = view.textElement.textContent.trim()
+            _showElems([edit.card], true)
+            // set text area content
+            edit.textArea.value = view.content.trim()
+            // set text area char count
+            edit.charCount.textContent = edit.textArea.value.length + "/" + edit.charLimit
+            // set text area initial height
+            edit.textArea.style.height = 'auto';
+            edit.textArea.style.height = edit.textArea.scrollHeight + 'px';
         })
+
+        // edit card cancel button
         edit.card.querySelector("button.cancel-btn").addEventListener("click", () => {
             // hide edit card
-            edit.card.classList.add("visually-hidden")
+            _showElems([edit.card], false)
             // show view card
-            view.card.classList.remove("visually-hidden")
+            _showElems([view.card], true)
         })
+
+        // edit card save button
         edit.card.querySelector("button.save-btn").addEventListener("click", () => {
             edit.form.submit()
+        })
+
+        // textarea onChange
+        edit.textArea.addEventListener("input", () => {
+            edit.textArea.style.height = 'auto';
+            edit.textArea.style.height = edit.textArea.scrollHeight + 'px';
+            edit.charCount.textContent = edit.textArea.value.length + "/" + edit.charLimit
         })
     })()
 </script>
