@@ -10,9 +10,10 @@
 <@default.navbar/>
 
 <div class="container mt-3">
-    <div class="card text-dark bg-light mb-3 w-100">
-        <div class="card-header">Create a new account</div>
+    <div class="card card-light text-dark mb-3 w-100">
         <div class="card-body">
+            <h6 class="mb-1">Create a new account</h6>
+            <br/>
             <form class="needs-validation" method="post">
                 <@default.csrfInput/>
                 <div class="row">

@@ -14,9 +14,10 @@
 
 <div class="container">
     <div class="d-flex align-items-center justify-content-center mt-5 mx-md-5-5 mx-lg-6">
-        <div class="card text-dark bg-light mb-3 w-100 <#if loginError>border-danger</#if>">
-            <div class="card-header">Log in with your account</div>
+        <div class="card card-light text-dark  mb-3 w-100 <#if loginError>border-danger</#if>">
             <div class="card-body">
+                <h6 class="mb-1">Log in with your account</h6>
+                <br/>
                 <#if loginError>
                     <div class="alert alert-danger" role="alert">
                         <#switch errorType!0>
