@@ -60,6 +60,7 @@ public class STAsApplication {
                     profile.setContactEmail("saif.w.alaqqad@gmail.com");
                     profile.setContactPhone("+962799545922");
                     profile.setLocation("Amman, Jordan");
+                    profile.getLinks().put("GitHub", "https://github.com/SaifAqqad/");
                     profile.setUser(user1);
                     profile = studentProfileRepository.save(profile);
 

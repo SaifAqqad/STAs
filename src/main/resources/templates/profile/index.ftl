@@ -18,30 +18,74 @@
 <body>
 <@default.navbar profile="active"/>
 
-<div class="container-fluid my-3">
+<div class="container-fluid container-xl my-3">
     <div id="profile">
         <div class="row">
             <#-- Left column -->
             <div class="col-md-4 col-lg-3">
-                <div id="profileInfo" class="card-border-grey rounded-2 p-2 mb-3">
-                    <div class="text-center ms-3">
-                        <div class="p-2">
-                            <img class="figure-img img-w-100 rounded-circle" src="${profile.imagerUri}"
-                                 alt="profile picture"/>
+                <#-- Profile info -->
+                <div id="profileInfo">
+                    <div class="card card-border-grey rounded-2 p-2 mb-3">
+                        <div class="text-center ms-3">
+                            <#-- profile picture -->
+                            <div class="p-2">
+                                <img class="figure-img img-w-100 rounded-circle" src="${profile.imagerUri}"
+                                     alt="profile picture"/>
+                            </div>
+                            <#-- name and major -->
+                            <div class="profile-view-items">
+                                <div class="fs-4 profile-view-item" data-prop="name">${profile.name}</div>
+                                <div class="fs-6 text-muted profile-view-item" data-prop="major">${profile.major}</div>
+                            </div>
+                            <div class="profile-edit-items text-start d-none">
+                                <div>
+                                    <label class="form-label text-muted mb-0" for="edit_name">Name</label>
+                                    <input class="form-control form-control-sm profile-edit-item" type="text"
+                                           data-prop="name" id="edit_name" value="${profile.name}">
+                                </div>
+                                <div class="mt-2">
+                                    <label class="form-label text-muted mb-0" for="edit_major">Major</label>
+                                    <input class="form-control form-control-sm profile-edit-item" type="text"
+                                           data-prop="major" id="edit_major" value="${profile.major}">
+                                </div>
+                            </div>
                         </div>
-                        <div class="fs-4" id="profileName">${profile.name}</div>
-                        <div class="fs-6 text-muted">${profile.major}</div>
-                    </div>
-                    <hr class="mx-4"/>
-                    <div class="ps-3">
-                        <@profileItem text=profile.location icon="location"/>
-                        <@profileItem text=profile.university icon="university"/>
-                        <@profileItem text=profile.contactEmail icon="email" link="mailto:${profile.contactEmail}"/>
-                        <@profileItem text=profile.contactPhone icon="phone" link="tel:${profile.contactPhone}"/>
-                        <@profileItem text="GitHub" icon="github" link="https://github.com/SaifAqqad" showLinkIcon=true/>
-                        <@profileItem text="LinkedIn" icon="linkedin" link="https://github.com/SaifAqqad" showLinkIcon=true/>
+                        <hr class="mx-4"/>
+                        <#-- profile info -->
+                        <div class="ps-3 profile-view-items">
+                            <@profileViewItem text=profile.location name="location" icon="location"/>
+                            <@profileViewItem text=profile.university name="university" icon="university"/>
+                            <@profileViewItem text=profile.contactEmail name="contactEmail" icon="email" link="mailto:${profile.contactEmail}"/>
+                            <@profileViewItem text=profile.contactPhone name="contactPhone" icon="phone" link="tel:${profile.contactPhone}"/>
+                            <#list profile.links as linkName, linkUrl>
+                                <@profileViewItem text=linkName name="link_${linkName}" icon=linkName?lower_case link=linkUrl showLinkIcon=true/>
+                            </#list>
+                        </div>
+                        <div class="mx-3 mt-3 profile-view-items ">
+                            <button class="btn btn-sm btn-outline-primary w-100" id="editInfoBtn">Edit information
+                            </button>
+                        </div>
+
+                        <div class="ps-3 profile-edit-items d-none ">
+                            <form action="<@spring.url "/profile/info"/>" method="post">
+                                <@default.csrfInput/>
+                                <input class="hidden-profile-edit-item" type="hidden" name="name"
+                                       value="${profile.name}">
+                                <input class="hidden-profile-edit-item" type="hidden" name="major"
+                                       value="${profile.major}">
+                                <@profileEditItem icon="location" name="location" label="Location" value=profile.location/>
+                                <@profileEditItem icon="university" name="university" label="University" value=profile.university/>
+                                <@profileEditItem icon="email" name="contactEmail" label="Contact email" value=profile.contactEmail/>
+                                <@profileEditItem icon="phone" name="contactPhone" label="Contact phone" value=profile.contactPhone/>
+                            </form>
+                        </div>
+                        <div class="mx-3 mt-3 d-flex justify-content-end profile-edit-items d-none">
+                            <button class="btn btn-sm btn-primary me-1" id="saveInfoBtn">Save</button>
+                            <button class="btn btn-sm btn-outline-primary" id="cancelInfoBtn">Cancel</button>
+                        </div>
                     </div>
                 </div>
+
                 <#-- TODO: Add skills card -->
             </div>
 
@@ -237,6 +281,56 @@
         })
     })()
 </script>
+<script>
+    <#-- Profile info script -->
+    (() => {
+        const view = {
+            items: document.querySelectorAll(".profile-view-item"),
+            groups: document.querySelectorAll(".profile-view-items"),
+            editButton: document.querySelector("#editInfoBtn"),
+        }
+        const edit = {
+            items: document.querySelectorAll(".profile-edit-item"),
+            groups: document.querySelectorAll(".profile-edit-items"),
+            form: document.querySelector(".profile-edit-items > form"),
+            saveButton: document.querySelector("#saveInfoBtn"),
+            cancelButton: document.querySelector("#cancelInfoBtn"),
+        }
+
+        <#noparse>
+        view.editButton.addEventListener("click", () => {
+            // hide view items
+            _showElems([...view.items, ...view.groups], false);
+            // show edit items
+            _showElems([...edit.items, ...edit.groups], true);
+            // copy view values onto edit inputs
+            edit.items.forEach(item => {
+                const propName = item.getAttribute("data-prop")
+                const propViewValue = document.querySelector(`.profile-view-item[data-prop=${propName}]`).textContent
+                item.value = propViewValue.trim()
+            })
+        });
+        edit.saveButton.addEventListener("click", () => {
+            // copy edit values onto hidden form inputs
+            edit.form.querySelectorAll("input.hidden-profile-edit-item").forEach(hiddenInput => {
+                let name = hiddenInput.getAttribute("name")
+                hiddenInput.value = document.querySelector(`.profile-edit-item[data-prop=${name}]`)
+            });
+            edit.form.submit();
+            // hide edit items
+            _showElems([...edit.items, ...edit.groups], false);
+            // show view items
+            _showElems([...view.items, ...view.groups], true);
+        });
+        edit.cancelButton.addEventListener("click", () => {
+            // hide edit items
+            _showElems([...edit.items, ...edit.groups], false);
+            // show view items
+            _showElems([...view.items, ...view.groups], true);
+        });
+        </#noparse>
+    })()
+</script>
 
 <@popups.experiencePopup popupId="experiencePopup" formId="experienceForm" uriBase="/profile/experiences"
 detailsPopup={
@@ -287,13 +381,13 @@ addPopup={
 
 <#macro profileCard title="" icon="" subtitle="" text="" id="" img="" img_alt="" class="" limitLines=true preserveLines=false>
     <div class="card card-border-grey w-100 h-100 ${class?no_esc}" <#if id?has_content>data-id="${id}"</#if>>
-        <div class="d-flex align-content-between align-items-center w-100">
+        <div class="d-flex flex-column flex-sm-row align-content-between align-items-center w-100">
             <#if img?has_content>
                 <div class="h-75">
                     <img src="${img}" class="w-100 h-100 rounded-1 img-w-limit object-fit" alt="${img_alt}">
                 </div>
             </#if>
-            <div class="card-body d-flex flex-column flex-grow-1">
+            <div class="card-body d-flex flex-column flex-grow-1 w-100">
                 <#if title?has_content>
                     <h5 class="card-title"><#if icon?has_content><@default.icon name=icon class="me-2"/></#if>${title}</h5>
                 </#if>
@@ -309,16 +403,25 @@ addPopup={
     </div>
 </#macro>
 
-<#macro profileItem text icon="" link="" showLinkIcon=false>
+<#macro profileViewItem text name icon="" link="" showLinkIcon=false>
     <div class="text-muted fs-6 text-truncate">
         <#if link?has_content>
-            <a href="${link?no_esc}" class="text-decoration-none text-muted text-hover-dark">
+            <a href="${link?no_esc}" target="_blank" class="text-decoration-none text-muted text-hover-dark">
                 <@default.icon name=icon fallback="web" class="mx-1"/>
-                <span>${text}<#if showLinkIcon><@default.externalLinkIcon/></#if></span>
+                <span data-prop="${name}"
+                      class="profile-view-item">${text}<#if showLinkIcon><@default.externalLinkIcon/></#if></span>
             </a>
         <#else>
             <@default.icon name=icon fallback="web" class="mx-1"/>
-            <span>${text}<#if showLinkIcon><@default.externalLinkIcon/></#if></span>
+            <span data-prop="${name}" class="profile-view-item">${text}</span>
         </#if>
+    </div>
+</#macro>
+
+<#macro profileEditItem icon name label value>
+    <div class="mt-1 mx-1 d-flex align-items-center text-muted">
+        <@default.icon name=icon fallback="web" class="me-2" width="20"/>
+        <input class="form-control form-control-sm flex-grow-1 rounded-3 profile-edit-item" type="text" name="${name}"
+               data-prop="${name}" placeholder="${label}" value="${value}" aria-label="${label}">
     </div>
 </#macro>
