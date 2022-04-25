@@ -26,7 +26,7 @@
                 <#-- Profile info -->
                 <div id="profileInfo">
                     <div class="card card-border-grey rounded-2 p-2 mb-3">
-                        <div class="text-center ms-3">
+                        <div class="text-center mx-3">
                             <#-- profile picture -->
                             <div class="p-2">
                                 <img class="figure-img img-w-100 rounded-circle" src="${profile.imagerUri}"
@@ -57,9 +57,11 @@
                             <@profileViewItem text=profile.university name="university" icon="university"/>
                             <@profileViewItem text=profile.contactEmail name="contactEmail" icon="email" link="mailto:${profile.contactEmail}"/>
                             <@profileViewItem text=profile.contactPhone name="contactPhone" icon="phone" link="tel:${profile.contactPhone}"/>
-                            <#list profile.links as linkName, linkUrl>
-                                <@profileViewItem text=linkName name="link_${linkName}" icon=linkName?lower_case link=linkUrl showLinkIcon=true/>
-                            </#list>
+                            <div class="profile-view-links">
+                                <#list profile.links as linkName, linkUrl>
+                                    <@profileViewItem text=linkName name="link_${linkName}" icon=linkName?lower_case link=linkUrl showLinkIcon=true/>
+                                </#list>
+                            </div>
                         </div>
                         <div class="mx-3 mt-3 profile-view-items ">
                             <button class="btn btn-sm btn-outline-primary w-100" id="editInfoBtn">Edit information
@@ -96,7 +98,8 @@
                     <@profileCard class="view-card">
                     <#-- Title -->
                         <div class="d-flex justify-content-between align-items-center">
-                            <h5 class="card-title"><@default.icon name="personInfo" class="me-2"/>About me</h5>
+                            <h5 class="card-title user-select-none"><@default.icon name="personInfo" class="me-2"/>About
+                                me</h5>
                             <button class="btn btn-outline-primary mb-2" id="editAboutButton">Edit</button>
                         </div>
                     <#-- Content -->
@@ -105,7 +108,8 @@
                     <@profileCard class="edit-card d-none">
                     <#-- Title -->
                         <div class="d-flex justify-content-between align-items-center">
-                            <h5 class="card-title"><@default.icon name="personInfo" class="me-2"/>About me</h5>
+                            <h5 class="card-title user-select-none"><@default.icon name="personInfo" class="me-2"/>About
+                                me</h5>
                             <div class="mb-2">
                                 <button class="btn btn-primary save-btn">Save</button>
                                 <button class="btn btn-outline-primary cancel-btn">Cancel</button>
@@ -127,7 +131,7 @@
                                     Markdown
                                 </a>
                             </div>
-                            <div class="float-end text-muted" id="aboutCharCount">0/5000</div>
+                            <div class="float-end text-muted user-select-none" id="aboutCharCount">0/5000</div>
                         </div>
                     </@profileCard>
                 </div>
@@ -136,7 +140,8 @@
                     <@profileCard>
                     <#-- Title -->
                         <div class="d-flex justify-content-between align-items-center">
-                            <h5 class="card-title"><@default.icon name="work" class="me-2"/>Experience</h5>
+                            <h5 class="card-title user-select-none"><@default.icon name="work" class="me-2"/>
+                                Experience</h5>
                             <button class="btn btn-outline-primary mb-2" id="addExperienceButton">Add</button>
                         </div>
                     <#-- Content -->
@@ -166,7 +171,8 @@
                     <@profileCard>
                     <#-- Title -->
                         <div class="d-flex justify-content-between align-items-center">
-                            <h5 class="card-title"><@default.icon name="group" class="me-2"/>Activities</h5>
+                            <h5 class="card-title user-select-none"><@default.icon name="group" class="me-2"/>
+                                Activities</h5>
                             <button class="btn btn-outline-primary mb-2" id="addActivityButton">Add</button>
                         </div>
                     <#-- Content -->
@@ -187,7 +193,8 @@
                     <@profileCard>
                     <#-- Title -->
                         <div class="d-flex justify-content-between align-items-center">
-                            <h5 class="card-title"><@default.icon name="project" class="me-2"/>Projects</h5>
+                            <h5 class="card-title user-select-none"><@default.icon name="project" class="me-2"/>
+                                Projects</h5>
                             <button class="btn btn-outline-primary mb-2" id="addProjectButton">Add</button>
                         </div>
                     <#-- Content -->
@@ -209,7 +216,8 @@
                     <@profileCard>
                     <#-- Title -->
                         <div class="d-flex justify-content-between align-items-center">
-                            <h5 class="card-title"><@default.icon name="course" class="me-2"/>Courses</h5>
+                            <h5 class="card-title user-select-none"><@default.icon name="course" class="me-2"/>
+                                Courses</h5>
                             <button class="btn btn-outline-primary mb-2" id="addCourseButton">Add</button>
                         </div>
                     <#-- Content -->
@@ -399,7 +407,7 @@ addPopup={
             </#if>
             <div class="card-body d-flex flex-column flex-grow-1 w-100">
                 <#if title?has_content>
-                    <h5 class="card-title"><#if icon?has_content><@default.icon name=icon class="me-2"/></#if>${title}</h5>
+                    <h5 class="card-title user-select-none"><#if icon?has_content><@default.icon name=icon class="me-2"/></#if>${title}</h5>
                 </#if>
                 <#if subtitle?has_content>
                     <h6 class="card-subtitle mb-2 text-muted">${subtitle}</h6>
@@ -418,7 +426,7 @@ addPopup={
         <#if link?has_content>
             <a href="${link?no_esc}" target="_blank" class="text-decoration-none text-muted text-hover-dark">
                 <@default.icon name=icon fallback="web" class="mx-1"/>
-                <span data-prop="${name}"
+                <span data-prop="${name}" data-url="${link}"
                       class="profile-view-item">${text}<#if showLinkIcon><@default.externalLinkIcon/></#if></span>
             </a>
         <#else>
