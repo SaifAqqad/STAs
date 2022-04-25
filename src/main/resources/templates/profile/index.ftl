@@ -120,6 +120,13 @@
                             </div>
                         </form>
                         <div class="clearfix">
+                            <div class="float-start">
+                                <a href="https://www.markdownguide.org/cheat-sheet/#basic-syntax" target="_blank"
+                                   class="text-decoration-none text-muted text-hover-dark">
+                                    <@default.icon name="mdi:language-markdown-outline" height="24" class="align-top me-1"/>
+                                    Markdown
+                                </a>
+                            </div>
                             <div class="float-end text-muted" id="aboutCharCount">0/5000</div>
                         </div>
                     </@profileCard>
@@ -229,11 +236,14 @@
 <@default.scripts/>
 <@default.toast/>
 <script>
+
     <#-- About card script -->
     (() => {
+        const renderer = new marked.Renderer();
+        renderer.image = (href, title, text) => text;
         const view = {card: document.querySelector("#profileAbout div.card.view-card")}
         view.textElement = view.card.querySelector("#aboutContent")
-        view.content = "${profile.about?js_string}"
+        view.content = "${profile.about?js_string?no_esc}";
         const edit = {card: document.querySelector("#profileAbout div.card.edit-card")}
         edit.textArea = edit.card.querySelector("textarea[name='about']")
         edit.form = edit.card.querySelector("form")
@@ -243,7 +253,7 @@
         // set initial textarea height
         edit.textArea.setAttribute("style", "height:" + (edit.textArea.scrollHeight) + "px;overflow-y:hidden;")
         // set initial content
-        view.textElement.innerHTML = marked.parse(view.content, {sanitizer: DOMPurify.sanitizeFn})
+        view.textElement.innerHTML = marked.parse(view.content, {sanitizer: DOMPurify.sanitizeFn, renderer})
 
         // view card edit button
         view.card.querySelector("#editAboutButton").addEventListener("click", () => {
