@@ -2,6 +2,21 @@
 <#import "/spring.ftl" as spring />
 <#import "../shared/default.ftl" as default />
 
+<#macro linkPopup addPopup detailsPopup popupId formId uriBase>
+    <@formPopup addPopup=addPopup detailsPopup=detailsPopup popupId=popupId formId=formId uriBase=uriBase>
+        <div class="form-floating">
+            <input class="form-control" required type="text" name="linkName" id="${formId}_linkName"
+                   placeholder="Name">
+            <label class="form-label text-muted" for="${formId}_linkName">Name</label>
+        </div>
+        <div class="form-floating mt-3">
+            <input class="form-control" required type="url" name="linkUrl" id="${formId}_linkUrl"
+                   placeholder="Link">
+            <label class="form-label text-muted" for="${formId}_linkUrl">Link</label>
+        </div>
+    </@formPopup>
+</#macro>
+
 <#macro experiencePopup addPopup detailsPopup popupId formId uriBase>
     <@formPopup addPopup=addPopup detailsPopup=detailsPopup popupId=popupId formId=formId uriBase=uriBase>
         <input type="hidden" name="id" id="${formId}_id"/>

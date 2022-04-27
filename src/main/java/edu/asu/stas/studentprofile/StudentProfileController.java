@@ -69,4 +69,19 @@ public class StudentProfileController {
         return "redirect:/profile";
     }
 
+    @PostMapping("/profile/info/links")
+    public String addNewLink(@RequestParam String linkName, @RequestParam String linkUrl, RedirectAttributes redirectAttributes) {
+        StudentProfile profile = Objects.requireNonNull(getStudentProfile());
+        var links = profile.getLinks();
+        if (links.containsKey(linkName)) {
+            redirectAttributes.addFlashAttribute("toastColor", "danger");
+            redirectAttributes.addFlashAttribute("toast", "Link already exists");
+        } else {
+            links.put(linkName, linkUrl);
+            studentProfileService.saveProfile(profile);
+            redirectAttributes.addFlashAttribute("toast", "Profile updated successfully");
+        }
+        return "redirect:/profile";
+    }
+
 }

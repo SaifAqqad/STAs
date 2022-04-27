@@ -8,11 +8,15 @@ import edu.asu.stas.user.User;
 import lombok.*;
 import org.hibernate.Hibernate;
 import org.hibernate.annotations.Type;
+import org.springframework.util.LinkedCaseInsensitiveMap;
 
 import javax.persistence.*;
 import java.io.Serial;
 import java.io.Serializable;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
 
 @Entity
 @NoArgsConstructor
@@ -60,7 +64,7 @@ public class StudentProfile implements Serializable {
 
     @Type(type = "json")
     @Column(columnDefinition = "json")
-    private final Map<String, String> links = new HashMap<>();
+    private final Map<String, String> links = new LinkedCaseInsensitiveMap<>();
 
     @OneToOne(targetEntity = User.class, fetch = FetchType.LAZY, optional = false)
     private User user;

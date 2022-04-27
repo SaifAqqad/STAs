@@ -6,6 +6,7 @@
 "linkedin"      : "mdi:linkedin",
 "google"        : "ant-design:google-outlined",
 "facebook"      : "akar-icons:facebook-fill",
+"twitter"       : "akar-icons:twitter-fill",
 "phone"         : "mdi:phone",
 "email"         : "mdi:email",
 "university"    : "mdi:school",

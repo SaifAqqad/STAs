@@ -52,7 +52,7 @@
                         </div>
                         <hr class="mx-4"/>
                         <#-- profile info -->
-                        <div class="ps-3 profile-view-items">
+                        <div class="px-3 profile-view-items">
                             <@profileViewItem text=profile.location name="location" icon="location"/>
                             <@profileViewItem text=profile.university name="university" icon="university"/>
                             <@profileViewItem text=profile.contactEmail name="contactEmail" icon="email" link="mailto:${profile.contactEmail}"/>
@@ -68,7 +68,7 @@
                             </button>
                         </div>
 
-                        <div class="ps-3 profile-edit-items d-none ">
+                        <div class="px-3 mb-1 profile-edit-items d-none">
                             <form action="<@spring.url "/profile/info"/>" method="post" enctype="multipart/form-data">
                                 <@default.csrfInput/>
                                 <input class="hidden-profile-edit-item" type="hidden" name="name"
@@ -79,13 +79,19 @@
                                 <@profileEditItem icon="university" name="university" label="University" value=profile.university/>
                                 <@profileEditItem icon="email" name="contactEmail" label="Contact email" value=profile.contactEmail/>
                                 <@profileEditItem icon="phone" name="contactPhone" label="Contact phone" value=profile.contactPhone/>
-                                <#list profile.links as linkName, linkUrl>
-                                    <@profileEditItem icon=linkName?lower_case name="link_${linkName}" label=linkName value=linkUrl showLabel=true/>
+                                <#list profile.links >
+                                    <div class="d-flex justify-content-evenly align-items-center user-select-none">
+                                        <div class="text-muted fs-6 me-1">Links</div>
+                                        <hr class="w-100"/>
+                                    </div>
+                                    <#items as linkName, linkUrl>
+                                        <@profileEditItem icon=linkName?lower_case name="link_${linkName}" label=linkName value=linkUrl showLabel=true/>
+                                    </#items>
                                 </#list>
+                                <div class="mx-1 mt-2 d-flex justify-content-end">
+                                    <button type="button" class="btn btn-sm btn-outline-primary" id="addLinkButton">Add link</button>
+                                </div>
                             </form>
-                            <div class="mx-3 mt-2 d-flex justify-content-end">
-                                <button class="btn btn-sm btn-outline-primary">Add link</button>
-                            </div>
                         </div>
                         <div class="mx-3 mt-3 d-flex justify-content-end profile-edit-items d-none">
                             <button class="btn btn-sm btn-primary me-1" id="saveInfoBtn">Save</button>
@@ -400,6 +406,17 @@ addPopup={
 "buttonId" : "addCourseButton"
 }
 />
+<@popups.linkPopup popupId="linkPopup" formId="linkForm" uriBase="/profile/info/links"
+detailsPopup={
+"popupTitle" : "Link details",
+"deleteButtonId" : "linkDelete",
+"elementSelector" : "#profileLinks .card.btn"
+}
+addPopup={
+"popupTitle" : "Add a new link",
+"buttonId" : "addLinkButton"
+}
+/>
 </body>
 </html>
 
@@ -445,7 +462,7 @@ addPopup={
 <#macro profileEditItem icon name label value showLabel=false>
     <div class="mt-1 mx-1 d-flex align-items-center text-muted">
         <#if showLabel>
-            <span class="me-2">${label}</span>
+            <span class="me-2 user-select-none">${label}</span>
         <#else>
             <@default.icon name=icon fallback="web" class="me-2" width="20"/>
         </#if>
