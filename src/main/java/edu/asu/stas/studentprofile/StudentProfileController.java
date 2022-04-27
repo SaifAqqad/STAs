@@ -79,7 +79,7 @@ public class StudentProfileController {
         } else {
             links.put(linkName, linkUrl);
             studentProfileService.saveProfile(profile);
-            redirectAttributes.addFlashAttribute("toast", "Profile updated successfully");
+            redirectAttributes.addFlashAttribute("toast", "Link added successfully");
         }
         return "redirect:/profile";
     }

@@ -15,7 +15,6 @@ import java.io.Serial;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 import java.util.Objects;
 
 @Entity
@@ -64,7 +63,7 @@ public class StudentProfile implements Serializable {
 
     @Type(type = "json")
     @Column(columnDefinition = "json")
-    private final Map<String, String> links = new LinkedCaseInsensitiveMap<>();
+    private final LinkedCaseInsensitiveMap<String> links = new LinkedCaseInsensitiveMap<>();
 
     @OneToOne(targetEntity = User.class, fetch = FetchType.LAZY, optional = false)
     private User user;
