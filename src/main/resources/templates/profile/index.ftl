@@ -80,7 +80,7 @@
                                 <@profileEditItem icon="email" name="contactEmail" label="Contact email" value=profile.contactEmail/>
                                 <@profileEditItem icon="phone" name="contactPhone" label="Contact phone" value=profile.contactPhone/>
                                 <#list profile.links >
-                                    <div class="d-flex justify-content-evenly align-items-center user-select-none">
+                                    <div class="d-flex justify-content-evenly align-items-center user-select-none mt-1">
                                         <div class="text-muted fs-6 me-1">Links</div>
                                         <hr class="w-100"/>
                                     </div>
