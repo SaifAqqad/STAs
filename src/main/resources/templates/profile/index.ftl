@@ -361,7 +361,7 @@
         </#noparse>
     })()
 </script>
-
+<@popups.script/>
 <@popups.experiencePopup popupId="experiencePopup" formId="experienceForm" uriBase="/profile/experiences"
 detailsPopup={
 "popupTitle" : "Experience details",

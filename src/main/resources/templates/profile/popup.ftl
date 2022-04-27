@@ -218,67 +218,77 @@
     </div>
     <script>
         (() => {
-            const uriBase = "${uriBase}"
-            const applyMethod = (${applyMethod});
-            const formId = "${formId?no_esc}"
-            const formElement = document.getElementById(formId)
-            const modalElement = document.getElementById("${popupId?no_esc}")
-            const modal = new bootstrap.Modal(modalElement)
-            const detailsPopup = {
-                elementSelector: "${detailsPopup.elementSelector?no_esc}",
-                deleteButton: document.getElementById("${detailsPopup.deleteButtonId?no_esc}"),
-                popupTitle: "${detailsPopup.popupTitle?no_esc}",
+            const options = {
+                uriBase: "${uriBase}",
+                applyMethod: (${applyMethod}),
+                formId: "${formId?no_esc}",
+                modalElement: document.getElementById("${popupId?no_esc}"),
+                detailsPopup: {
+                    elementSelector: "${detailsPopup.elementSelector?no_esc}",
+                    deleteButton: document.getElementById("${detailsPopup.deleteButtonId?no_esc}"),
+                    popupTitle: "${detailsPopup.popupTitle?no_esc}",
+                },
+                addPopup: {
+                    addButton: document.getElementById("${addPopup.buttonId?no_esc}"),
+                    popupTitle: "${addPopup.popupTitle?no_esc}",
+                },
+                imageInputSelector: "<#list imageInputId as id>#${id}<#sep>,</#list>",
             }
-            const addPopup = {
-                addButton: document.getElementById("${addPopup.buttonId?no_esc}"),
-                popupTitle: "${addPopup.popupTitle?no_esc}",
-            }
-            const imageInputSelector = "<#list imageInputId as id>#${id}<#sep>,</#list>";
+            options.formElement = document.getElementById(options.formId)
+            options.modal = new bootstrap.Modal(options.modalElement)
+            _setupPopup(options)
+        })()
+    </script>
+</#macro>
+
+<#macro script>
+    <script>
+        function _setupPopup(options) {
             <#noparse>
             // set up details popup
-            document.querySelectorAll(detailsPopup.elementSelector).forEach(element => {
+            document.querySelectorAll(options.detailsPopup.elementSelector).forEach(element => {
                 element.addEventListener("click", async () => {
                     // get the data id from the element
                     let elementId = element.getAttribute("data-id")
                     // fetch its info
-                    let response = await fetch(`${uriBase}/${elementId}`)
+                    let response = await fetch(`${options.uriBase}/${elementId}`)
                     if (!response.ok)
                         return
                     // apply it onto the form
-                    applyMethod(formId, await response.json())
+                    options.applyMethod(options.formId, await response.json())
                     // set the popup title
-                    modalElement.querySelector(".modal-title").textContent = detailsPopup.popupTitle
+                    options.modalElement.querySelector(".modal-title").textContent = options.detailsPopup.popupTitle
                     // show the delete button
-                    detailsPopup.deleteButton.classList.remove("visually-hidden")
+                    options.detailsPopup.deleteButton.classList.remove("visually-hidden")
                     // set the form action
-                    formElement.setAttribute("action", `${uriBase}/${elementId}`)
-                    modal.show(element)
+                    options.formElement.setAttribute("action", `${options.uriBase}/${elementId}`)
+                    options.modal.show(element)
                 })
             })
             // set up delete button
-            detailsPopup.deleteButton.addEventListener("click", async () => {
+            options.detailsPopup.deleteButton.addEventListener("click", async () => {
                 // set the form action to './delete'
-                formElement.setAttribute("action", `${uriBase}/delete`)
+                options.formElement.setAttribute("action", `${options.uriBase}/delete`)
                 // submit the form and hide the popup
-                formElement.submit()
-                modal.hide()
+                options.formElement.submit()
+                options.modal.hide()
             })
             // set up 'add new' popup
-            addPopup.addButton.addEventListener("click", () => {
+            options.addPopup.addButton.addEventListener("click", () => {
                 // clear the form
-                _clearForm(formElement)
+                _clearForm(options.formElement)
                 // set the popup title
-                modalElement.querySelector(".modal-title").textContent = addPopup.popupTitle
+                options.modalElement.querySelector(".modal-title").textContent = options.addPopup.popupTitle
                 // hide the delete button
-                detailsPopup.deleteButton.classList.add("visually-hidden")
+                options.detailsPopup.deleteButton.classList.add("visually-hidden")
                 // set the form action
-                formElement.setAttribute("action", `${uriBase}`)
-                modal.show(null)
+                options.formElement.setAttribute("action", `${options.uriBase}`)
+                options.modal.show(null)
             })
-            if (imageInputSelector) {
-                document.querySelectorAll(imageInputSelector).forEach(input => {
+            if (options.imageInputSelector) {
+                document.querySelectorAll(options.imageInputSelector).forEach(input => {
                     input.addEventListener("change", event => {
-                        let imageElement = document.getElementById(formId + "_image")
+                        let imageElement = document.getElementById(options.formId + "_image")
                         if (event.target.files) {
                             let imageData = URL.createObjectURL(event.target.files[0])
                             imageElement.src = imageData
@@ -290,7 +300,6 @@
                 })
             }
             </#noparse>
-        })();
+        }
     </script>
-
 </#macro>
