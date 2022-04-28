@@ -285,6 +285,8 @@
             if (options.detailsPopup) {
                 document.querySelectorAll(options.detailsPopup.elementSelector).forEach(element => {
                     element.addEventListener("click", async () => {
+                        // clear the form
+                        _clearForm(options.formElement)
                         // get the data id from the element
                         let elementId = element.getAttribute("data-id")
                         if (!options.defaultValue) {
@@ -337,7 +339,7 @@
                         if (event.target.files) {
                             let imageData = URL.createObjectURL(event.target.files[0])
                             imageElement.src = imageData
-                            URL.revokeObjectURL(imageData)
+                            options.modalElement.addEventListener('hidden.bs.modal', () => URL.revokeObjectURL(imageData), {once: true})
                         } else {
                             imageElement.src = event.target.value
                         }
