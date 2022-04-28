@@ -8,6 +8,35 @@
 
 <@default.head title="Profile - STAs">
     <style>
+        #aboutContent h1 {
+            font-size: 1.75rem;
+        }
+
+        #aboutContent h2 {
+            font-size: 1.5rem;
+        }
+
+        #aboutContent h3 {
+            font-size: 1.25rem;
+        }
+
+        #aboutContent h4 {
+            font-size: 1rem;
+        }
+
+        #aboutContent h5 {
+            font-size: 0.75rem;
+        }
+
+        #aboutContent h6 {
+            font-size: 0.5rem;
+        }
+
+        #aboutContent * {
+            max-width: 100% !important;
+            color: inherit !important;
+        }
+
         .scrollable-box {
             max-height: 600px;
             overflow: auto;
@@ -30,8 +59,8 @@
                             <#-- profile picture -->
                             <div class="d-flex justify-content-center p-3 user-select-none">
                                 <div class="position-relative">
-                                    <img class="img-w-100 rounded-circle object-fit-cover" src="${profile.imageUri}" id="profilePicture"
-                                         alt="profile picture"/>
+                                    <img class="img-w-100 rounded-circle object-fit-cover" src="${profile.imageUri}"
+                                         id="profilePicture" alt="profile picture"/>
                                     <div class="image-mask img-w-100 rounded-circle clickable"
                                          id="profilePictureEditButton">
                                         <@default.icon name="editImage" width="32"/>
@@ -147,8 +176,8 @@
                             <div class="float-start">
                                 <a href="https://www.markdownguide.org/cheat-sheet/#basic-syntax" target="_blank"
                                    class="text-decoration-none text-muted text-hover-dark">
-                                    <@default.icon name="mdi:language-markdown-outline" height="24" class="align-top me-1"/>
-                                    Markdown
+                                    <@default.icon name="mdi:language-markdown-outline" height="24"
+                                    class="align-top me-1"/>Markdown is supported
                                 </a>
                             </div>
                             <div class="float-end text-muted user-select-none" id="aboutCharCount">0/5000</div>
@@ -267,8 +296,6 @@
 
     <#-- About card script -->
     (() => {
-        const renderer = new marked.Renderer();
-        renderer.image = (href, title, text) => text;
         const view = {card: document.querySelector("#profileAbout div.card.view-card")}
         view.textElement = view.card.querySelector("#aboutContent")
         view.content = "${profile.about?js_string?no_esc}";
@@ -281,7 +308,7 @@
         // set initial textarea height
         edit.textArea.setAttribute("style", "height:" + (edit.textArea.scrollHeight) + "px;overflow-y:hidden;")
         // set initial content
-        view.textElement.innerHTML = marked.parse(view.content, {sanitizer: DOMPurify.sanitizeFn, renderer})
+        view.textElement.innerHTML = marked.parse(view.content, {sanitizer: DOMPurify.sanitizeFn})
 
         // view card edit button
         view.card.querySelector("#editAboutButton").addEventListener("click", () => {

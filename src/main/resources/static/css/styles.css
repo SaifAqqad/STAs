@@ -34,7 +34,7 @@ body {
 
 pre {
     display: block;
-    padding: 9.5px;
+    padding: 10px;
     margin: 0 0 10px;
     font-size: 13px;
     line-height: 1.42857143;
@@ -46,7 +46,7 @@ pre {
     border-radius: 4px;
 }
 
-.object-fit-cover{
+.object-fit-cover {
     object-fit: cover;
 }
 
