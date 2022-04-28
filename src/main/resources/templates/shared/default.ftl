@@ -17,7 +17,8 @@
 "group"         : "fa:group",
 "project"       : "ant-design:project-filled",
 "course"        : "dashicons:book",
-"personInfo"    : "bi:person-lines-fill"
+"personInfo"    : "bi:person-lines-fill",
+"editImage"     : "mdi:image-edit-outline"
 } />
 
 <#macro head title>
@@ -53,7 +54,6 @@
 
         function _applyJsonToForm(formId, json) {
             for (const prop in json) {
-                console.log()
                 const elem = document.getElementById(formId + "_" + prop)
                 if (elem) {
                     elem.value = json[prop]

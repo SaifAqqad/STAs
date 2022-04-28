@@ -28,9 +28,15 @@
                     <div class="card card-border-grey rounded-2 p-2 mb-3">
                         <div class="text-center mx-3">
                             <#-- profile picture -->
-                            <div class="p-2">
-                                <img class="figure-img img-w-100 rounded-circle" src="${profile.imagerUri}"
-                                     alt="profile picture"/>
+                            <div class="d-flex justify-content-center p-3 user-select-none">
+                                <div class="position-relative">
+                                    <img class="img-w-100 rounded-circle object-fit-cover" src="${profile.imageUri}" id="profilePicture"
+                                         alt="profile picture"/>
+                                    <div class="image-mask img-w-100 rounded-circle clickable"
+                                         id="profilePictureEditButton">
+                                        <@default.icon name="editImage" width="32"/>
+                                    </div>
+                                </div>
                             </div>
                             <#-- name and major -->
                             <div class="profile-view-items">
@@ -89,7 +95,9 @@
                                     </#items>
                                 </#list>
                                 <div class="mx-1 mt-2 d-flex justify-content-end">
-                                    <button type="button" class="btn btn-sm btn-outline-primary" id="addLinkButton">Add link</button>
+                                    <button type="button" class="btn btn-sm btn-outline-primary" id="addLinkButton">Add
+                                        link
+                                    </button>
                                 </div>
                             </form>
                         </div>
@@ -407,14 +415,16 @@ addPopup={
 }
 />
 <@popups.linkPopup popupId="linkPopup" formId="linkForm" uriBase="/profile/info/links"
-detailsPopup={
-"popupTitle" : "Link details",
-"deleteButtonId" : "linkDelete",
-"elementSelector" : "#profileLinks .card.btn"
-}
 addPopup={
 "popupTitle" : "Add a new link",
 "buttonId" : "addLinkButton"
+}
+/>
+<@popups.picturePopup popupId="profilePicturePopup" formId="profilePictureForm" uriBase="/profile/picture" defaultValue={"imageUri": profile.imageUri}
+detailsPopup={
+"popupTitle" : "Profile picture",
+"deleteButtonId" : "profilePictureDeleteButton",
+"elementSelector" : "#profilePictureEditButton"
 }
 />
 </body>
@@ -425,7 +435,7 @@ addPopup={
         <div class="d-flex flex-column flex-sm-row align-content-between align-items-center w-100">
             <#if img?has_content>
                 <div class="h-75">
-                    <img src="${img}" class="w-100 h-100 rounded-1 img-w-limit object-fit" alt="${img_alt}">
+                    <img src="${img}" class="w-100 h-100 rounded-1 img-w-limit object-fit-contain" alt="${img_alt}">
                 </div>
             </#if>
             <div class="card-body d-flex flex-column flex-grow-1 w-100">

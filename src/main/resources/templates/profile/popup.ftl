@@ -2,8 +2,8 @@
 <#import "/spring.ftl" as spring />
 <#import "../shared/default.ftl" as default />
 
-<#macro linkPopup addPopup detailsPopup popupId formId uriBase>
-    <@formPopup addPopup=addPopup detailsPopup=detailsPopup popupId=popupId formId=formId uriBase=uriBase>
+<#macro linkPopup addPopup popupId formId uriBase>
+    <@formPopup addPopup=addPopup popupId=popupId formId=formId uriBase=uriBase>
         <div class="form-floating">
             <input class="form-control" required type="text" name="linkName" id="${formId}_linkName"
                    placeholder="Name">
@@ -190,7 +190,30 @@
     </@formPopup>
 </#macro>
 
-<#macro formPopup detailsPopup popupId formId uriBase addPopup="" isMultiPartForm=false imageInputId=[] applyMethod="_applyJsonToForm">
+<#macro picturePopup detailsPopup popupId formId uriBase defaultValue>
+    <script>
+        function _applyPictureToForm(formId, project) {
+            _applyJsonToForm(formId, project)
+            const imageElem = document.getElementById(formId + "_image")
+            const imageUri = document.getElementById(formId + "_imageUri")
+            imageElem.src = imageUri.value
+        }
+    </script>
+    <@formPopup detailsPopup=detailsPopup popupId=popupId formId=formId uriBase=uriBase isMultiPartForm=true imageInputId=["${formId}_imageUri", "${formId}_imageUriData"] applyMethod="_applyCourseToForm" defaultValue=defaultValue>
+        <div class="mt-3">
+            <div class="card w-100 mt-3">
+                <img id="${formId}_image" class="card-img-top" alt="" src="">
+                <div class="card-body">
+                    <input type="hidden" name="imageUri" id="${formId}_imageUri"/>
+                    <input class="form-control" type="file" accept="image/*" name="imageUriData"
+                           id="${formId}_imageUriData" placeholder="Profile picture">
+                </div>
+            </div>
+        </div>
+    </@formPopup>
+</#macro>
+
+<#macro formPopup popupId formId uriBase detailsPopup={} addPopup={} isMultiPartForm=false imageInputId=[] applyMethod="_applyJsonToForm" defaultValue={}>
     <div class="modal fade" id="${popupId?no_esc}" tabindex="-1">
         <div class="modal-dialog modal-dialog-centered">
             <div class="modal-content">
@@ -205,9 +228,11 @@
                     </form>
                 </div>
                 <div class="modal-footer justify-content-between">
-                    <div>
-                        <button id="${detailsPopup.deleteButtonId}" class="btn btn-outline-danger">Delete</button>
-                    </div>
+                    <#if detailsPopup?has_content>
+                        <div>
+                            <button id="${detailsPopup.deleteButtonId}" class="btn btn-outline-danger">Delete</button>
+                        </div>
+                    </#if>
                     <div>
                         <input class="btn btn-primary" type="submit" value="Save" form="${formId}"/>
                         <button class="btn btn-outline-primary" data-bs-dismiss="modal">Cancel</button>
@@ -223,15 +248,26 @@
                 applyMethod: (${applyMethod}),
                 formId: "${formId?no_esc}",
                 modalElement: document.getElementById("${popupId?no_esc}"),
+                <#if detailsPopup?has_content>
                 detailsPopup: {
                     elementSelector: "${detailsPopup.elementSelector?no_esc}",
                     deleteButton: document.getElementById("${detailsPopup.deleteButtonId?no_esc}"),
                     popupTitle: "${detailsPopup.popupTitle?no_esc}",
                 },
+                </#if>
+                <#if addPopup?has_content>
                 addPopup: {
                     addButton: document.getElementById("${addPopup.buttonId?no_esc}"),
                     popupTitle: "${addPopup.popupTitle?no_esc}",
                 },
+                </#if>
+                <#list defaultValue >
+                defaultValue: {
+                    <#items as prop ,val>
+                    "${prop}": "${val}",
+                    </#items>
+                },
+                </#list>
                 imageInputSelector: "<#list imageInputId as id>#${id}<#sep>,</#list>",
             }
             options.formElement = document.getElementById(options.formId)
@@ -246,45 +282,54 @@
         function _setupPopup(options) {
             <#noparse>
             // set up details popup
-            document.querySelectorAll(options.detailsPopup.elementSelector).forEach(element => {
-                element.addEventListener("click", async () => {
-                    // get the data id from the element
-                    let elementId = element.getAttribute("data-id")
-                    // fetch its info
-                    let response = await fetch(`${options.uriBase}/${elementId}`)
-                    if (!response.ok)
-                        return
-                    // apply it onto the form
-                    options.applyMethod(options.formId, await response.json())
-                    // set the popup title
-                    options.modalElement.querySelector(".modal-title").textContent = options.detailsPopup.popupTitle
-                    // show the delete button
-                    options.detailsPopup.deleteButton.classList.remove("visually-hidden")
-                    // set the form action
-                    options.formElement.setAttribute("action", `${options.uriBase}/${elementId}`)
-                    options.modal.show(element)
+            if (options.detailsPopup) {
+                document.querySelectorAll(options.detailsPopup.elementSelector).forEach(element => {
+                    element.addEventListener("click", async () => {
+                        // get the data id from the element
+                        let elementId = element.getAttribute("data-id")
+                        if (!options.defaultValue) {
+                            // fetch its info
+                            let response = await fetch(`${options.uriBase}/${elementId}`)
+                            if (!response.ok)
+                                return
+                            // apply it onto the form
+                            options.applyMethod(options.formId, await response.json())
+                            // set the form action
+                            options.formElement.setAttribute("action", `${options.uriBase}/${elementId}`)
+                        } else {
+                            options.applyMethod(options.formId, options.defaultValue)
+                            options.formElement.setAttribute("action", options.uriBase)
+                        }
+                        // set the popup title
+                        options.modalElement.querySelector(".modal-title").textContent = options.detailsPopup.popupTitle
+                        // show the delete button
+                        options.detailsPopup.deleteButton.classList.remove("visually-hidden")
+                        options.modal.show(element)
+                    })
                 })
-            })
-            // set up delete button
-            options.detailsPopup.deleteButton.addEventListener("click", async () => {
-                // set the form action to './delete'
-                options.formElement.setAttribute("action", `${options.uriBase}/delete`)
-                // submit the form and hide the popup
-                options.formElement.submit()
-                options.modal.hide()
-            })
+                // set up delete button
+                options.detailsPopup.deleteButton.addEventListener("click", async () => {
+                    // set the form action to './delete'
+                    options.formElement.setAttribute("action", `${options.uriBase}/delete`)
+                    // submit the form and hide the popup
+                    options.formElement.submit()
+                    options.modal.hide()
+                })
+            }
             // set up 'add new' popup
-            options.addPopup.addButton.addEventListener("click", () => {
-                // clear the form
-                _clearForm(options.formElement)
-                // set the popup title
-                options.modalElement.querySelector(".modal-title").textContent = options.addPopup.popupTitle
-                // hide the delete button
-                options.detailsPopup.deleteButton.classList.add("visually-hidden")
-                // set the form action
-                options.formElement.setAttribute("action", `${options.uriBase}`)
-                options.modal.show(null)
-            })
+            if (options.addPopup) {
+                options.addPopup.addButton.addEventListener("click", () => {
+                    // clear the form
+                    _clearForm(options.formElement)
+                    // set the popup title
+                    options.modalElement.querySelector(".modal-title").textContent = options.addPopup.popupTitle
+                    // hide the delete button
+                    options.detailsPopup?.deleteButton.classList.add("visually-hidden")
+                    // set the form action
+                    options.formElement.setAttribute("action", `${options.uriBase}`)
+                    options.modal.show(null)
+                })
+            }
             if (options.imageInputSelector) {
                 document.querySelectorAll(options.imageInputSelector).forEach(input => {
                     input.addEventListener("change", event => {

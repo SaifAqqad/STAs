@@ -1,5 +1,6 @@
 package edu.asu.stas.studentprofile;
 
+import edu.asu.stas.content.ContentService;
 import edu.asu.stas.user.User;
 import edu.asu.stas.user.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -8,8 +9,10 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
+import java.io.IOException;
 import java.util.Map;
 import java.util.Objects;
 import java.util.stream.Collectors;
@@ -18,10 +21,13 @@ import java.util.stream.Collectors;
 public class StudentProfileController {
 
     private final StudentProfileService studentProfileService;
+    private final ContentService contentService;
+
 
     @Autowired
-    public StudentProfileController(StudentProfileService studentProfileService) {
+    public StudentProfileController(StudentProfileService studentProfileService, ContentService contentService) {
         this.studentProfileService = studentProfileService;
+        this.contentService = contentService;
     }
 
     public StudentProfile getStudentProfile() {
@@ -56,15 +62,7 @@ public class StudentProfileController {
     @PostMapping("/profile/info")
     public String updateProfileInfo(ProfileInfo profileInfo, @RequestParam Map<String, String> links, RedirectAttributes redirectAttributes) {
         StudentProfile profile = Objects.requireNonNull(getStudentProfile());
-        studentProfileService.updateProfileInfo(
-                profile,
-                profileInfo,
-                links.entrySet().stream()
-                        .filter(entry -> entry.getKey().startsWith("link_") && !entry.getValue().isBlank())
-                        .collect(Collectors.toMap(
-                                entry -> entry.getKey().replaceFirst("link_", ""),
-                                Map.Entry::getValue))
-        );
+        studentProfileService.updateProfileInfo(profile, profileInfo, links.entrySet().stream().filter(entry -> entry.getKey().startsWith("link_") && !entry.getValue().isBlank()).collect(Collectors.toMap(entry -> entry.getKey().replaceFirst("link_", ""), Map.Entry::getValue)));
         redirectAttributes.addFlashAttribute("toast", "Profile updated successfully");
         return "redirect:/profile";
     }
@@ -84,4 +82,25 @@ public class StudentProfileController {
         return "redirect:/profile";
     }
 
+    @PostMapping("/profile/picture")
+    public String updateProfilePicture(@RequestParam MultipartFile imageUriData, RedirectAttributes redirectAttributes) throws IOException {
+        StudentProfile profile = Objects.requireNonNull(getStudentProfile());
+        if (!imageUriData.isEmpty()) {
+            profile.setImageUri(contentService.storeResource(imageUriData.getResource(), "profile", profile.getId().toString()));
+            studentProfileService.saveProfile(profile);
+        }
+        redirectAttributes.addFlashAttribute("toast", "Profile picture updated successfully");
+        return "redirect:/profile";
+    }
+
+    @PostMapping("/profile/picture/delete")
+    public String deleteProfilePicture(RedirectAttributes redirectAttributes) {
+        StudentProfile profile = Objects.requireNonNull(getStudentProfile());
+        String imageName = profile.getImageUri().substring(profile.getImageUri().lastIndexOf('/') + 1);
+        contentService.removeResource("profile", profile.getId().toString() + "_" + imageName);
+        profile.setImageUri(StudentProfile.defaultImageUri);
+        studentProfileService.saveProfile(profile);
+        redirectAttributes.addFlashAttribute("toast", "Profile picture removed successfully");
+        return "redirect:/profile";
+    }
 }
