@@ -48,7 +48,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
         http
 
                 .authorizeRequests()
-                    .mvcMatchers("/account/**", "/connect/**", "/profile/**").authenticated()
+                    .mvcMatchers("/account/**", "/connect/**", "/profile/**", "/connections/**").authenticated()
                     .mvcMatchers(HttpMethod.POST, "/login").denyAll()
                 .and()
 

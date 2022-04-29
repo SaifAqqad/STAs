@@ -25,7 +25,7 @@ import java.util.Objects;
 public class StudentProfile implements Serializable {
     @Serial
     private static final long serialVersionUID = 1L;
-    public static final String defaultImageUri = "/images/generic_profile.png";
+    public static final String DEFAULT_IMAGE_URI = "/images/generic_profile.png";
 
     @Id
     @GeneratedValue
@@ -48,7 +48,7 @@ public class StudentProfile implements Serializable {
 
     private String major;
 
-    private String imageUri = defaultImageUri;
+    private String imageUri = DEFAULT_IMAGE_URI;
 
     @OneToMany(mappedBy = "profile", orphanRemoval = true)
     private final List<Course> courses = new ArrayList<>();
