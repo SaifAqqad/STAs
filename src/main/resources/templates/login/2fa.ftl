@@ -13,9 +13,10 @@
 
 <div class="container">
     <div class="d-flex align-items-center justify-content-center mt-5 mx-md-5-5 mx-lg-6">
-        <div class="card text-dark bg-light mb-3 w-100 <#if auth2FAError??>border-danger</#if>">
-            <div class="card-header">Two-factor authentication</div>
+        <div class="card card-light text-dark mb-3 w-100 <#if auth2FAError??>border-danger</#if>">
             <div class="card-body">
+                <h6 class="mb-1">Two-factor authentication</h6>
+                <br/>
                 <div class="card-text">
                     Open the two-factor authenticator (TOTP) app on your mobile device to view your authentication code.
                 </div>

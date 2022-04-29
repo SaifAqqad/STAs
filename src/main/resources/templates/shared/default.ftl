@@ -2,25 +2,27 @@
 <#import "/spring.ftl" as spring />
 <#global roles = {"student" : "ROLE_STUDENT", "admin": "ROLE_ADMIN"}/>
 <#global knownIcons = {
-    "github"        : "mdi:github",
-    "linkedin"      : "mdi:linkedin",
-    "google"        : "ant-design:google-outlined",
-    "facebook"      : "akar-icons:facebook-fill",
-    "phone"         : "mdi:phone",
-    "email"         : "mdi:email",
-    "university"    : "mdi:school",
-    "location"      : "mdi:map-marker",
-    "web"           : "mdi:web",
-    "externalLink"  : "mdi:open-in-new",
-    "work"          : "ic:baseline-work",
-    "group"         : "fa:group",
-    "project"       : "ant-design:project-filled",
-    "course"        : "dashicons:book",
-    "personInfo"    : "bi:person-lines-fill"
+"github"        : "mdi:github",
+"linkedin"      : "mdi:linkedin",
+"google"        : "ant-design:google-outlined",
+"facebook"      : "akar-icons:facebook-fill",
+"twitter"       : "akar-icons:twitter-fill",
+"phone"         : "mdi:phone",
+"email"         : "mdi:email",
+"university"    : "mdi:school",
+"location"      : "mdi:map-marker",
+"web"           : "mdi:web",
+"externalLink"  : "mdi:open-in-new",
+"work"          : "ic:baseline-work",
+"group"         : "fa:group",
+"project"       : "ant-design:project-filled",
+"course"        : "dashicons:book",
+"personInfo"    : "bi:person-lines-fill",
+"editImage"     : "mdi:image-edit-outline"
 } />
 
 <#macro head title>
-    <head xmlns="">
+    <head>
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1">
         <meta name="_csrf" content="${_csrf.token}"/>
@@ -40,6 +42,8 @@
 <#macro scripts>
     <script src="<@spring.url "/webjars/bootstrap/js/bootstrap.bundle.min.js"/>"></script>
     <script src="<@spring.url "/webjars/iconify__iconify/dist/iconify.min.js"/>"></script>
+    <script src="<@spring.url "/webjars/dompurify/dist/purify.min.js"/>"></script>
+    <script src="<@spring.url "/webjars/marked/marked.min.js"/>"></script>
     <script>
         function _clearForm(form) {
             form.querySelectorAll("input:not([name='_csrf'])").forEach((elem) => elem.value = "")
@@ -50,13 +54,17 @@
 
         function _applyJsonToForm(formId, json) {
             for (const prop in json) {
-                console.log()
                 const elem = document.getElementById(formId + "_" + prop)
                 if (elem) {
                     elem.value = json[prop]
                 }
             }
         }
+
+        function _showElems(elems, show) {
+            elems.forEach(element => element.classList[show ? "remove" : "add"]("d-none"))
+        }
+
     </script>
     <#nested >
 </#macro>
@@ -69,10 +77,10 @@
 </#macro>
 
 <#macro navbar home="" login="" profile="" dashboard="" account="">
-    <nav class="navbar navbar-expand-md navbar-light bg-white">
-        <div class="container-fluid">
+    <nav class="navbar navbar-expand-md py-2 navbar-dark bg-dark">
+        <div class="container">
             <a class="navbar-brand" href="<@spring.url relativeUrl="/"/>">
-                <@logo width="30px" height="30px" color="#393939"/>
+                <@icon name="university" width="30"/>
                 STAs
             </a>
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse"
@@ -81,7 +89,7 @@
                 <span class="navbar-toggler-icon"></span>
             </button>
             <div class="collapse navbar-collapse" id="navbarSupportedContent">
-                <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+                <ul class="navbar-nav me-auto mb-2 mb-md-0">
                     <#-- General links -->
                     <li class="nav-item">
                         <a class="nav-link ps-2 ps-sm-p75 ${home}" href="<@spring.url relativeUrl="/"/>">Home</a>
@@ -102,7 +110,7 @@
                 </ul>
                 <#-- Login/Logout links -->
                 <div class="d-flex">
-                    <ul class="navbar-nav me-2 mb-2 mb-lg-0 w-100">
+                    <ul class="navbar-nav me-2 mb-2 mb-md-0 w-100">
                         <#-- if the user is authenticated -->
                         <#if authenticatedUser??>
                             <li class="nav-item"> <#-- user's fName lName -->
@@ -163,7 +171,7 @@
     </#compress>
 </#macro>
 
-<#macro icon name isInline=true fallback="" class="">
+<#macro icon name isInline=true fallback="" class="" width="" height="">
     <#compress>
         <#if name?contains(":")>
             <#assign iconName = name/>
@@ -171,7 +179,9 @@
             <#assign iconName = knownIcons[name]!knownIcons[fallback]!""/>
         </#if>
         <span class="iconify<#if isInline>-inline</#if> ${class?no_esc}"
-              <#if iconName?has_content>data-icon="${iconName}"</#if>></span>
+              <#if iconName?has_content>data-icon="${iconName}"</#if>
+                <#if width?has_content>data-width="${width}"</#if>
+                <#if height?has_content>data-width="${height}"</#if>></span>
     </#compress>
 </#macro>
 

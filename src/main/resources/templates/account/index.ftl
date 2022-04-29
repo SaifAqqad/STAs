@@ -11,7 +11,7 @@
 <body>
 <@default.navbar account="active"/>
 
-<div class="container-fluid my-3">
+<div class="container-fluid container-md my-3">
     <div class="row">
         <#-- Sidebar -->
         <div class="col-sm-3">
@@ -21,30 +21,34 @@
         <div class="col-sm-9">
             <div class="container mt-2">
                 <div class="fs-4">Account information</div>
-                <form class="" action="<@spring.url "/account/update"/>" method="post">
-                    <@default.csrfInput/>
-                    <div class="row">
-                        <div class="col">
-                            <div class="form-floating mt-3">
-                                <@account.formElement path="accountDetails.firstName" label="First Name" attrb="required " placeholder="First Name" />
+                <div class="card mt-3">
+                    <div class="card-body">
+                        <form class="" action="<@spring.url "/account/update"/>" method="post">
+                            <@default.csrfInput/>
+                            <div class="row">
+                                <div class="col">
+                                    <div class="form-floating mt-3">
+                                        <@account.formElement path="accountDetails.firstName" label="First Name" attrb="required " placeholder="First Name" />
+                                    </div>
+                                </div>
+                                <div class="col">
+                                    <div class="form-floating mt-3">
+                                        <@account.formElement path="accountDetails.lastName" label="Last Name" attrb="required" placeholder="Last Name" />
+                                    </div>
+                                </div>
                             </div>
-                        </div>
-                        <div class="col">
                             <div class="form-floating mt-3">
-                                <@account.formElement path="accountDetails.lastName" label="Last Name" attrb="required" placeholder="Last Name" />
+                                <@account.formElement path="accountDetails.email" label="Email" type="email" attrb="required" placeholder="Email" />
                             </div>
-                        </div>
+                            <div class="form-floating mt-3">
+                                <@account.formElement path="accountDetails.dateOfBirth" label="Date of birth" type="date" attrb="required" placeholder="Date of birth" />
+                            </div>
+                            <div class="mt-3">
+                                <input class="btn btn-outline-primary" value="Save" type="submit">
+                            </div>
+                        </form>
                     </div>
-                    <div class="form-floating mt-3">
-                        <@account.formElement path="accountDetails.email" label="Email" type="email" attrb="required" placeholder="Email" />
-                    </div>
-                    <div class="form-floating mt-3">
-                        <@account.formElement path="accountDetails.dateOfBirth" label="Date of birth" type="date" attrb="required" placeholder="Date of birth" />
-                    </div>
-                    <div class="mt-3">
-                        <input class="btn btn-outline-primary" value="Save" type="submit">
-                    </div>
-                </form>
+                </div>
             </div>
         </div>
     </div>

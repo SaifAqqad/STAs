@@ -11,9 +11,10 @@
 
 <div class="container mt-3">
     <div class="d-flex align-items-center justify-content-center mt-5 mx-md-5">
-        <div class="card text-dark bg-light mb-3 w-75">
-            <div class="card-header">Request a verification code</div>
+        <div class="card card-light text-dark mb-3 w-75">
             <div class="card-body">
+                <h6 class="mb-1">Request a verification code</h6>
+                <br/>
                 <form method="post">
                     <@default.csrfInput/>
                     <div class="form-floating mt-3">

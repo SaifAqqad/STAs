@@ -9,7 +9,7 @@
 <@default.navbar />
 <div class="container">
     <div class="d-flex align-items-center justify-content-center mt-5 mx-md-5 mx-lg-5-5">
-        <div class="card  mb-3 w-75">
+        <div class="card card-light mb-3 w-75">
             <div class="card-header">
                 <div class="d-flex align-items-center justify-content-between">
                     ${errorTitle!"An error has occurred"}

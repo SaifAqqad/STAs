@@ -14,9 +14,10 @@
 
 <div class="container">
     <div class="d-flex align-items-center justify-content-center mt-5 mx-md-5-5 mx-lg-6">
-        <div class="card text-dark bg-light mb-3 w-100 <#if loginError>border-danger</#if>">
-            <div class="card-header">Log in with your account</div>
+        <div class="card card-light text-dark  mb-3 w-100 <#if loginError>border-danger</#if>">
             <div class="card-body">
+                <h6 class="mb-1">Log in with your account</h6>
+                <br/>
                 <#if loginError>
                     <div class="alert alert-danger" role="alert">
                         <#switch errorType!0>
@@ -35,12 +36,12 @@
                     <div class="form-floating mb-3">
                         <input class="form-control" type="email" name="email" id="email" placeholder="Email Address"
                                required/>
-                        <label class="form-label" for="email">Email address</label>
+                        <label class="form-label text-muted" for="email">Email address</label>
                     </div>
                     <div class="form-floating mb-3">
                         <input class="form-control" type="password" name="password" id="password" placeholder="Password"
                                required/>
-                        <label class="form-label" for="password">Password</label>
+                        <label class="form-label text-muted" for="password">Password</label>
                     </div>
                     <div class="d-flex justify-content-end mb-2">
                         <div class="">

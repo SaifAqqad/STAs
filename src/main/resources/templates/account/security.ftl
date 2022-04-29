@@ -10,7 +10,7 @@
 <body>
 <@default.navbar account="active"/>
 
-<div class="container-fluid my-3">
+<div class="container-fluid container-md my-3">
     <div class="row">
         <div class="col-sm-3">
             <@account.sidebar accountSecurity="active"/>
@@ -123,7 +123,7 @@
             </div>
             <div class="modal-body">
                 <div>Copy the following code and paste it into your TOTP app</div>
-                <code>${twoFactorSecret!""}</code>
+                <code class="user-select-all">${twoFactorSecret!""}</code>
             </div>
         </div>
     </div>

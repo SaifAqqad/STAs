@@ -56,10 +56,19 @@ public class STAsApplication {
                     profile.setName("Saif Alaqqad");
                     profile.setUniversity("Applied Science University");
                     profile.setMajor("Computer Science");
-                    profile.setAbout("Lorem ipsum dolor sit amet, nibh suavitate qualisque ut nam. Ad harum primis electram duo, porro principes ei has Lorem ipsum dolor sit amet, nibh suavitate qualisque ut nam. Ad harum primis electram duo, porro principes ei has.");
+                    profile.setAbout("""
+                            ## Lorem ipsum
+
+                            dolor sit amet, nibh suavitate qualisque ut nam. Ad harum primis electram duo, porro principes ei has Lorem ipsum dolor sit amet, nibh suavitate qualisque ut nam. Ad harum primis electram duo, porro principes ei has.
+                            _____
+                            * Ad harum primis electram duo, porro principes ei has.
+                            * Ad harum primis electram duo, porro principes ei has.
+                            * Ad harum primis electram duo, porro principes ei has.
+                            """);
                     profile.setContactEmail("saif.w.alaqqad@gmail.com");
                     profile.setContactPhone("+962799545922");
                     profile.setLocation("Amman, Jordan");
+                    profile.getLinks().put("GitHub", "https://github.com/SaifAqqad/");
                     profile.setUser(user1);
                     profile = studentProfileRepository.save(profile);
 

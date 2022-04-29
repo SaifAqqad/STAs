@@ -8,11 +8,14 @@ import edu.asu.stas.user.User;
 import lombok.*;
 import org.hibernate.Hibernate;
 import org.hibernate.annotations.Type;
+import org.springframework.util.LinkedCaseInsensitiveMap;
 
 import javax.persistence.*;
 import java.io.Serial;
 import java.io.Serializable;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Objects;
 
 @Entity
 @NoArgsConstructor
@@ -22,6 +25,7 @@ import java.util.*;
 public class StudentProfile implements Serializable {
     @Serial
     private static final long serialVersionUID = 1L;
+    public static final String defaultImageUri = "/images/generic_profile.png";
 
     @Id
     @GeneratedValue
@@ -44,7 +48,7 @@ public class StudentProfile implements Serializable {
 
     private String major;
 
-    private String imagerUri = "/images/generic_profile.png";
+    private String imageUri = defaultImageUri;
 
     @OneToMany(mappedBy = "profile", orphanRemoval = true)
     private final List<Course> courses = new ArrayList<>();
@@ -60,7 +64,7 @@ public class StudentProfile implements Serializable {
 
     @Type(type = "json")
     @Column(columnDefinition = "json")
-    private final Map<String, String> links = new HashMap<>();
+    private final LinkedCaseInsensitiveMap<String> links = new LinkedCaseInsensitiveMap<>();
 
     @OneToOne(targetEntity = User.class, fetch = FetchType.LAZY, optional = false)
     private User user;
