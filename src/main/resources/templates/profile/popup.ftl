@@ -227,7 +227,7 @@
                         <#nested/>
                     </form>
                 </div>
-                <div class="modal-footer justify-content-between">
+                <div class="modal-footer <#if detailsPopup?has_content>justify-content-between</#if>">
                     <#if detailsPopup?has_content>
                         <div>
                             <button id="${detailsPopup.deleteButtonId}" class="btn btn-outline-danger">Delete</button>

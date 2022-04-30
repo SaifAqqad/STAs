@@ -17,7 +17,9 @@
         </div>
         <div class="col-sm-9">
             <div class="container mt-2">
-                <div class="fs-4">Account security</div>
+                <div class="fs-4"><@default.icon name="security"/>
+                    Account security
+                </div>
                 <div class="container px-0">
                     <div class="card mt-3">
                         <div class="card-body">
@@ -39,7 +41,8 @@
                                     <input class="form-control" name="confirmNewPassword" id="confirmNewPassword"
                                            required
                                            placeholder="Confirm password" type="password"/>
-                                    <label class="form-label text-muted" for="confirmNewPassword">Confirm password</label>
+                                    <label class="form-label text-muted" for="confirmNewPassword">Confirm
+                                        password</label>
                                     <span class="invalid-feedback" id="confirmNewPasswordFeedback"></span>
                                 </div>
                                 <div class="mt-3">
@@ -151,10 +154,12 @@
         modal.show(null);
     });
 
-    revealSecretButton.addEventListener("click", () => {
-        let modal = new bootstrap.Modal(revealSecretModal);
-        modal.show(null);
-    });
+    if (revealSecretButton) {
+        revealSecretButton.addEventListener("click", () => {
+            let modal = new bootstrap.Modal(revealSecretModal);
+            modal.show(null);
+        });
+    }
 </script>
 </body>
 </html>

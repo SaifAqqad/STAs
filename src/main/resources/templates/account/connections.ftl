@@ -17,13 +17,16 @@
         </div>
         <div class="col-sm-9">
             <div class="container mt-2">
-                <div class="fs-4">Connections</div>
+                <div class="fs-4"><@default.icon name="connection"/>
+                    Connections
+                </div>
                 <div class="container px-0">
                     <div class="card mt-3">
                         <div class="card-body">
                             <div class="d-flex align-items-center justify-content-between">
                                 <div class="fs-4">
-                                    <span class="iconify-inline" data-icon="ant-design:google-outlined" data-width="38"></span>
+                                    <span class="iconify-inline" data-icon="ant-design:google-outlined"
+                                          data-width="38"></span>
                                     <span class="align-text-bottom">Google</span>
                                 </div>
                                 <#if service_google??>
