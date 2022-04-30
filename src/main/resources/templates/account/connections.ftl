@@ -10,12 +10,12 @@
 <body>
 <@default.navbar account="active"/>
 
-<div class="container-fluid container-md my-3">
+<div class="container-fluid container-lg my-3">
     <div class="row">
-        <div class="col-sm-3">
+        <div class="col-md-3">
             <@account.sidebar accountConnections="active"/>
         </div>
-        <div class="col-sm-9">
+        <div class="col-md-9">
             <div class="container mt-2">
                 <div class="fs-4"><@default.icon name="connection"/>
                     Connections

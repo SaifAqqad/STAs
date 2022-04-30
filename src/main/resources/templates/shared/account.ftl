@@ -7,7 +7,7 @@
         <span class="fs-4"><@default.icon name="mdi:account-box"/>
             My Account</span>
         <hr/>
-        <div class="list-group ">
+        <div class="list-group mx-2 mx-md-0">
             <a class="text-decoration-none list-group-item list-group-item-action d-flex align-items-center ${accountDetails}"
                href="<@spring.url "/account"/>"><@default.icon name="accountEdit" width="24" class="me-2"/>
                 Account information

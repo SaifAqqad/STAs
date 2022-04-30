@@ -84,6 +84,7 @@ public class StudentProfileController {
 
     @PostMapping("/profile/picture")
     public String updateProfilePicture(@RequestParam MultipartFile imageUriData, RedirectAttributes redirectAttributes) throws IOException {
+        deleteProfilePicture(redirectAttributes);
         StudentProfile profile = Objects.requireNonNull(getStudentProfile());
         if (!imageUriData.isEmpty()) {
             profile.setImageUri(contentService.storeResource(imageUriData.getResource(), "profile", profile.getId().toString()));
