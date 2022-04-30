@@ -11,16 +11,18 @@
 <body>
 <@default.navbar account="active"/>
 
-<div class="container-fluid container-md my-3">
+<div class="container-fluid container-lg my-3">
     <div class="row">
         <#-- Sidebar -->
-        <div class="col-sm-3">
+        <div class="col-md-3">
             <@account.sidebar accountDetails="active"/>
         </div>
         <#-- Main page -->
-        <div class="col-sm-9">
+        <div class="col-md-9">
             <div class="container mt-2">
-                <div class="fs-4">Account information</div>
+                <div class="fs-4"><@default.icon name="accountEdit"/>
+                    Account information
+                </div>
                 <div class="card mt-3">
                     <div class="card-body">
                         <form class="" action="<@spring.url "/account/update"/>" method="post">

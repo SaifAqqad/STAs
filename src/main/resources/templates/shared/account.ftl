@@ -1,21 +1,23 @@
 <#ftl output_format="HTML">
 <#import "/spring.ftl" as spring />
+<#import "./default.ftl" as default />
 
 <#macro sidebar accountDetails="" accountSecurity="" accountConnections="">
-    <div class="mb-2">
-        <span class="fs-4">My Account</span>
+    <div class="mb-2 user-select-none">
+        <span class="fs-4"><@default.icon name="mdi:account-box"/>
+            My Account</span>
         <hr/>
-        <div class="list-group ">
-            <a class="text-decoration-none list-group-item list-group-item-action ${accountDetails}"
-               href="<@spring.url "/account"/>">
+        <div class="list-group mx-2 mx-md-0">
+            <a class="text-decoration-none list-group-item list-group-item-action d-flex align-items-center ${accountDetails}"
+               href="<@spring.url "/account"/>"><@default.icon name="accountEdit" width="24" class="me-2"/>
                 Account information
             </a>
-            <a class="text-decoration-none list-group-item list-group-item-action ${accountSecurity}"
-               href="<@spring.url "/account/security"/>">
+            <a class="text-decoration-none list-group-item list-group-item-action d-flex align-items-center ${accountSecurity}"
+               href="<@spring.url "/account/security"/>"><@default.icon name="security" width="24" class="me-2"/>
                 Account security
             </a>
-            <a class="text-decoration-none list-group-item list-group-item-action ${accountConnections}"
-               href="<@spring.url "/account/connections"/>">
+            <a class="text-decoration-none list-group-item list-group-item-action d-flex align-items-center ${accountConnections}"
+               href="<@spring.url "/account/connections"/>"><@default.icon name="connection" width="24" class="me-2"/>
                 Connections
             </a>
         </div>

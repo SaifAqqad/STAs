@@ -14,7 +14,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.server.ResponseStatusException;
 
-import java.util.Objects;
+import static edu.asu.stas.lib.RestUtils.requireNonNull;
 
 @RestController
 @RequestMapping("/content")
@@ -51,10 +51,5 @@ public class ContentController {
         throw new ResponseStatusException(HttpStatus.NOT_FOUND);
     }
 
-    private <T> T requireNonNull(T o) {
-        if (Objects.isNull(o))
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND);
-        return o;
-    }
 
 }

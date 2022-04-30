@@ -1,98 +1,47 @@
 package edu.asu.stas.connnection;
 
-import edu.asu.stas.connnection.oauth.OAuthClientHelper;
-import edu.asu.stas.lib.TokenGenerator;
+import edu.asu.stas.user.User;
 import edu.asu.stas.user.UserService;
+import lombok.NonNull;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.oauth2.client.registration.ClientRegistration;
-import org.springframework.security.oauth2.client.registration.ClientRegistrationRepository;
-import org.springframework.security.oauth2.client.userinfo.OAuth2UserRequest;
-import org.springframework.security.oauth2.core.OAuth2AuthenticationException;
 import org.springframework.stereotype.Controller;
-import org.springframework.ui.Model;
-import org.springframework.util.StringUtils;
-import org.springframework.web.bind.annotation.*;
-import org.springframework.web.bind.support.SessionStatus;
-import org.springframework.web.servlet.mvc.support.RedirectAttributes;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.ResponseBody;
 
+import java.util.List;
 import java.util.Objects;
 
+import static edu.asu.stas.lib.RestUtils.requireNonNull;
 
 @Controller
-@SessionAttributes({"clientRegistration", "state", "redirectUri"})
 public class ConnectionController {
-    private final TokenGenerator keyGenerator;
-    private final ClientRegistrationRepository clientRegistrationRepository;
-    private final OAuthClientHelper oAuthClientHelper;
-    private final UserService userService;
-
+    private final ConnectionRepository connectionRepository;
 
     @Autowired
-    public ConnectionController(
-            TokenGenerator keyGenerator,
-            ClientRegistrationRepository clientRegistrationRepository,
-            OAuthClientHelper oAuthClientHelper,
-            UserService userService
-    ) {
-        this.keyGenerator = keyGenerator;
-        this.clientRegistrationRepository = clientRegistrationRepository;
-        this.oAuthClientHelper = oAuthClientHelper;
-        this.userService = userService;
+    public ConnectionController(ConnectionRepository connectionRepository) {
+        this.connectionRepository = connectionRepository;
     }
 
-    @GetMapping("/connect/{clientId}")
-    public String connectToService(
-            @PathVariable String clientId,
-            @RequestParam(required = false, defaultValue = "/") String redirectUri,
-            Model model
-    ) {
-        ClientRegistration clientRegistration = clientRegistrationRepository.findByRegistrationId(clientId);
-        String state = keyGenerator.generateToken(46);
-        model.addAttribute("clientRegistration", clientRegistration);
-        model.addAttribute("state", state);
-        model.addAttribute("redirectUri", redirectUri);
-        return "redirect:" + oAuthClientHelper.getAuthorizationUri(clientRegistration, state);
+    @GetMapping("/connections")
+    @ResponseBody
+    public List<ConnectionDto> getConnections() {
+        User authedUser = Objects.requireNonNull(UserService.getAuthenticatedUser());
+        return connectionRepository.findAllByUser(authedUser)
+                .stream()
+                .map(conn -> new ConnectionDto(conn.getId(),
+                                               conn.getServiceName(),
+                                               conn.getServiceUserProfile()))
+                .toList();
     }
 
-    @GetMapping("/oauth/redirect/{registrationId}/connect")
-    public String redirectFromService(
-            @RequestParam(required = false) String code,
-            @RequestParam String state,
-            @RequestParam(required = false) String error,
-            @RequestParam(required = false, name = "error_description") String errorDesc,
-            @PathVariable(name = "registrationId") String registrationId,
-            @SessionAttribute("state") String savedState,
-            @SessionAttribute("redirectUri") String redirectUri,
-            @SessionAttribute("clientRegistration") ClientRegistration clientRegistration,
-            RedirectAttributes redirectAttributes,
-            SessionStatus sessionStatus
-    ) {
-        // clear the session
-        sessionStatus.setComplete();
-        // check the csrf token (state)
-        if (!state.equals(savedState) || !registrationId.equalsIgnoreCase(clientRegistration.getClientName())) {
-            redirectAttributes.addFlashAttribute("toastColor", "danger");
-            redirectAttributes.addFlashAttribute("toast", "An error occurred during redirection");
-            return "redirect:" + (redirectUri + "?error");
-        }
-        // check for an oauth-provider error
-        if(Objects.nonNull(error)){
-            redirectAttributes.addFlashAttribute("toastColor", "danger");
-            redirectAttributes.addFlashAttribute("toast", errorDesc);
-            return "redirect:" + (redirectUri + "?error");
-        }
-        // Exchange the temp code for an OAuth2UserRequest
-        OAuth2UserRequest oAuth2UserRequest = oAuthClientHelper.exchangeOAuthCode(code, clientRegistration);
-        // Connect the userRequest to the authed user
-        try {
-            userService.loadUser(oAuth2UserRequest);
-        } catch (OAuth2AuthenticationException e) {
-            redirectAttributes.addFlashAttribute("toastColor", "danger");
-            redirectAttributes.addFlashAttribute("toast", e.getError().getDescription());
-            return "redirect:" + (redirectUri + "?error");
-        }
-        redirectAttributes.addFlashAttribute("toast", StringUtils.capitalize(clientRegistration.getClientName()) + " account connected successfully");
-        return "redirect:" + redirectUri;
+    @GetMapping("/connections/{serviceName}")
+    @ResponseBody
+    public ConnectionDto getConnection(@PathVariable @NonNull String serviceName) {
+        User authedUser = Objects.requireNonNull(UserService.getAuthenticatedUser());
+        var connection = requireNonNull(connectionRepository.findByUserAndServiceName(authedUser, serviceName));
+        return new ConnectionDto(connection.getId(),
+                                 connection.getServiceName(),
+                                 connection.getServiceUserProfile());
     }
-
 }

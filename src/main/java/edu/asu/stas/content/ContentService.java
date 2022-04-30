@@ -41,9 +41,10 @@ public class ContentService {
         // create parent dirs recursively
         Files.createDirectories(filePath.getParent());
         // create output stream for the resource file
-        OutputStream file = Files.newOutputStream(filePath, CREATE, WRITE, TRUNCATE_EXISTING);
-        // transfer the resource to the file
-        resource.getInputStream().transferTo(file);
+        try (OutputStream file = Files.newOutputStream(filePath, CREATE, WRITE, TRUNCATE_EXISTING)) {
+            // transfer the resource to the file
+            resource.getInputStream().transferTo(file);
+        }
         // generate the resource URI
         return generateResourceUri(type, fileName);
     }
@@ -52,8 +53,9 @@ public class ContentService {
         Path filePath = Path.of(basePath, type, name);
         // create a resource for the file
         var resource = new FileSystemResource(filePath);
-        if (resource.exists())
+        if (resource.exists()) {
             return resource;
+        }
         return null;
     }
 
@@ -73,6 +75,6 @@ public class ContentService {
     private String generateRandomFileName(Resource resource, String baseName) {
         String originalName = Objects.requireNonNull(resource.getFilename());
         String fileExtension = originalName.substring(originalName.lastIndexOf('.') + 1);
-        return baseName + '_' + tokenGenerator.generateToken(48) + '.' + fileExtension;
+        return baseName + '_' + tokenGenerator.generateToken(12) + '.' + fileExtension;
     }
 }

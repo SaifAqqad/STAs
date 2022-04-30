@@ -84,6 +84,7 @@ public class StudentProfileController {
 
     @PostMapping("/profile/picture")
     public String updateProfilePicture(@RequestParam MultipartFile imageUriData, RedirectAttributes redirectAttributes) throws IOException {
+        deleteProfilePicture(redirectAttributes);
         StudentProfile profile = Objects.requireNonNull(getStudentProfile());
         if (!imageUriData.isEmpty()) {
             profile.setImageUri(contentService.storeResource(imageUriData.getResource(), "profile", profile.getId().toString()));
@@ -98,7 +99,7 @@ public class StudentProfileController {
         StudentProfile profile = Objects.requireNonNull(getStudentProfile());
         String imageName = profile.getImageUri().substring(profile.getImageUri().lastIndexOf('/') + 1);
         contentService.removeResource("profile", profile.getId().toString() + "_" + imageName);
-        profile.setImageUri(StudentProfile.defaultImageUri);
+        profile.setImageUri(StudentProfile.DEFAULT_IMAGE_URI);
         studentProfileService.saveProfile(profile);
         redirectAttributes.addFlashAttribute("toast", "Profile picture removed successfully");
         return "redirect:/profile";

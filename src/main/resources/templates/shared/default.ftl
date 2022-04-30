@@ -18,7 +18,10 @@
 "project"       : "ant-design:project-filled",
 "course"        : "dashicons:book",
 "personInfo"    : "bi:person-lines-fill",
-"editImage"     : "mdi:image-edit-outline"
+"editImage"     : "mdi:image-edit-outline",
+"connection"    : "mdi:link-variant",
+"security"      : "mdi:shield-lock-outline",
+"accountEdit"   : "mdi:account-edit-outline"
 } />
 
 <#macro head title>
@@ -77,10 +80,10 @@
 </#macro>
 
 <#macro navbar home="" login="" profile="" dashboard="" account="">
-    <nav class="navbar navbar-expand-md py-2 navbar-dark bg-dark">
+    <nav class="navbar navbar-expand-md py-2 navbar-dark bg-dark user-select-none">
         <div class="container">
-            <a class="navbar-brand" href="<@spring.url relativeUrl="/"/>">
-                <@icon name="university" width="30"/>
+            <a class="navbar-brand d-flex align-items-center" href="<@spring.url relativeUrl="/"/>">
+                <@icon name="university" width="30" class="me-2"/>
                 STAs
             </a>
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse"
