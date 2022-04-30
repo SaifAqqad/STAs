@@ -9,10 +9,9 @@ import edu.asu.stas.lib.JsonHelper;
 import lombok.*;
 import org.springframework.security.oauth2.core.OAuth2AccessToken;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.*;
 
 import static org.springframework.http.HttpHeaders.AUTHORIZATION;
 
@@ -51,8 +50,10 @@ public class GithubProfile implements OAuthProfile {
     }
 
     private static ObjectMapper objectMapper() {
-        ObjectMapper mapper = JsonHelper.objectMapper();
+        final DateFormat df = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
+        final ObjectMapper mapper = JsonHelper.objectMapper();
         mapper.setPropertyNamingStrategy(PropertyNamingStrategies.SNAKE_CASE);
+        mapper.setDateFormat(df);
         return mapper;
     }
 
@@ -65,5 +66,7 @@ public class GithubProfile implements OAuthProfile {
         private String language;
         private Long stargazersCount;
         private String htmlUrl;
+        private Date createdAt;
+        private Date updatedAt;
     }
 }
