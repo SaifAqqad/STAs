@@ -79,9 +79,9 @@
     </svg>
 </#macro>
 
-<#macro navbar home="" login="" profile="" dashboard="" account="">
+<#macro navbar home="" login="" profile="" dashboard="" account="" marginBreak="lg">
     <nav class="navbar navbar-expand-md py-2 navbar-dark bg-dark user-select-none">
-        <div class="container">
+        <div class="container-fluid container-${marginBreak}">
             <a class="navbar-brand d-flex align-items-center" href="<@spring.url relativeUrl="/"/>">
                 <@icon name="university" width="30" class="me-2"/>
                 STAs

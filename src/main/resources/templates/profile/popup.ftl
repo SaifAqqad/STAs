@@ -20,12 +20,25 @@
 <#macro experiencePopup addPopup detailsPopup popupId formId uriBase overviewPopupDetails>
     <#if overviewPopupDetails.enabled>
         <script>
-            function _applyExperienceToModal() {
-
+            function _applyExperienceToModal(json) {
+                document.querySelectorAll("#${popupId} [data-prop]").forEach(element => {
+                    const propName = element.getAttribute("data-prop")
+                    element.textContent = json[propName] || "";
+                })
+                document.querySelector("#${popupId} [data-prop='formattedEndDate']").textContent = json["formattedEndDate"] || "Present"
             }
         </script>
         <@overviewPopup popupId=popupId uriBase=uriBase overviewPopup=overviewPopupDetails applyMethod="_applyExperienceToModal">
-
+            <div class="pt-0 card-body">
+                <h5 data-prop="jobTitle"></h5>
+                <h6 data-prop="companyName"></h6>
+                <div class="text-muted">
+                    <span data-prop="formattedStartDate"></span> -
+                    <span data-prop="formattedEndDate"></span> ·
+                    <span data-prop="duration"></span>
+                </div>
+                <p class="mt-2 preserve-lines" data-prop="description"></p>
+            </div>
         </@overviewPopup>
     <#else >
         <@formPopup addPopup=addPopup detailsPopup=detailsPopup popupId=popupId formId=formId uriBase=uriBase>
@@ -58,57 +71,45 @@
     </#if>
 </#macro>
 
-<#macro activityPopup addPopup detailsPopup popupId formId uriBase overviewPopupDetails>
-    <#if overviewPopupDetails.enabled>
-        <script>
-            function _applyActivityToModal() {
-
-            }
-        </script>
-        <@overviewPopup popupId=popupId uriBase=uriBase overviewPopup=overviewPopupDetails applyMethod="_applyActivityToModal">
-
-        </@overviewPopup>
-    <#else >
-        <script>
-            function _applyActivityToForm(formId, project) {
-                _applyJsonToForm(formId, project)
-                const imageElem = document.getElementById(formId + "_image")
-                const imageUri = document.getElementById(formId + "_imageUri")
-                imageElem.src = imageUri.value
-            }
-        </script>
-        <@formPopup addPopup=addPopup detailsPopup=detailsPopup popupId=popupId formId=formId uriBase=uriBase isMultiPartForm=true imageInputId=["${formId}_imageUri", "${formId}_imageUriData"] applyMethod="_applyActivityToForm">
-            <input type="hidden" name="id" id="${formId}_id"/>
-            <div class="form-floating">
-                <input class="form-control" required type="text" name="name" id="${formId}_name"
-                       placeholder="Name">
-                <label class="form-label text-muted" for="${formId}_name">Name</label>
-            </div>
-            <div class="form-floating mt-3 fix-floating-label">
+<#macro activityPopup addPopup detailsPopup popupId formId uriBase>
+    <script>
+        function _applyActivityToForm(formId, project) {
+            _applyJsonToForm(formId, project)
+            const imageElem = document.getElementById(formId + "_image")
+            const imageUri = document.getElementById(formId + "_imageUri")
+            imageElem.src = imageUri.value
+        }
+    </script>
+    <@formPopup addPopup=addPopup detailsPopup=detailsPopup popupId=popupId formId=formId uriBase=uriBase isMultiPartForm=true imageInputId=["${formId}_imageUri", "${formId}_imageUriData"] applyMethod="_applyActivityToForm">
+        <input type="hidden" name="id" id="${formId}_id"/>
+        <div class="form-floating">
+            <input class="form-control" required type="text" name="name" id="${formId}_name"
+                   placeholder="Name">
+            <label class="form-label text-muted" for="${formId}_name">Name</label>
+        </div>
+        <div class="form-floating mt-3 fix-floating-label">
             <textarea class="form-control" name="description" id="${formId}_description"
                       placeholder="Description"></textarea>
-                <label class="form-label text-muted" for="${formId}_description">Description</label>
-            </div>
-            <div class="form-floating mt-3">
-                <input class="form-control" required type="date" name="date" id="${formId}_date"
-                       placeholder="Date">
-                <label class="form-label text-muted" for="${formId}_date">Date</label>
-            </div>
-            <div class="mt-3">
-                <label class="form-label text-muted" for="${formId}_imageUriData">Activity image</label>
-                <div class="card w-100 mt-3">
-                    <img id="${formId}_image" class="card-img-top" alt="" src="">
-                    <div class="card-body">
-                        <input type="hidden" name="imageUri" id="${formId}_imageUri"/>
-                        <input class="form-control" type="file" accept="image/*" name="imageUriData"
-                               id="${formId}_imageUriData"
-                               placeholder="Activity image">
-                    </div>
+            <label class="form-label text-muted" for="${formId}_description">Description</label>
+        </div>
+        <div class="form-floating mt-3">
+            <input class="form-control" required type="date" name="date" id="${formId}_date"
+                   placeholder="Date">
+            <label class="form-label text-muted" for="${formId}_date">Date</label>
+        </div>
+        <div class="mt-3">
+            <label class="form-label text-muted" for="${formId}_imageUriData">Activity image</label>
+            <div class="card w-100 mt-3">
+                <img id="${formId}_image" class="card-img-top" alt="" src="">
+                <div class="card-body">
+                    <input type="hidden" name="imageUri" id="${formId}_imageUri"/>
+                    <input class="form-control" type="file" accept="image/*" name="imageUriData"
+                           id="${formId}_imageUriData"
+                           placeholder="Activity image">
                 </div>
             </div>
-        </@formPopup>
-
-    </#if>
+        </div>
+    </@formPopup>
 </#macro>
 
 <#macro projectPopup addPopup detailsPopup popupId formId uriBase overviewPopupDetails>
@@ -259,14 +260,12 @@
 
 <#macro overviewPopup popupId uriBase applyMethod overviewPopup>
     <div class="modal fade" id="${popupId?no_esc}" tabindex="-1">
-        <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-dialog modal-lg modal-dialog-centered user-select-none">
             <div class="modal-content">
                 <div class="modal-header">
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
-                <div class="modal-body">
-                    <#nested />
-                </div>
+                <#nested />
             </div>
         </div>
     </div>

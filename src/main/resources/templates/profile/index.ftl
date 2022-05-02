@@ -45,7 +45,7 @@
 </@default.head>
 
 <body>
-<@default.navbar profile="active"/>
+<@default.navbar profile="active" marginBreak="xl"/>
 
 <div class="container-fluid container-xl my-3">
     <div id="profile">
@@ -178,7 +178,7 @@
                 <div id="profileAbout" class="mb-3">
                     <@profileCard class="view-card">
                     <#-- Title -->
-                        <div class="d-flex justify-content-between align-items-center">
+                        <div class="d-flex justify-content-between align-items-center <@viewOnly>mb-2</@viewOnly>">
                             <h5 class="card-title mb-2"><@default.icon name="personInfo" class="me-2"/>
                                 About me
                             </h5>
@@ -192,7 +192,7 @@
                     <@editOnly>
                         <@profileCard class="edit-card d-none">
                         <#-- Title -->
-                            <div class="d-flex justify-content-between align-items-center">
+                            <div class="d-flex justify-content-between align-items-center <@viewOnly>mb-2</@viewOnly>">
                                 <h5 class="card-title user-select-none mb-2"><@default.icon name="personInfo" class="me-2"/>
                                     About me
                                 </h5>
@@ -228,7 +228,7 @@
                     <div id="profileExperience" class="mb-3">
                         <@profileCard>
                         <#-- Title -->
-                            <div class="d-flex justify-content-between align-items-center">
+                            <div class="d-flex justify-content-between align-items-center <@viewOnly>mb-2</@viewOnly>">
                                 <h5 class="card-title mb-2"><@default.icon name="work" class="me-2"/>
                                     Experience
                                 </h5>
@@ -264,7 +264,7 @@
                     <div id="profileActivity" class="mb-3">
                         <@profileCard>
                         <#-- Title -->
-                            <div class="d-flex justify-content-between align-items-center">
+                            <div class="d-flex justify-content-between align-items-center <@viewOnly>mb-2</@viewOnly>">
                                 <h5 class="card-title mb-2"><@default.icon name="group" class="me-2"/>
                                     Activities
                                 </h5>
@@ -276,7 +276,7 @@
                             <div class="scrollable-box">
                                 <#list profile.activities as activity>
                                     <@profileCard title=activity.name subtitle=activity.getFormattedDate() text=activity.description img=activity.imageUri img_alt=activity.name id=activity.id?c
-                                    limitLines=false class="btn w-100 bg-hover rounded-0 ${activity?is_first?then('rounded-top','')} ${activity?is_last?then('rounded-bottom','border-bottom-0')}"/>
+                                    limitLines=false class="btn w-100 ${isEditing?then('bg-hover','')} rounded-0 ${activity?is_first?then('rounded-top','')} ${activity?is_last?then('rounded-bottom','border-bottom-0')}"/>
                                 <#else>
                                     <div class="w-100 min-h-100 d-flex justify-content-center align-items-center">
                                         <span class="fs-6 text-muted user-select-none">You haven't added anything yet</span>
@@ -291,7 +291,7 @@
                     <div id="profileProjects" class="mb-3">
                         <@profileCard>
                         <#-- Title -->
-                            <div class="d-flex justify-content-between align-items-center">
+                            <div class="d-flex justify-content-between align-items-center <@viewOnly>mb-2</@viewOnly>">
                                 <h5 class="card-title mb-2"><@default.icon name="project" class="me-2"/>
                                     Projects
                                 </h5>
@@ -319,7 +319,7 @@
                     <div id="profileCourses" class="mb-3">
                         <@profileCard>
                         <#-- Title -->
-                            <div class="d-flex justify-content-between align-items-center">
+                            <div class="d-flex justify-content-between align-items-center <@viewOnly>mb-2</@viewOnly>">
                                 <h5 class="card-title mb-2"><@default.icon name="course" class="me-2"/>
                                     Courses
                                 </h5>
@@ -472,7 +472,7 @@
         })()
     </script>
 </@editOnly>
-<#-- edit popups -->
+<#-- edit/overview popups -->
 <@popups.script/>
 <@popups.experiencePopup popupId="experiencePopup" formId="experienceForm" uriBase=springMacroRequestContext.requestUri+"/experiences"
 detailsPopup={
@@ -487,21 +487,6 @@ addPopup={
 overviewPopupDetails={
 "enabled": !isEditing,
 "elementSelector" : "#profileExperience li"
-}
-/>
-<@popups.activityPopup popupId="activityPopup" formId="activityForm" uriBase=springMacroRequestContext.requestUri+"/activities"
-detailsPopup={
-"popupTitle" : "Activity details",
-"deleteButtonId" : "activityDelete",
-"elementSelector" : "#profileActivity .card.btn"
-}
-addPopup={
-"popupTitle" : "Add a new activity",
-"buttonId" : "addActivityButton"
-}
-overviewPopupDetails={
-"enabled": !isEditing,
-"elementSelector" : "#profileActivity .card.btn"
 }
 />
 <@popups.projectPopup popupId="projectPopup" formId="projectForm" uriBase=springMacroRequestContext.requestUri+"/projects"
@@ -535,6 +520,17 @@ overviewPopupDetails={
 }
 />
 <@editOnly>
+    <@popups.activityPopup popupId="activityPopup" formId="activityForm" uriBase=springMacroRequestContext.requestUri+"/activities"
+    detailsPopup={
+    "popupTitle" : "Activity details",
+    "deleteButtonId" : "activityDelete",
+    "elementSelector" : "#profileActivity .card.btn"
+    }
+    addPopup={
+    "popupTitle" : "Add a new activity",
+    "buttonId" : "addActivityButton"
+    }
+    />
     <@popups.linkPopup popupId="linkPopup" formId="linkForm" uriBase="/profile/info/links"
     addPopup={
     "popupTitle" : "Add a new link",
@@ -553,7 +549,8 @@ overviewPopupDetails={
 </html>
 
 <#macro profileCard title="" icon="" subtitle="" text="" id="" img="" img_alt="" class="" limitLines=true preserveLines=false>
-    <div class="card card-border-grey w-100 h-100 ${class?no_esc}" <#if id?has_content>data-id="${id}"</#if>>
+    <div class="card card-border-grey w-100 h-100 user-select-none ${class?no_esc}"
+         <#if id?has_content>data-id="${id}"</#if>>
         <div class="d-flex flex-column flex-sm-row align-content-between align-items-center w-100">
             <#if img?has_content>
                 <div class="h-75">
