@@ -58,8 +58,18 @@ public class UserService implements UserDetailsService, OAuth2UserService<OAuth2
 
 
     @Autowired
-    public UserService(UserRepository userRepository, UserTokenRepository userTokenRepository,
-                       PasswordEncoder passwordEncoder, TokenGenerator tokenGenerator, MailService mailService, ConnectionRepository connectionRepository, CodeVerifier totpVerifier, SecretGenerator secretGenerator, QrDataFactory qrDataFactory, QrGenerator qrGenerator) {
+    public UserService(
+            UserRepository userRepository,
+            UserTokenRepository userTokenRepository,
+            PasswordEncoder passwordEncoder,
+            TokenGenerator tokenGenerator,
+            MailService mailService,
+            ConnectionRepository connectionRepository,
+            CodeVerifier totpVerifier,
+            SecretGenerator secretGenerator,
+            QrDataFactory qrDataFactory,
+            QrGenerator qrGenerator
+    ) {
         this.userRepository = userRepository;
         this.userTokenRepository = userTokenRepository;
         this.passwordEncoder = passwordEncoder;
