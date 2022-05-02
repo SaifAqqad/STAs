@@ -46,6 +46,13 @@ pre {
     border-radius: 4px;
 }
 
+.card-title {
+    -webkit-user-select: none !important;
+    -moz-user-select: none !important;
+    -ms-user-select: none !important;
+    user-select: none !important;
+}
+
 .object-fit-cover {
     object-fit: cover;
 }

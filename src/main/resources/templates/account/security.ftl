@@ -17,7 +17,7 @@
         </div>
         <div class="col-md-9">
             <div class="container mt-2">
-                <div class="fs-4"><@default.icon name="security"/>
+                <div class="fs-4 user-select-none"><@default.icon name="security"/>
                     Account security
                 </div>
                 <div class="container px-0">
