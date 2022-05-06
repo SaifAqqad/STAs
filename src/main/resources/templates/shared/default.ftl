@@ -33,7 +33,6 @@
         <title>${title}</title>
 
         <link rel="icon" type="image/svg+xml" href="<@spring.url "/images/favicon.svg"/>">
-        <link rel="icon" type="image/png" href="<@spring.url "/images/favicon.png"/>">
         <link rel="manifest" href="<@spring.url "/js/site.webmanifest"/>">
 
         <link rel="stylesheet" href="<@spring.url "/webjars/bootswatch/dist/zephyr/bootstrap.min.css"/>"/>
