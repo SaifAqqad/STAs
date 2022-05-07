@@ -41,6 +41,12 @@
             max-height: 600px;
             overflow: auto;
         }
+
+        <#--noinspection CssUnusedSymbol-->
+        .card-body .card-body {
+            padding-left: 0.5rem;
+            padding-right: 0.5rem;
+        }
     </style>
 </@default.head>
 
@@ -276,7 +282,7 @@
                             <div class="scrollable-box">
                                 <#list profile.activities as activity>
                                     <@profileCard title=activity.name subtitle=activity.getFormattedDate() text=activity.description img=activity.imageUri img_alt=activity.name id=activity.id?c
-                                    limitLines=false class="btn w-100 ${isEditing?then('bg-hover','')} rounded-0 ${activity?is_first?then('rounded-top','')} ${activity?is_last?then('rounded-bottom','border-bottom-0')}"/>
+                                    limitLines=false class="btn w-100 ${isEditing?then('bg-hover','pe-none')} rounded-0 ${activity?is_first?then('rounded-top','')} ${activity?is_last?then('rounded-bottom','border-bottom-0')}"/>
                                 <#else>
                                     <div class="w-100 min-h-100 d-flex justify-content-center align-items-center">
                                         <span class="fs-6 text-muted user-select-none">You haven't added anything yet</span>
@@ -331,7 +337,7 @@
                             <div class="row row-cols-1 row-cols-lg-2">
                                 <#list profile.courses as course >
                                     <div class="col mb-3">
-                                        <@profileCard title=course.name text=course.studentComment img=course.imageUri id=course.id?c class="btn bg-hover"/>
+                                        <@profileCard title=course.name text=(course.studentComment?has_content)?then(course.studentComment,course.description) img=course.imageUri id=course.id?c class="btn bg-hover"/>
                                     </div>
                                 <#else>
                                     <div class="w-100 min-h-100 d-flex justify-content-center align-items-center">

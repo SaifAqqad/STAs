@@ -67,6 +67,35 @@
             elems.forEach(element => element.classList[show ? "remove" : "add"]("d-none"))
         }
 
+        function _assignDefaultValue(target, src) {
+            for (const targetKey in target) {
+                const value = target[targetKey];
+                if (!src[targetKey]) {
+                    src[targetKey] = value
+                }
+            }
+            return src
+        }
+
+        function _updateAutoTextArea(textArea) {
+            if (!(textArea instanceof HTMLElement))
+                textArea = document.querySelector(textArea)
+            textArea.style.height = '3.5rem';
+            textArea.style.height = textArea.scrollHeight + 'px';
+        }
+
+        function _setupAutoTextArea(textArea) {
+            if (!(textArea instanceof HTMLElement))
+                textArea = document.querySelector(textArea)
+            // set initial textarea height
+            textArea.setAttribute("style", "height:3.5rem;overflow-y:hidden;")
+            // textarea onInput
+            textArea.addEventListener("input", _updateAutoTextArea.bind(this, textArea))
+        }
+
+        function _sleep(ms) {
+            return new Promise(resolve => setTimeout(resolve, ms));
+        }
     </script>
     <#nested >
 </#macro>

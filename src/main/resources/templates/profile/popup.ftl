@@ -21,11 +21,21 @@
     <#if overviewPopupDetails.enabled>
         <script>
             function _applyExperienceToModal(json) {
-                document.querySelectorAll("#${popupId} [data-prop]").forEach(element => {
-                    const propName = element.getAttribute("data-prop")
-                    element.textContent = json[propName] || "";
-                })
-                document.querySelector("#${popupId} [data-prop='formattedEndDate']").textContent = json["formattedEndDate"] || "Present"
+                const tooltips = [];
+                _applyJsonToModal("${popupId}", json)
+                document.querySelector("#${popupId} [data-prop='formattedEndDate']").textContent = json["formattedEndDate"] || "Present";
+                // set startDate tooltip value
+                document.querySelector("#${popupId} [data-prop-manual='startDate']").setAttribute("title", json["startDate"])
+                const endDateElem = document.querySelector("#${popupId} [data-prop-manual='endDate']")
+                // set endDate tooltip value
+                if (json["endDate"])
+                    endDateElem.setAttribute("title", json["endDate"])
+                else
+                    endDateElem.removeAttribute("title")
+                // create a tooltip for elements with [data-bs-toggle='tooltip'][title]
+                document.querySelectorAll("#${popupId} [data-bs-toggle='tooltip'][title]").forEach(element => tooltips.push(new bootstrap.Tooltip(element)))
+                // destroy tooltips when hiding the popup
+                document.querySelector("#${popupId}").addEventListener('hide.bs.modal', () => tooltips.forEach(tooltip => tooltip.dispose()))
             }
         </script>
         <@overviewPopup popupId=popupId uriBase=uriBase overviewPopup=overviewPopupDetails applyMethod="_applyExperienceToModal">
@@ -33,8 +43,10 @@
                 <h5 data-prop="jobTitle"></h5>
                 <h6 data-prop="companyName"></h6>
                 <div class="text-muted">
-                    <span data-prop="formattedStartDate"></span> -
-                    <span data-prop="formattedEndDate"></span> ·
+                    <span data-prop="formattedStartDate" data-bs-toggle="tooltip" data-bs-placement="top"
+                          title="" data-prop-manual="startDate"></span> -
+                    <span data-prop="formattedEndDate" data-bs-toggle="tooltip" data-bs-placement="top"
+                          title="" data-prop-manual="endDate"></span> ·
                     <span data-prop="duration"></span>
                 </div>
                 <p class="mt-2 preserve-lines" data-prop="description"></p>
@@ -73,8 +85,8 @@
 
 <#macro activityPopup addPopup detailsPopup popupId formId uriBase>
     <script>
-        function _applyActivityToForm(formId, project) {
-            _applyJsonToForm(formId, project)
+        function _applyActivityToForm(formId, activity) {
+            _applyJsonToForm(formId, activity)
             const imageElem = document.getElementById(formId + "_image")
             const imageUri = document.getElementById(formId + "_imageUri")
             imageElem.src = imageUri.value
@@ -115,12 +127,50 @@
 <#macro projectPopup addPopup detailsPopup popupId formId uriBase overviewPopupDetails>
     <#if overviewPopupDetails.enabled>
         <script>
-            function _applyProjectToModal() {
-
+            function _applyProjectToModal(json) {
+                const tooltips = [];
+                _applyJsonToModal("${popupId}", json)
+                document.querySelector("#${popupId} [data-prop='formattedEndDate']").textContent = json["formattedEndDate"] || "Present"
+                document.querySelector("#${popupId} [data-prop-manual='imageUri']").src = json["imageUri"]
+                document.querySelector("#${popupId} [data-prop-manual='url']").href = json["url"]
+                // set startDate tooltip value
+                document.querySelector("#${popupId} [data-prop-manual='startDate']").setAttribute("title", json["startDate"])
+                const endDateElem = document.querySelector("#${popupId} [data-prop-manual='endDate']")
+                // set endDate tooltip value
+                if (json["endDate"])
+                    endDateElem.setAttribute("title", json["endDate"])
+                else
+                    endDateElem.removeAttribute("title")
+                // create a tooltip for elements with [data-bs-toggle='tooltip'][title]
+                document.querySelectorAll("#${popupId} [data-bs-toggle='tooltip'][title]").forEach(element => tooltips.push(new bootstrap.Tooltip(element)))
+                // destroy tooltips when hiding the popup
+                document.querySelector("#${popupId}").addEventListener('hide.bs.modal', () => tooltips.forEach(tooltip => tooltip.dispose()))
             }
         </script>
         <@overviewPopup popupId=popupId uriBase=uriBase overviewPopup=overviewPopupDetails applyMethod="_applyProjectToModal">
-
+            <div class="pt-0 card-body">
+                <div class="d-flex justify-content-around align-items-center flex-column flex-lg-row">
+                    <div class="card w-100 me-0 mb-3 w-lg-50 me-lg-3 mb-lg-0">
+                        <img class="card-img-top" data-prop-manual="imageUri" src="" alt="Project image">
+                    </div>
+                    <div class="w-100 w-lg-50">
+                        <h5>
+                            <a class="text-decoration-none link-dark" data-prop-manual="url" target="_blank" href="">
+                                <span data-prop="name"></span><@default.externalLinkIcon/>
+                            </a>
+                        </h5>
+                        <h6 class="text-muted" data-prop="category"></h6>
+                        <div class="text-muted">
+                            <span data-prop="formattedStartDate" data-bs-toggle="tooltip" data-bs-placement="top"
+                                  title="" data-prop-manual="startDate"></span> -
+                            <span data-prop="formattedEndDate" data-bs-toggle="tooltip" data-bs-placement="top" title=""
+                                  data-prop-manual="endDate"></span> ·
+                            <span data-prop="duration"></span>
+                        </div>
+                        <p class="mt-2" data-prop="description"></p>
+                    </div>
+                </div>
+            </div>
         </@overviewPopup>
     <#else >
         <script>
@@ -181,17 +231,46 @@
 <#macro coursePopup addPopup detailsPopup popupId formId uriBase overviewPopupDetails>
     <#if overviewPopupDetails.enabled>
         <script>
-            function _applyCourseToModal() {
-
+            function _applyCourseToModal(json) {
+                _assignDefaultValue({publisher: "Link"}, json)
+                _applyJsonToModal("${popupId}", json)
+                document.querySelector("#${popupId} [data-prop-manual='imageUri']").src = json["imageUri"]
+                document.querySelector("#${popupId} [data-prop-manual='url']").href = json["url"]
             }
         </script>
         <@overviewPopup popupId=popupId uriBase=uriBase overviewPopup=overviewPopupDetails applyMethod="_applyCourseToModal">
-
+            <div class="pt-0 card-body">
+                <div class="d-flex justify-content-around align-items-center flex-column flex-lg-row">
+                    <#-- below lg: width(100) me(0) mb(3) -->
+                    <#-- lg and above: width(50) me(3) mb(0) -->
+                    <div class="card w-100 me-0 mb-3 w-lg-50 me-lg-3 mb-lg-0">
+                        <img class="card-img-top" data-prop-manual="imageUri" src="" alt="Course image">
+                    </div>
+                    <div class="w-100 w-lg-50">
+                        <h5>
+                            <span data-prop="name"></span>
+                        </h5>
+                        <h6 class="">
+                            <a class="text-decoration-none link-dark" data-prop-manual="url" target="_blank" href="">
+                                <span data-prop="publisher"></span><@default.externalLinkIcon/>
+                            </a>
+                        </h6>
+                        <div data-group="description">
+                            <div class="text-black">Course description</div>
+                            <p class="mt-0 limit-lines-8" data-prop="description"></p>
+                        </div>
+                        <div data-group="studentComment">
+                            <div class="text-black">Course reflection</div>
+                            <p class="mt-0" data-prop="studentComment"></p>
+                        </div>
+                    </div>
+                </div>
+            </div>
         </@overviewPopup>
     <#else >
         <script>
-            function _applyCourseToForm(formId, project) {
-                _applyJsonToForm(formId, project)
+            function _applyCourseToForm(formId, course) {
+                _applyJsonToForm(formId, course)
                 const imageElem = document.getElementById(formId + "_image")
                 const imageUri = document.getElementById(formId + "_imageUri")
                 imageElem.src = imageUri.value
@@ -212,10 +291,15 @@
             <div class="form-floating mt-3 fix-floating-label">
             <textarea class="form-control" name="studentComment" id="${formId}_studentComment"
                       placeholder="Comment"></textarea>
-                <label class="form-label text-muted" for="${formId}_studentComment">Comment</label>
+                <label class="form-label text-muted" for="${formId}_studentComment">Reflection</label>
             </div>
             <div class="form-floating mt-3">
-                <input class="form-control" type="text" name="url" id="${formId}_url"
+                <input class="form-control" type="text" name="publisher" id="${formId}_publisher"
+                       placeholder="Publisher">
+                <label class="form-label text-muted" for="${formId}_publisher">Publisher</label>
+            </div>
+            <div class="form-floating mt-3">
+                <input class="form-control" type="url" name="url" id="${formId}_url"
                        placeholder="Link">
                 <label class="form-label text-muted" for="${formId}_url">Link</label>
             </div>
@@ -296,6 +380,7 @@
             <div class="modal-content">
                 <div class="modal-header">
                     <h5 class="modal-title"></h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body">
                     <form id="${formId}" action="" method="post"
@@ -349,6 +434,7 @@
             }
             options.formElement = document.getElementById(options.formId)
             options.modal = new bootstrap.Modal(options.modalElement)
+            options.textAreas = document.querySelectorAll(`#${formId} textarea`)
             try {
                 _setupPopup(options)
             } catch (e) {
@@ -360,8 +446,37 @@
 
 <#macro script>
     <script>
+        function _applyJsonToModal(modalId, json) {
+            <#noparse>
+            document.querySelectorAll(`#${modalId} [data-prop]`).forEach(element => {
+                const propName = element.getAttribute("data-prop")
+                element.textContent = json[propName] || "";
+                let elementGroup = document.querySelector(`#${modalId} [data-group='${propName}']`)
+                if (elementGroup)
+                    elementGroup.classList[json[propName] ? "remove" : "add"]("d-none")
+            })
+            </#noparse>
+        }
+
         function _setupPopup(options) {
             <#noparse>
+            if (options.textAreas) {
+                // set up auto expanding text areas
+                options.textAreas.forEach(textArea => _setupAutoTextArea(textArea))
+                // when the modal is fully shown
+                options.modalElement.addEventListener("shown.bs.modal", () => options.textAreas.forEach(async textArea => {
+                    // add height transition
+                    textArea.classList.add("height-transition")
+                    // update text area height
+                    _updateAutoTextArea(textArea)
+                    // wait for transition to end
+                    await _sleep(200)
+                    // remove height transition
+                    textArea.classList.remove("height-transition")
+                }))
+                // when the modal is fully hidden -> reset the text area's height
+                options.modalElement.addEventListener("hidden.bs.modal", () => options.textAreas.forEach(textArea => textArea.style.height = '3.5rem'))
+            }
             // set up details popup
             if (options.detailsPopup) {
                 document.querySelectorAll(options.detailsPopup.elementSelector).forEach(element => {
