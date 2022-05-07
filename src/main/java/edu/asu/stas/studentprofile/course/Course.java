@@ -23,7 +23,10 @@ public class Course {
     @Column(length = 5000)
     private String description;
 
+    @Column(length = 5000)
     private String studentComment;
+
+    private String publisher;
 
     private String url;
 
