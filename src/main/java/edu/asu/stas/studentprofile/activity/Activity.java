@@ -18,6 +18,8 @@ import java.time.format.DateTimeFormatter;
 @Getter
 @Setter
 public class Activity {
+    private static final DateTimeFormatter DATE_TIME_FORMATTER = DateTimeFormatter.ofPattern("dd MMMM, yyyy");
+
     @Id
     @GeneratedValue
     private Long id;
@@ -39,7 +41,7 @@ public class Activity {
 
     @Transient
     public String getFormattedDate() {
-        return date.format(DateTimeFormatter.ofPattern("dd MMMM, yyyy"));
+        return date.format(DATE_TIME_FORMATTER);
     }
 
 }

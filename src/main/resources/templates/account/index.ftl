@@ -20,7 +20,7 @@
         <#-- Main page -->
         <div class="col-md-9">
             <div class="container mt-2">
-                <div class="fs-4"><@default.icon name="accountEdit"/>
+                <div class="fs-4 user-select-none"><@default.icon name="accountEdit"/>
                     Account information
                 </div>
                 <div class="card mt-3">

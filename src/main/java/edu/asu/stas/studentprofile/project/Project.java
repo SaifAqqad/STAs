@@ -1,6 +1,7 @@
 package edu.asu.stas.studentprofile.project;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import edu.asu.stas.connnection.oauth.GithubProfile.Repository;
 import edu.asu.stas.studentprofile.StudentProfile;
 import lombok.Getter;
@@ -12,12 +13,18 @@ import org.springframework.format.annotation.DateTimeFormat;
 
 import javax.persistence.*;
 import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
+import java.util.Objects;
+
+import static edu.asu.stas.lib.DateUtils.getYearMonthPeriod;
 
 @Entity
 @NoArgsConstructor
 @Getter
 @Setter
 public class Project {
+    private static final DateTimeFormatter DATE_TIME_FORMATTER = DateTimeFormatter.ofPattern("MMM yyyy");
+
     @Id
     @GeneratedValue
     private Long id;
@@ -47,4 +54,23 @@ public class Project {
     @Type(type = "json")
     @Column(columnDefinition = "json")
     private Repository repository;
+
+    @Transient
+    @JsonProperty("formattedStartDate")
+    public String getFormattedStartDate() {
+        return Objects.nonNull(startDate) ? startDate.format(DATE_TIME_FORMATTER) : null;
+    }
+
+    @Transient
+    @JsonProperty("formattedEndDate")
+    public String getFormattedEndDate() {
+        return Objects.nonNull(endDate) ? endDate.format(DATE_TIME_FORMATTER) : null;
+    }
+
+    @Transient
+    @JsonProperty("duration")
+    public String getDuration() {
+        return getYearMonthPeriod(startDate, endDate);
+    }
+
 }

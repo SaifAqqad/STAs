@@ -33,7 +33,6 @@
         <title>${title}</title>
 
         <link rel="icon" type="image/svg+xml" href="<@spring.url "/images/favicon.svg"/>">
-        <link rel="icon" type="image/png" href="<@spring.url "/images/favicon.png"/>">
         <link rel="manifest" href="<@spring.url "/js/site.webmanifest"/>">
 
         <link rel="stylesheet" href="<@spring.url "/webjars/bootswatch/dist/zephyr/bootstrap.min.css"/>"/>
@@ -68,6 +67,35 @@
             elems.forEach(element => element.classList[show ? "remove" : "add"]("d-none"))
         }
 
+        function _assignDefaultValue(target, src) {
+            for (const targetKey in target) {
+                const value = target[targetKey];
+                if (!src[targetKey]) {
+                    src[targetKey] = value
+                }
+            }
+            return src
+        }
+
+        function _updateAutoTextArea(textArea) {
+            if (!(textArea instanceof HTMLElement))
+                textArea = document.querySelector(textArea)
+            textArea.style.height = '3.5rem';
+            textArea.style.height = textArea.scrollHeight + 'px';
+        }
+
+        function _setupAutoTextArea(textArea) {
+            if (!(textArea instanceof HTMLElement))
+                textArea = document.querySelector(textArea)
+            // set initial textarea height
+            textArea.setAttribute("style", "height:3.5rem;overflow-y:hidden;")
+            // textarea onInput
+            textArea.addEventListener("input", _updateAutoTextArea.bind(this, textArea))
+        }
+
+        function _sleep(ms) {
+            return new Promise(resolve => setTimeout(resolve, ms));
+        }
     </script>
     <#nested >
 </#macro>
@@ -79,9 +107,9 @@
     </svg>
 </#macro>
 
-<#macro navbar home="" login="" profile="" dashboard="" account="">
+<#macro navbar home="" login="" profile="" dashboard="" account="" marginBreak="lg">
     <nav class="navbar navbar-expand-md py-2 navbar-dark bg-dark user-select-none">
-        <div class="container">
+        <div class="container-fluid container-${marginBreak}">
             <a class="navbar-brand d-flex align-items-center" href="<@spring.url relativeUrl="/"/>">
                 <@icon name="university" width="30" class="me-2"/>
                 STAs

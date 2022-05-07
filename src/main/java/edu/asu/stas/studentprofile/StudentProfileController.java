@@ -6,9 +6,8 @@ import edu.asu.stas.user.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.support.SessionStatus;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
@@ -18,6 +17,7 @@ import java.util.Objects;
 import java.util.stream.Collectors;
 
 @Controller
+@SessionAttributes("isEditing")
 public class StudentProfileController {
 
     private final StudentProfileService studentProfileService;
@@ -36,10 +36,21 @@ public class StudentProfileController {
     }
 
     @GetMapping("/profile")
-    public String getProfilePage(Model model) {
+    public String getProfilePage(
+            @RequestParam(required = false) Boolean edit,
+            Model model,
+            SessionStatus sessionStatus
+    ) {
         StudentProfile profile = getStudentProfile();
         if (Objects.isNull(profile)) return "redirect:/profile/create";
         model.addAttribute("profile", profile);
+        if (Objects.nonNull(edit)) {
+            model.addAttribute("isEditing", edit);
+        }
+        if (!model.containsAttribute("isEditing")) {
+            sessionStatus.setComplete();
+            model.addAttribute("isEditing", false);
+        }
         return "profile/index";
     }
 
@@ -60,15 +71,30 @@ public class StudentProfileController {
     }
 
     @PostMapping("/profile/info")
-    public String updateProfileInfo(ProfileInfo profileInfo, @RequestParam Map<String, String> links, RedirectAttributes redirectAttributes) {
+    public String updateProfileInfo(
+            ProfileInfo profileInfo,
+            @RequestParam Map<String, String> links,
+            RedirectAttributes redirectAttributes
+    ) {
         StudentProfile profile = Objects.requireNonNull(getStudentProfile());
-        studentProfileService.updateProfileInfo(profile, profileInfo, links.entrySet().stream().filter(entry -> entry.getKey().startsWith("link_") && !entry.getValue().isBlank()).collect(Collectors.toMap(entry -> entry.getKey().replaceFirst("link_", ""), Map.Entry::getValue)));
+        studentProfileService.updateProfileInfo(profile,
+                                                profileInfo,
+                                                links.entrySet()
+                                                        .stream()
+                                                        .filter(entry -> entry.getKey().startsWith("link_") &&
+                                                                !entry.getValue().isBlank())
+                                                        .collect(Collectors.toMap(entry -> entry.getKey()
+                                                                .replaceFirst("link_", ""), Map.Entry::getValue)));
         redirectAttributes.addFlashAttribute("toast", "Profile updated successfully");
         return "redirect:/profile";
     }
 
     @PostMapping("/profile/info/links")
-    public String addNewLink(@RequestParam String linkName, @RequestParam String linkUrl, RedirectAttributes redirectAttributes) {
+    public String addNewLink(
+            @RequestParam String linkName,
+            @RequestParam String linkUrl,
+            RedirectAttributes redirectAttributes
+    ) {
         StudentProfile profile = Objects.requireNonNull(getStudentProfile());
         var links = profile.getLinks();
         if (links.containsKey(linkName)) {
@@ -83,11 +109,16 @@ public class StudentProfileController {
     }
 
     @PostMapping("/profile/picture")
-    public String updateProfilePicture(@RequestParam MultipartFile imageUriData, RedirectAttributes redirectAttributes) throws IOException {
+    public String updateProfilePicture(
+            @RequestParam MultipartFile imageUriData,
+            RedirectAttributes redirectAttributes
+    ) throws IOException {
         deleteProfilePicture(redirectAttributes);
         StudentProfile profile = Objects.requireNonNull(getStudentProfile());
         if (!imageUriData.isEmpty()) {
-            profile.setImageUri(contentService.storeResource(imageUriData.getResource(), "profile", profile.getId().toString()));
+            profile.setImageUri(contentService.storeResource(imageUriData.getResource(),
+                                                             "profile",
+                                                             profile.getId().toString()));
             studentProfileService.saveProfile(profile);
         }
         redirectAttributes.addFlashAttribute("toast", "Profile picture updated successfully");

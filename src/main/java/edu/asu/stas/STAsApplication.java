@@ -78,6 +78,7 @@ public class STAsApplication {
                     course.setStudentComment("This book helped me learn Java in-depth, it covers a lot of great topics like IO, encryption and functional programming");
                     course.setImageUri("https://static.packt-cdn.com/products/9781838986698/cover/smaller");
                     course.setUrl("https://www.packtpub.com/product/the-java-workshop/9781838986698");
+                    course.setPublisher("Packt");
                     course.setProfile(profile);
                     courseRepository.save(course);
 
