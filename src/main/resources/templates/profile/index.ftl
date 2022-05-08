@@ -619,6 +619,7 @@ overviewPopupDetails={
 </#macro>
 
 <#macro ownOnly>
-<#-- TODO: Add check -->
-    <#nested/>
+    <#if !(isPublicView!false)>
+        <#nested/>
+    </#if>
 </#macro>

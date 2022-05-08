@@ -35,7 +35,7 @@
                 // create a tooltip for elements with [data-bs-toggle='tooltip'][title]
                 document.querySelectorAll("#${popupId} [data-bs-toggle='tooltip'][title]").forEach(element => tooltips.push(new bootstrap.Tooltip(element)))
                 // destroy tooltips when hiding the popup
-                document.querySelector("#${popupId}").addEventListener('hide.bs.modal', () => tooltips.forEach(tooltip => tooltip.dispose()))
+                document.querySelector("#${popupId}").addEventListener('hide.bs.modal', () => tooltips.forEach(tooltip => tooltip.dispose()), {once: true})
             }
         </script>
         <@overviewPopup popupId=popupId uriBase=uriBase overviewPopup=overviewPopupDetails applyMethod="_applyExperienceToModal">
@@ -144,7 +144,7 @@
                 // create a tooltip for elements with [data-bs-toggle='tooltip'][title]
                 document.querySelectorAll("#${popupId} [data-bs-toggle='tooltip'][title]").forEach(element => tooltips.push(new bootstrap.Tooltip(element)))
                 // destroy tooltips when hiding the popup
-                document.querySelector("#${popupId}").addEventListener('hide.bs.modal', () => tooltips.forEach(tooltip => tooltip.dispose()))
+                document.querySelector("#${popupId}").addEventListener('hide.bs.modal', () => tooltips.forEach(tooltip => tooltip.dispose()), {once: true})
             }
         </script>
         <@overviewPopup popupId=popupId uriBase=uriBase overviewPopup=overviewPopupDetails applyMethod="_applyProjectToModal">

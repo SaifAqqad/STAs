@@ -42,8 +42,7 @@ public class ContentController {
             case "project" -> requireNonNull(profileService.getProjectById(objectId)).getProfile();
             default -> throw new ResponseStatusException(HttpStatus.NOT_FOUND);
         };
-        // TODO: add check for profilePrivacy
-        if (objectProfile.equals(profileService.getAuthenticatedUserProfile())) {
+        if (objectProfile.isPublic() || objectProfile.equals(profileService.getAuthenticatedUserProfile())) {
             Resource file = requireNonNull(contentService.loadResource(objectType, objectId + "_" + fileName));
             MediaType fileType = MediaType.parseMediaType(new Tika().detect(file.getFilename()));
             return ResponseEntity.ok().contentType(fileType).body(file);

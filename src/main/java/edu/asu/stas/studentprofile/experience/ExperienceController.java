@@ -15,7 +15,10 @@ public class ExperienceController {
     private final StudentProfileService studentProfileService;
     private final ExperienceRepository experienceRepository;
 
-    public ExperienceController(StudentProfileService studentProfileService, ExperienceRepository experienceRepository) {
+    public ExperienceController(
+            StudentProfileService studentProfileService,
+            ExperienceRepository experienceRepository
+    ) {
         this.studentProfileService = studentProfileService;
         this.experienceRepository = experienceRepository;
     }
@@ -25,10 +28,24 @@ public class ExperienceController {
     public ResponseEntity<Experience> getById(@PathVariable Long id) {
         var profile = studentProfileService.getAuthenticatedUserProfile();
         var experience = experienceRepository.getByProfileAndId(profile, id);
-        if (Objects.isNull(experience))
+        if (Objects.isNull(experience)) {
             return ResponseEntity.notFound().build();
+        }
         return ResponseEntity.ok(experience);
     }
+
+    @GetMapping("profile/{uuid}/experiences/{id}")
+    public ResponseEntity<Experience> getByProfileUuidAndId(@PathVariable String uuid, @PathVariable Long id) {
+        var profile = studentProfileService.getProfileByUuid(uuid);
+        if (Objects.nonNull(profile) && profile.isPublic()) {
+            var experience = experienceRepository.getByProfileAndId(profile, id);
+            if (Objects.nonNull(experience)) {
+                return ResponseEntity.ok(experience);
+            }
+        }
+        return ResponseEntity.notFound().build();
+    }
+
 
     // POST /profile/experiences/delete
     @PostMapping("delete")
@@ -47,7 +64,11 @@ public class ExperienceController {
 
     // POST /profile/experiences/{id}
     @PostMapping("{id}")
-    public RedirectView updateById(@PathVariable Long id, Experience experience, RedirectAttributes redirectAttributes) {
+    public RedirectView updateById(
+            @PathVariable Long id,
+            Experience experience,
+            RedirectAttributes redirectAttributes
+    ) {
         var profile = studentProfileService.getAuthenticatedUserProfile();
         if (id.equals(experience.getId()) && experienceRepository.existsByProfileAndId(profile, experience.getId())) {
             experience.setProfile(profile);

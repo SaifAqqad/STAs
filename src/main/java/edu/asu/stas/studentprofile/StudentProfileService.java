@@ -13,6 +13,7 @@ import edu.asu.stas.user.UserService;
 import lombok.NonNull;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.web.bind.annotation.PostMapping;
 
 import java.util.Comparator;
 import java.util.Map;
@@ -54,10 +55,15 @@ public class StudentProfileService {
         return studentProfileRepository.findById(id).orElse(null);
     }
 
+    public StudentProfile getProfileByUuid(String uuid) {
+        return studentProfileRepository.getByUuid(uuid);
+    }
+
     public StudentProfile getAuthenticatedUserProfile() {
         User user = UserService.getAuthenticatedUser();
-        if (Objects.isNull(user))
+        if (Objects.isNull(user)) {
             return null;
+        }
         return getProfileByUser(user);
     }
 

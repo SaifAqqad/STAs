@@ -20,7 +20,11 @@ public class CourseController {
     private final ContentService contentService;
 
 
-    public CourseController(StudentProfileService studentProfileService, CourseRepository courseRepository, ContentService contentService) {
+    public CourseController(
+            StudentProfileService studentProfileService,
+            CourseRepository courseRepository,
+            ContentService contentService
+    ) {
         this.studentProfileService = studentProfileService;
         this.courseRepository = courseRepository;
         this.contentService = contentService;
@@ -31,9 +35,22 @@ public class CourseController {
     public ResponseEntity<Course> getById(@PathVariable Long id) {
         var profile = studentProfileService.getAuthenticatedUserProfile();
         var course = courseRepository.getByProfileAndId(profile, id);
-        if (Objects.isNull(course))
+        if (Objects.isNull(course)) {
             return ResponseEntity.notFound().build();
+        }
         return ResponseEntity.ok(course);
+    }
+
+    @GetMapping("profile/{uuid}/courses/{id}")
+    public ResponseEntity<Course> getByProfileUuidAndId(@PathVariable String uuid, @PathVariable Long id) {
+        var profile = studentProfileService.getProfileByUuid(uuid);
+        if (Objects.nonNull(profile) && profile.isPublic()) {
+            var course = courseRepository.getByProfileAndId(profile, id);
+            if (Objects.nonNull(course)) {
+                return ResponseEntity.ok(course);
+            }
+        }
+        return ResponseEntity.notFound().build();
     }
 
     // POST /profile/courses/delete
@@ -53,7 +70,7 @@ public class CourseController {
         return new RedirectView("/profile");
     }
 
-    // POST /profile/activities/{id}
+    // POST /profile/courses/{id}
     @PostMapping("{id}")
     @Transactional
     public RedirectView updateById(
@@ -65,12 +82,13 @@ public class CourseController {
         var profile = studentProfileService.getAuthenticatedUserProfile();
         if (id.equals(course.getId()) && courseRepository.existsByProfileAndId(profile, course.getId())) {
             course.setProfile(profile);
-            if (!imageUriData.isEmpty())
+            if (!imageUriData.isEmpty()) {
                 course.setImageUri(contentService.storeResource(
                         imageUriData.getResource(),
                         "course",
                         course.getId().toString()
                 ));
+            }
             courseRepository.save(course);
             redirectAttributes.addFlashAttribute("toast", "Course updated successfully");
         } else {
@@ -80,7 +98,7 @@ public class CourseController {
         return new RedirectView("/profile");
     }
 
-    // POST /profile/activities
+    // POST /profile/courses
     @PostMapping
     @Transactional
     public RedirectView addNew(

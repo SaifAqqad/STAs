@@ -4,11 +4,13 @@ import edu.asu.stas.content.ContentService;
 import edu.asu.stas.user.User;
 import edu.asu.stas.user.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.bind.support.SessionStatus;
 import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.server.ResponseStatusException;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import java.io.IOException;
@@ -52,6 +54,18 @@ public class StudentProfileController {
             model.addAttribute("isEditing", false);
         }
         return "profile/index";
+    }
+
+    @GetMapping("/profile/{uuid}")
+    public String getProfileByUuid(@PathVariable String uuid, Model model) {
+        StudentProfile profile = studentProfileService.getProfileByUuid(uuid);
+        if (Objects.nonNull(profile) && profile.isPublic()) {
+            model.addAttribute("profile", profile);
+            model.addAttribute("isEditing", false);
+            model.addAttribute("isPublicView", true);
+            return "profile/index";
+        }
+        throw new ResponseStatusException(HttpStatus.NOT_FOUND);
     }
 
     @GetMapping("/profile/create")
