@@ -109,7 +109,7 @@ public class AccountController {
             redirectAttributes.addFlashAttribute("twoFactorSecretQR", secret.getQrImageData());
             return "redirect:/account/security";
         } else { // turned off 2FA
-            if (Objects.nonNull(code) && userService.is2FACodeValid(user, code)) {
+            if (Objects.nonNull(code) && (userService.is2FACodeValid(user, code) || user.getToken2FA().equals(code))) {
                 userService.disable2FA(user);
                 redirectAttributes.addFlashAttribute("toast", "Two-factor authentication disabled successfully");
                 return "redirect:/account/security";

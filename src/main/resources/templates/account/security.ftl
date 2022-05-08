@@ -137,6 +137,7 @@
 <@default.toast />
 <script>
     const twoFactorSwitch = document.getElementById("twoFactorSwitch");
+    const twoFactorSecret = "${twoFactorSecret!""}";
     const twoFactorForm = document.getElementById("form2fa");
     const twoFactorState = document.getElementById("twoFactorState");
     const twoFactorModal = document.getElementById("twoFactorModal")
@@ -148,6 +149,10 @@
         twoFactorState.value = switchState;
         if (switchState)
             return twoFactorForm.submit();
+        if (twoFactorSecret) {
+            document.getElementById("twoFactorCode").value = twoFactorSecret
+            return twoFactorForm.submit();
+        }
         let modal = new bootstrap.Modal(twoFactorModal);
         twoFactorModal.addEventListener("shown.bs.modal", () => document.getElementById("twoFactorCode").focus());
         twoFactorModal.addEventListener("hide.bs.modal", () => twoFactorState.value = twoFactorSwitch.checked = !switchState);
