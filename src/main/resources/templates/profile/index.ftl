@@ -551,6 +551,12 @@ overviewPopupDetails={
     }
     />
 </@editOnly>
+<@ownOnly>
+    <@popups.settingsPopup options={
+    "elementSelector" : "#profileSettings"
+    }
+    />
+</@ownOnly>
 </body>
 </html>
 

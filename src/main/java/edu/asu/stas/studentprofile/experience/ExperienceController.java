@@ -10,7 +10,6 @@ import javax.transaction.Transactional;
 import java.util.Objects;
 
 @RestController
-@RequestMapping("/profile/experiences")
 public class ExperienceController {
     private final StudentProfileService studentProfileService;
     private final ExperienceRepository experienceRepository;
@@ -24,7 +23,7 @@ public class ExperienceController {
     }
 
     // GET /profile/experiences/{id}
-    @GetMapping("{id}")
+    @GetMapping("/profile/experiences/{id}")
     public ResponseEntity<Experience> getById(@PathVariable Long id) {
         var profile = studentProfileService.getAuthenticatedUserProfile();
         var experience = experienceRepository.getByProfileAndId(profile, id);
@@ -48,7 +47,7 @@ public class ExperienceController {
 
 
     // POST /profile/experiences/delete
-    @PostMapping("delete")
+    @PostMapping("/profile/experiences/delete")
     @Transactional
     public RedirectView deleteById(Experience experience, RedirectAttributes redirectAttributes) {
         var profile = studentProfileService.getAuthenticatedUserProfile();
@@ -63,7 +62,7 @@ public class ExperienceController {
     }
 
     // POST /profile/experiences/{id}
-    @PostMapping("{id}")
+    @PostMapping("/profile/experiences/{id}")
     public RedirectView updateById(
             @PathVariable Long id,
             Experience experience,
@@ -82,7 +81,7 @@ public class ExperienceController {
     }
 
     // POST /profile/experiences
-    @PostMapping
+    @PostMapping("/profile/experiences")
     public RedirectView addNew(Experience experience, RedirectAttributes redirectAttributes) {
         var profile = studentProfileService.getAuthenticatedUserProfile();
         experience.setProfile(profile);

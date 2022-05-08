@@ -48,6 +48,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
         http
 
                 .authorizeRequests()
+                    .mvcMatchers("/profile/{uuid}", "/profile/{uuid}/**").permitAll()
                     .mvcMatchers("/account/**", "/connect/**", "/profile/**", "/connections/**").authenticated()
                     .mvcMatchers(HttpMethod.POST, "/login").denyAll()
                 .and()

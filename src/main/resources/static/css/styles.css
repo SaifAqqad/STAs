@@ -2,6 +2,11 @@
     .ps-sm-p75 {
         padding-left: 0.75rem !important;
     }
+
+    .w-sm-auto {
+        width: auto !important;
+    }
+
 }
 
 @media (min-width: 768px) {

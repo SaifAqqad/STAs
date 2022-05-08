@@ -13,7 +13,6 @@ import java.io.IOException;
 import java.util.Objects;
 
 @RestController
-@RequestMapping("/profile/courses")
 public class CourseController {
     private final StudentProfileService studentProfileService;
     private final CourseRepository courseRepository;
@@ -31,7 +30,7 @@ public class CourseController {
     }
 
     // GET /profile/courses/{id}
-    @GetMapping("{id}")
+    @GetMapping("/profile/courses/{id}")
     public ResponseEntity<Course> getById(@PathVariable Long id) {
         var profile = studentProfileService.getAuthenticatedUserProfile();
         var course = courseRepository.getByProfileAndId(profile, id);
@@ -54,7 +53,7 @@ public class CourseController {
     }
 
     // POST /profile/courses/delete
-    @PostMapping("delete")
+    @PostMapping("/profile/courses/delete")
     @Transactional
     public RedirectView deleteById(Course course, RedirectAttributes redirectAttributes) {
         var profile = studentProfileService.getAuthenticatedUserProfile();
@@ -71,7 +70,7 @@ public class CourseController {
     }
 
     // POST /profile/courses/{id}
-    @PostMapping("{id}")
+    @PostMapping("/profile/courses/{id}")
     @Transactional
     public RedirectView updateById(
             @PathVariable Long id,
@@ -99,7 +98,7 @@ public class CourseController {
     }
 
     // POST /profile/courses
-    @PostMapping
+    @PostMapping("/profile/courses")
     @Transactional
     public RedirectView addNew(
             Course course,

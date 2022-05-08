@@ -2,6 +2,106 @@
 <#import "/spring.ftl" as spring />
 <#import "../shared/default.ftl" as default />
 
+<#macro settingsPopup options>
+    <div class="modal fade" id="settingsPopup" tabindex="-1">
+        <div class="modal-dialog modal-dialog-centered user-select-none">
+            <div class="modal-content">
+                <div class="pb-3 modal-header">
+                    <span>Profile settings</span>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="pt-0 card-body">
+                    <div class="mb-1">Privacy</div>
+                    <form class="w-100" action="<@spring.url "/profile/privacy"/>" id="privacyForm">
+                        <div class="w-100 pt-0 card-body d-inline-flex justify-content-center align-items-center">
+                            <@default.csrfInput/>
+                            <input type="hidden" name="uuid" id="privacyForm_uuid">
+                            <div class="w-50 w-sm-auto form-check form-switch me-3 user-select-none">
+                                <input class="form-check-input form-submitter" type="checkbox" role="switch"
+                                       name="public" id="privacyForm_isPublic">
+                                <label class="form-check-label text-muted" for="privacyForm_isPublic">Public
+                                    URL</label>
+                            </div>
+                            <div class="w-auto input-group">
+                                <input class="form-control form-control-sm" readonly
+                                       id="privacyForm_publicUri" aria-label="Public URL"
+                                       placeholder="Public URL">
+                                <button type="button" id="privacyForm_publicUriCopyBtn"
+                                        class="btn btn-primary copy-button">
+                                    <@default.icon name="mdi:clipboard-text-outline"/>
+                                </button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script>
+        (() => {
+            const options = {
+                formId: "privacyForm",
+                modalElement: document.getElementById("settingsPopup"),
+                elementSelector: "${options.elementSelector?no_esc}",
+            }
+            options.modal = new bootstrap.Modal(options.modalElement)
+
+            <#noparse>
+
+            const formFetchSubmit = async function (formId, applyMethod, post = true) {
+                const formElem = document.getElementById(formId),
+                    formData = new FormData(formElem),
+                    formAction = formElem.action;
+                let response = await fetch(formAction, post ? {body: formData, method: "post"} : {})
+                if (!response.ok)
+                    return
+                applyMethod(await response.json());
+            };
+
+            const privacyFormApply = (json) => {
+                document.getElementById("privacyForm_uuid").value = json["uuid"];
+                document.getElementById("privacyForm_isPublic").checked = !!json["public"];
+                let urlInput = document.getElementById("privacyForm_publicUri");
+                let urlInputCopyBtn = document.getElementById("privacyForm_publicUriCopyBtn");
+                if (json["uuid"]) {
+                    const url = window.location;
+                    urlInput.value = `${url.protocol}//${url.hostname}/profile/${json["uuid"]}`;
+                    urlInputCopyBtn.removeAttribute("disabled")
+                } else {
+                    urlInput.value = "";
+                    urlInputCopyBtn.setAttribute("disabled", "true")
+                }
+            };
+
+            document.querySelectorAll(options.elementSelector).forEach(element => {
+                element.addEventListener("click", async () => {
+                    await formFetchSubmit("privacyForm", privacyFormApply, false)
+                    options.modal.show(element)
+                })
+            })
+
+            options.modalElement.querySelectorAll("#privacyForm .form-submitter").forEach(elem => {
+                elem.addEventListener("change", async () => {
+                    await formFetchSubmit("privacyForm", privacyFormApply)
+                })
+            })
+
+            options.modalElement.querySelectorAll(".input-group .copy-button").forEach(copyBtn => {
+                const inputElem = copyBtn.parentElement.querySelector("input")
+                copyBtn.addEventListener("click", async () => {
+                    await navigator.clipboard.writeText(inputElem.value)
+                    copyBtn.classList.add("btn-success")
+                    copyBtn.blur()
+                    await _sleep(600)
+                    copyBtn.classList.remove("btn-success")
+                })
+            })
+            </#noparse>
+        })()
+    </script>
+
+</#macro>
+
 <#macro linkPopup addPopup popupId formId uriBase>
     <@formPopup addPopup=addPopup popupId=popupId formId=formId uriBase=uriBase>
         <div class="form-floating">
