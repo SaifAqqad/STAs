@@ -7,20 +7,20 @@
         <div class="modal-dialog modal-dialog-centered user-select-none">
             <div class="modal-content">
                 <div class="pb-3 modal-header">
-                    <span>Profile settings</span>
+                    <span>Settings</span>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="pt-0 card-body">
-                    <div class="mb-1">Privacy</div>
-                    <form class="w-100" action="<@spring.url "/profile/privacy"/>" id="privacyForm">
-                        <div class="w-100 pt-0 card-body d-inline-flex justify-content-center align-items-center">
+                    <div class="mb-1">Privacy settings</div>
+                    <form class="w-100 pt-0 card-body" action="<@spring.url "/profile/privacy"/>" id="privacyForm">
+                        <div class="d-inline-flex justify-content-center align-items-center">
                             <@default.csrfInput/>
                             <input type="hidden" name="uuid" id="privacyForm_uuid">
                             <div class="w-50 w-sm-auto form-check form-switch me-3 user-select-none">
                                 <input class="form-check-input form-submitter" type="checkbox" role="switch"
                                        name="public" id="privacyForm_isPublic">
                                 <label class="form-check-label text-muted" for="privacyForm_isPublic">Public
-                                    URL</label>
+                                    profile</label>
                             </div>
                             <div class="w-auto input-group">
                                 <input class="form-control form-control-sm" readonly
@@ -30,6 +30,14 @@
                                         class="btn btn-primary copy-button">
                                     <@default.icon name="mdi:clipboard-text-outline"/>
                                 </button>
+                            </div>
+                        </div>
+                        <div class="mt-2 d-inline-flex align-items-center">
+                            <div class="w-100 form-check form-switch me-3 user-select-none">
+                                <input class="form-check-input form-submitter" type="checkbox" role="switch"
+                                       name="includeInSearch" id="privacyForm_includeInSearch">
+                                <label class="form-check-label text-muted" for="privacyForm_includeInSearch">Include in
+                                    search</label>
                             </div>
                         </div>
                     </form>
@@ -43,6 +51,11 @@
                 formId: "privacyForm",
                 modalElement: document.getElementById("settingsPopup"),
                 elementSelector: "${options.elementSelector?no_esc}",
+                uuidInput: document.getElementById("privacyForm_uuid"),
+                publicUrlInput: document.getElementById("privacyForm_publicUri"),
+                publicUrlCopyBtn: document.getElementById("privacyForm_publicUriCopyBtn"),
+                isPublicCheckbox: document.getElementById("privacyForm_isPublic"),
+                includeInSearchCheckbox: document.getElementById("privacyForm_includeInSearch"),
             }
             options.modal = new bootstrap.Modal(options.modalElement)
 
@@ -50,8 +63,14 @@
 
             const formFetchSubmit = async function (formId, applyMethod, post = true) {
                 const formElem = document.getElementById(formId),
-                    formData = new FormData(formElem),
                     formAction = formElem.action;
+                if (post) {
+                    // Enable disabled inputs
+                    formElem.querySelectorAll("input[disabled]").forEach(elem => {
+                        elem.removeAttribute("disabled");
+                    })
+                }
+                const formData = new FormData(formElem);
                 let response = await fetch(formAction, post ? {body: formData, method: "post"} : {})
                 if (!response.ok)
                     return
@@ -59,17 +78,19 @@
             };
 
             const privacyFormApply = (json) => {
-                document.getElementById("privacyForm_uuid").value = json["uuid"];
-                document.getElementById("privacyForm_isPublic").checked = !!json["public"];
-                let urlInput = document.getElementById("privacyForm_publicUri");
-                let urlInputCopyBtn = document.getElementById("privacyForm_publicUriCopyBtn");
+                options.uuidInput.value = json["uuid"];
+                options.isPublicCheckbox.checked = !!json["public"];
+                options.includeInSearchCheckbox.checked = !!json["includeInSearch"];
+                // set up public url input and copy button
                 if (json["uuid"]) {
                     const url = window.location;
-                    urlInput.value = `${url.protocol}//${url.hostname}/profile/${json["uuid"]}`;
-                    urlInputCopyBtn.removeAttribute("disabled")
+                    options.publicUrlInput.value = `${url.protocol}//${url.hostname}/profile/${json["uuid"]}`;
+                    options.publicUrlCopyBtn.removeAttribute("disabled")
+                    options.includeInSearchCheckbox.removeAttribute("disabled")
                 } else {
-                    urlInput.value = "";
-                    urlInputCopyBtn.setAttribute("disabled", "true")
+                    options.publicUrlInput.value = "";
+                    options.publicUrlCopyBtn.setAttribute("disabled", "true")
+                    options.includeInSearchCheckbox.setAttribute("disabled", "true")
                 }
             };
 

@@ -112,7 +112,8 @@ public class StudentProfileService {
             profile.setPublic(false);
             profile.setUuid(null);
         }
+        profile.setIncludeInSearch(profilePrivacy.isIncludeInSearch());
         profile = studentProfileRepository.save(profile);
-        return new ProfilePrivacy(profile.isPublic(), profile.getUuid());
+        return new ProfilePrivacy(profile.isPublic(), profile.getUuid(), profile.isIncludeInSearch());
     }
 }
