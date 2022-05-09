@@ -10,28 +10,44 @@ import javax.transaction.Transactional;
 import java.util.Objects;
 
 @RestController
-@RequestMapping("/profile/experiences")
 public class ExperienceController {
     private final StudentProfileService studentProfileService;
     private final ExperienceRepository experienceRepository;
 
-    public ExperienceController(StudentProfileService studentProfileService, ExperienceRepository experienceRepository) {
+    public ExperienceController(
+            StudentProfileService studentProfileService,
+            ExperienceRepository experienceRepository
+    ) {
         this.studentProfileService = studentProfileService;
         this.experienceRepository = experienceRepository;
     }
 
     // GET /profile/experiences/{id}
-    @GetMapping("{id}")
+    @GetMapping("/profile/experiences/{id}")
     public ResponseEntity<Experience> getById(@PathVariable Long id) {
         var profile = studentProfileService.getAuthenticatedUserProfile();
         var experience = experienceRepository.getByProfileAndId(profile, id);
-        if (Objects.isNull(experience))
+        if (Objects.isNull(experience)) {
             return ResponseEntity.notFound().build();
+        }
         return ResponseEntity.ok(experience);
     }
 
+    @GetMapping("profile/{uuid}/experiences/{id}")
+    public ResponseEntity<Experience> getByProfileUuidAndId(@PathVariable String uuid, @PathVariable Long id) {
+        var profile = studentProfileService.getProfileByUuid(uuid);
+        if (Objects.nonNull(profile) && profile.isPublic()) {
+            var experience = experienceRepository.getByProfileAndId(profile, id);
+            if (Objects.nonNull(experience)) {
+                return ResponseEntity.ok(experience);
+            }
+        }
+        return ResponseEntity.notFound().build();
+    }
+
+
     // POST /profile/experiences/delete
-    @PostMapping("delete")
+    @PostMapping("/profile/experiences/delete")
     @Transactional
     public RedirectView deleteById(Experience experience, RedirectAttributes redirectAttributes) {
         var profile = studentProfileService.getAuthenticatedUserProfile();
@@ -46,8 +62,12 @@ public class ExperienceController {
     }
 
     // POST /profile/experiences/{id}
-    @PostMapping("{id}")
-    public RedirectView updateById(@PathVariable Long id, Experience experience, RedirectAttributes redirectAttributes) {
+    @PostMapping("/profile/experiences/{id}")
+    public RedirectView updateById(
+            @PathVariable Long id,
+            Experience experience,
+            RedirectAttributes redirectAttributes
+    ) {
         var profile = studentProfileService.getAuthenticatedUserProfile();
         if (id.equals(experience.getId()) && experienceRepository.existsByProfileAndId(profile, experience.getId())) {
             experience.setProfile(profile);
@@ -61,7 +81,7 @@ public class ExperienceController {
     }
 
     // POST /profile/experiences
-    @PostMapping
+    @PostMapping("/profile/experiences")
     public RedirectView addNew(Experience experience, RedirectAttributes redirectAttributes) {
         var profile = studentProfileService.getAuthenticatedUserProfile();
         experience.setProfile(profile);

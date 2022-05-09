@@ -13,30 +13,46 @@ import java.io.IOException;
 import java.util.Objects;
 
 @RestController
-@RequestMapping("/profile/activities")
 public class ActivityController {
     private final StudentProfileService studentProfileService;
     private final ActivityRepository activityRepository;
     private final ContentService contentService;
 
-    public ActivityController(StudentProfileService studentProfileService, ActivityRepository activityRepository, ContentService contentService) {
+    public ActivityController(
+            StudentProfileService studentProfileService,
+            ActivityRepository activityRepository,
+            ContentService contentService
+    ) {
         this.studentProfileService = studentProfileService;
         this.activityRepository = activityRepository;
         this.contentService = contentService;
     }
 
     // GET /profile/activities/{id}
-    @GetMapping("{id}")
+    @GetMapping("/profile/activities/{id}")
     public ResponseEntity<Activity> getById(@PathVariable Long id) {
         var profile = studentProfileService.getAuthenticatedUserProfile();
         var activity = activityRepository.getByProfileAndId(profile, id);
-        if (Objects.isNull(activity))
+        if (Objects.isNull(activity)) {
             return ResponseEntity.notFound().build();
+        }
         return ResponseEntity.ok(activity);
     }
 
+    @GetMapping("profile/{uuid}/activities/{id}")
+    public ResponseEntity<Activity> getByProfileUuidAndId(@PathVariable String uuid, @PathVariable Long id) {
+        var profile = studentProfileService.getProfileByUuid(uuid);
+        if (Objects.nonNull(profile) && profile.isPublic()) {
+            var activity = activityRepository.getByProfileAndId(profile, id);
+            if (Objects.nonNull(activity)) {
+                return ResponseEntity.ok(activity);
+            }
+        }
+        return ResponseEntity.notFound().build();
+    }
+
     // POST /profile/activities/delete
-    @PostMapping("delete")
+    @PostMapping("/profile/activities/delete")
     @Transactional
     public RedirectView deleteById(Activity activity, RedirectAttributes redirectAttributes) {
         var profile = studentProfileService.getAuthenticatedUserProfile();
@@ -53,7 +69,7 @@ public class ActivityController {
     }
 
     // POST /profile/activities/{id}
-    @PostMapping("{id}")
+    @PostMapping("/profile/activities/{id}")
     @Transactional
     public RedirectView updateById(
             @PathVariable Long id,
@@ -64,12 +80,13 @@ public class ActivityController {
         var profile = studentProfileService.getAuthenticatedUserProfile();
         if (id.equals(activity.getId()) && activityRepository.existsByProfileAndId(profile, activity.getId())) {
             activity.setProfile(profile);
-            if (!imageUriData.isEmpty())
+            if (!imageUriData.isEmpty()) {
                 activity.setImageUri(contentService.storeResource(
                         imageUriData.getResource(),
                         "activity",
                         activity.getId().toString()
                 ));
+            }
             activityRepository.save(activity);
             redirectAttributes.addFlashAttribute("toast", "Activity updated successfully");
         } else {
@@ -80,7 +97,7 @@ public class ActivityController {
     }
 
     // POST /profile/activities
-    @PostMapping
+    @PostMapping("/profile/activities")
     @Transactional
     public RedirectView addNew(
             Activity activity,

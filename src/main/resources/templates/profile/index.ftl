@@ -551,6 +551,12 @@ overviewPopupDetails={
     }
     />
 </@editOnly>
+<@ownOnly>
+    <@popups.settingsPopup options={
+    "elementSelector" : "#profileSettings"
+    }
+    />
+</@ownOnly>
 </body>
 </html>
 
@@ -619,6 +625,7 @@ overviewPopupDetails={
 </#macro>
 
 <#macro ownOnly>
-<#-- TODO: Add check -->
-    <#nested/>
+    <#if !(isPublicView!false)>
+        <#nested/>
+    </#if>
 </#macro>

@@ -13,30 +13,46 @@ import java.io.IOException;
 import java.util.Objects;
 
 @RestController
-@RequestMapping("/profile/projects")
 public class ProjectController {
     private final StudentProfileService studentProfileService;
     private final ProjectRepository projectRepository;
     private final ContentService contentService;
 
-    public ProjectController(StudentProfileService studentProfileService, ProjectRepository projectRepository, ContentService contentService) {
+    public ProjectController(
+            StudentProfileService studentProfileService,
+            ProjectRepository projectRepository,
+            ContentService contentService
+    ) {
         this.studentProfileService = studentProfileService;
         this.projectRepository = projectRepository;
         this.contentService = contentService;
     }
 
     // GET /profile/projects/{id}
-    @GetMapping("{id}")
+    @GetMapping("/profile/projects/{id}")
     public ResponseEntity<Project> getById(@PathVariable Long id) {
         var profile = studentProfileService.getAuthenticatedUserProfile();
         var project = projectRepository.getByProfileAndId(profile, id);
-        if (Objects.isNull(project))
+        if (Objects.isNull(project)) {
             return ResponseEntity.notFound().build();
+        }
         return ResponseEntity.ok(project);
     }
 
+    @GetMapping("profile/{uuid}/projects/{id}")
+    public ResponseEntity<Project> getByProfileUuidAndId(@PathVariable String uuid, @PathVariable Long id) {
+        var profile = studentProfileService.getProfileByUuid(uuid);
+        if (Objects.nonNull(profile) && profile.isPublic()) {
+            var project = projectRepository.getByProfileAndId(profile, id);
+            if (Objects.nonNull(project)) {
+                return ResponseEntity.ok(project);
+            }
+        }
+        return ResponseEntity.notFound().build();
+    }
+
     // POST /profile/projects/delete
-    @PostMapping("delete")
+    @PostMapping("/profile/projects/delete")
     @Transactional
     public RedirectView deleteById(Project project, RedirectAttributes redirectAttributes) {
         var profile = studentProfileService.getAuthenticatedUserProfile();
@@ -53,7 +69,7 @@ public class ProjectController {
     }
 
     // POST /profile/activities/{id}
-    @PostMapping("{id}")
+    @PostMapping("/profile/projects/{id}")
     @Transactional
     public RedirectView updateById(
             @PathVariable Long id,
@@ -64,12 +80,13 @@ public class ProjectController {
         var profile = studentProfileService.getAuthenticatedUserProfile();
         if (id.equals(project.getId()) && projectRepository.existsByProfileAndId(profile, project.getId())) {
             project.setProfile(profile);
-            if (!imageUriData.isEmpty())
+            if (!imageUriData.isEmpty()) {
                 project.setImageUri(contentService.storeResource(
                         imageUriData.getResource(),
                         "project",
                         project.getId().toString()
                 ));
+            }
             projectRepository.save(project);
             redirectAttributes.addFlashAttribute("toast", "Project updated successfully");
         } else {
@@ -80,7 +97,7 @@ public class ProjectController {
     }
 
     // POST /profile/activities
-    @PostMapping
+    @PostMapping("/profile/projects")
     @Transactional
     public RedirectView addNew(
             Project project,

@@ -7,4 +7,5 @@ import org.springframework.data.repository.CrudRepository;
 public interface StudentProfileRepository extends CrudRepository<StudentProfile, Long> {
     boolean existsByUser(User user);
     StudentProfile getByUser(User user);
+    StudentProfile getByUuid(String uuid);
 }

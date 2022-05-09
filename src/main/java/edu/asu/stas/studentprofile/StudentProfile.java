@@ -1,5 +1,6 @@
 package edu.asu.stas.studentprofile;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import edu.asu.stas.studentprofile.activity.Activity;
 import edu.asu.stas.studentprofile.course.Course;
 import edu.asu.stas.studentprofile.experience.Experience;
@@ -26,6 +27,7 @@ public class StudentProfile implements Serializable {
     @Serial
     private static final long serialVersionUID = 1L;
     public static final String DEFAULT_IMAGE_URI = "/images/generic_profile.png";
+    private static final String PUBLIC_BASE_URI = "/profile/";
 
     @Id
     @GeneratedValue
@@ -50,6 +52,10 @@ public class StudentProfile implements Serializable {
 
     private String imageUri = DEFAULT_IMAGE_URI;
 
+    private String uuid;
+
+    private boolean isPublic = false;
+
     @OneToMany(mappedBy = "profile", orphanRemoval = true)
     private final List<Course> courses = new ArrayList<>();
 
@@ -68,6 +74,14 @@ public class StudentProfile implements Serializable {
 
     @OneToOne(targetEntity = User.class, fetch = FetchType.LAZY, optional = false)
     private User user;
+
+    @JsonProperty("publicUri")
+    public String getPublicUri() {
+        if (Objects.isNull(uuid)) {
+            return null;
+        }
+        return PUBLIC_BASE_URI + uuid;
+    }
 
     @Override
     public boolean equals(Object o) {

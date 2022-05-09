@@ -1,5 +1,6 @@
 package edu.asu.stas.studentprofile;
 
+import edu.asu.stas.lib.TokenGenerator;
 import edu.asu.stas.studentprofile.activity.Activity;
 import edu.asu.stas.studentprofile.activity.ActivityRepository;
 import edu.asu.stas.studentprofile.course.Course;
@@ -27,6 +28,7 @@ public class StudentProfileService {
     private final CourseRepository courseRepository;
     private final ExperienceRepository experienceRepository;
     private final ProjectRepository projectRepository;
+    private final TokenGenerator tokenGenerator;
 
     @Autowired
     public StudentProfileService(
@@ -34,13 +36,15 @@ public class StudentProfileService {
             ActivityRepository activityRepository,
             CourseRepository courseRepository,
             ExperienceRepository experienceRepository,
-            ProjectRepository projectRepository
+            ProjectRepository projectRepository,
+            TokenGenerator tokenGenerator
     ) {
         this.studentProfileRepository = studentProfileRepository;
         this.activityRepository = activityRepository;
         this.courseRepository = courseRepository;
         this.experienceRepository = experienceRepository;
         this.projectRepository = projectRepository;
+        this.tokenGenerator = tokenGenerator;
     }
 
     public StudentProfile getProfileByUser(@NonNull User user) {
@@ -54,15 +58,20 @@ public class StudentProfileService {
         return studentProfileRepository.findById(id).orElse(null);
     }
 
+    public StudentProfile getProfileByUuid(String uuid) {
+        return studentProfileRepository.getByUuid(uuid);
+    }
+
     public StudentProfile getAuthenticatedUserProfile() {
         User user = UserService.getAuthenticatedUser();
-        if (Objects.isNull(user))
+        if (Objects.isNull(user)) {
             return null;
+        }
         return getProfileByUser(user);
     }
 
-    public StudentProfile saveProfile(StudentProfile profile) {
-        return studentProfileRepository.save(profile);
+    public void saveProfile(StudentProfile profile) {
+        studentProfileRepository.save(profile);
     }
 
     public Activity getActivityById(Long id) {
@@ -91,5 +100,19 @@ public class StudentProfileService {
         profile.getLinks().clear();
         profile.getLinks().putAll(links);
         studentProfileRepository.save(profile);
+    }
+
+    public ProfilePrivacy updateProfilePrivacy(StudentProfile profile, ProfilePrivacy profilePrivacy) {
+        if (profilePrivacy.isPublic()) { // if profile privacy is set to public
+            profile.setPublic(true);
+            if (profilePrivacy.getUuid().isBlank()) { // if there isn't an existing uuid
+                profile.setUuid(tokenGenerator.generateToken(32));
+            }
+        } else {
+            profile.setPublic(false);
+            profile.setUuid(null);
+        }
+        profile = studentProfileRepository.save(profile);
+        return new ProfilePrivacy(profile.isPublic(), profile.getUuid());
     }
 }
