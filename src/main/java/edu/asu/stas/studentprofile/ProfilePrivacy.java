@@ -12,4 +12,5 @@ import lombok.Setter;
 public class ProfilePrivacy {
     private boolean isPublic;
     private String uuid;
+    private boolean includeInSearch;
 }

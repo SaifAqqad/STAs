@@ -56,6 +56,8 @@ public class StudentProfile implements Serializable {
 
     private boolean isPublic = false;
 
+    private boolean includeInSearch = false;
+
     @OneToMany(mappedBy = "profile", orphanRemoval = true)
     private final List<Course> courses = new ArrayList<>();
 

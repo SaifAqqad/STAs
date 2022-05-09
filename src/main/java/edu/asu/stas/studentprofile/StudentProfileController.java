@@ -163,6 +163,8 @@ public class StudentProfileController {
     @ResponseBody
     public ResponseEntity<ProfilePrivacy> getProfilePrivacy() {
         StudentProfile profile = Objects.requireNonNull(getStudentProfile());
-        return ResponseEntity.ok(new ProfilePrivacy(profile.isPublic(), profile.getUuid()));
+        return ResponseEntity.ok(new ProfilePrivacy(profile.isPublic(),
+                                                    profile.getUuid(),
+                                                    profile.isIncludeInSearch()));
     }
 }
