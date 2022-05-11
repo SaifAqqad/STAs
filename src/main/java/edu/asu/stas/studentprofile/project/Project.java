@@ -2,13 +2,11 @@ package edu.asu.stas.studentprofile.project;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import edu.asu.stas.connnection.oauth.GithubProfile.Repository;
 import edu.asu.stas.studentprofile.StudentProfile;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.NonNull;
 import lombok.Setter;
-import org.hibernate.annotations.Type;
 import org.springframework.format.annotation.DateTimeFormat;
 
 import javax.persistence.*;
@@ -50,10 +48,6 @@ public class Project {
     @ManyToOne(optional = false, targetEntity = StudentProfile.class)
     @JsonIgnore
     private StudentProfile profile;
-
-    @Type(type = "json")
-    @Column(columnDefinition = "json")
-    private Repository repository;
 
     @Transient
     @JsonProperty("formattedStartDate")
