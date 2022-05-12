@@ -17,7 +17,8 @@ public interface StudentProfileRepository extends CrudRepository<StudentProfile,
 
     @Query(value = """
             SELECT * FROM student_profile
-            WHERE include_in_search = true
+            WHERE is_public = true
+            AND include_in_search = true
             AND MATCH(name, location, university)
             AGAINST (CONCAT(:query, '*') IN BOOLEAN MODE)
             """, nativeQuery = true)
