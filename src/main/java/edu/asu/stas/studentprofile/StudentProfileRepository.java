@@ -1,11 +1,11 @@
 package edu.asu.stas.studentprofile;
 
-import edu.asu.stas.studentprofile.profilesearch.ProfileInfo;
 import edu.asu.stas.user.User;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.CrudRepository;
+import org.springframework.data.repository.query.Param;
 
 
 public interface StudentProfileRepository extends CrudRepository<StudentProfile, Long> {
@@ -16,9 +16,10 @@ public interface StudentProfileRepository extends CrudRepository<StudentProfile,
     StudentProfile getByUuid(String uuid);
 
     @Query(value = """
-            select p from StudentProfile p
-            where p.includeInSearch=true
-            and p.name like %:name%
-            """)
-    Page<ProfileInfo> searchForProfile(String name, Pageable pageable);
+            SELECT * FROM student_profile
+            WHERE include_in_search = true
+            AND MATCH(name, location, university)
+            AGAINST (CONCAT(:query, '*') IN BOOLEAN MODE)
+            """, nativeQuery = true)
+    Page<StudentProfile> searchForProfile(@Param("query") String query, Pageable pageable);
 }
