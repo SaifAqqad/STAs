@@ -18,4 +18,6 @@ public class ProfileSearch{
 
     private int page;
 
+    private long totalCount;
+
 }
