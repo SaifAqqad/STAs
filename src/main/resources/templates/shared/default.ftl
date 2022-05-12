@@ -107,7 +107,7 @@
     </svg>
 </#macro>
 
-<#macro navbar home="" login="" profile="" dashboard="" account="" marginBreak="lg">
+<#macro navbar home="" login="" profile="" search="" account="" marginBreak="lg">
     <nav class="navbar navbar-expand-md py-2 navbar-dark bg-dark user-select-none">
         <div class="container-fluid container-${marginBreak}">
             <a class="navbar-brand d-flex align-items-center" href="<@spring.url relativeUrl="/"/>">
@@ -124,6 +124,9 @@
                     <#-- General links -->
                     <li class="nav-item">
                         <a class="nav-link ps-2 ps-sm-p75 ${home}" href="<@spring.url relativeUrl="/"/>">Home</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link ps-2 ps-sm-p75 ${search}" href="<@spring.url relativeUrl="/search"/>">Search</a>
                     </li>
                     <#-- STUDENT-only links -->
                     <@requiredRole roles.student>
@@ -192,6 +195,11 @@
             });
         }
     </script>
+</#macro>
+
+<#macro jsStr>
+    <#local captured><#compress><#nested></#compress></#local>
+    `${captured?no_esc}`<#t>
 </#macro>
 
 <#macro externalLinkIcon>
