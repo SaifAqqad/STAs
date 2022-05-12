@@ -1,8 +1,12 @@
 ###############################
 # Hibernate Sequence table
 # see https://stackoverflow.com/a/59729185/13162549
-create table hibernate_sequence (next_val bigint) engine=InnoDB;
-insert into hibernate_sequence values ( 1 );
+create table hibernate_sequence
+(
+    next_val bigint
+) engine = InnoDB;
+insert into hibernate_sequence
+values (1);
 
 ###############################
 # User table
@@ -19,7 +23,7 @@ CREATE TABLE user
     is_using2fa   BIT(1)       NULL,
     is_enabled    BIT(1)       NULL,
     CONSTRAINT pk_user PRIMARY KEY (id)
-) engine=InnoDB;
+) engine = InnoDB;
 
 ALTER TABLE user
     ADD CONSTRAINT uc_user_email UNIQUE (email);
@@ -34,7 +38,7 @@ CREATE TABLE user_token
     type        INT         NULL,
     user_id     BIGINT      NOT NULL,
     CONSTRAINT pk_usertoken PRIMARY KEY (id)
-) engine=InnoDB;
+) engine = InnoDB;
 
 ALTER TABLE user_token
     ADD CONSTRAINT uc_usertoken_token UNIQUE (token);
@@ -54,7 +58,7 @@ CREATE TABLE connection
     service_user_profile  JSON          NULL,
     user_id               BIGINT        NOT NULL,
     CONSTRAINT pk_connection PRIMARY KEY (id)
-) engine=InnoDB;
+) engine = InnoDB;
 ALTER TABLE connection
     ADD CONSTRAINT FK_CONNECTION_ON_USER FOREIGN KEY (user_id) REFERENCES user (id);
 
@@ -76,8 +80,9 @@ CREATE TABLE student_profile
     include_in_search BIT(1)        NULL,
     links             JSON          NULL,
     user_id           BIGINT        NOT NULL,
+    FULLTEXT (name, location, university),
     CONSTRAINT pk_studentprofile PRIMARY KEY (id)
-) engine=InnoDB;
+) engine = InnoDB;
 
 ALTER TABLE student_profile
     ADD CONSTRAINT FK_STUDENTPROFILE_ON_USER FOREIGN KEY (user_id) REFERENCES user (id);
@@ -93,7 +98,7 @@ CREATE TABLE activity
     image_uri     VARCHAR(255)  NULL,
     profile_id    BIGINT        NOT NULL,
     CONSTRAINT pk_activity PRIMARY KEY (id)
-) engine=InnoDB;
+) engine = InnoDB;
 ALTER TABLE activity
     ADD CONSTRAINT FK_ACTIVITY_ON_PROFILE FOREIGN KEY (profile_id) REFERENCES student_profile (id);
 
@@ -111,7 +116,7 @@ CREATE TABLE project
     end_date      date          NULL,
     profile_id    BIGINT        NOT NULL,
     CONSTRAINT pk_project PRIMARY KEY (id)
-) engine=InnoDB;
+) engine = InnoDB;
 ALTER TABLE project
     ADD CONSTRAINT FK_PROJECT_ON_PROFILE FOREIGN KEY (profile_id) REFERENCES student_profile (id);
 
@@ -127,7 +132,7 @@ CREATE TABLE experience
     end_date      date          NULL,
     profile_id    BIGINT        NOT NULL,
     CONSTRAINT pk_experience PRIMARY KEY (id)
-) engine=InnoDB;
+) engine = InnoDB;
 ALTER TABLE experience
     ADD CONSTRAINT FK_EXPERIENCE_ON_PROFILE FOREIGN KEY (profile_id) REFERENCES student_profile (id);
 
@@ -144,6 +149,6 @@ CREATE TABLE course
     image_uri       VARCHAR(255)  NULL,
     profile_id      BIGINT        NOT NULL,
     CONSTRAINT pk_course PRIMARY KEY (id)
-) engine=InnoDB;
+) engine = InnoDB;
 ALTER TABLE course
     ADD CONSTRAINT FK_COURSE_ON_PROFILE FOREIGN KEY (profile_id) REFERENCES student_profile (id);
