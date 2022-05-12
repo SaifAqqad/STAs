@@ -19,7 +19,7 @@
                             <div class="w-50 w-sm-auto form-check form-switch me-3 user-select-none">
                                 <input class="form-check-input form-submitter" type="checkbox" role="switch"
                                        name="public" id="privacyForm_isPublic">
-                                <label class="form-check-label text-muted" for="privacyForm_isPublic">Public
+                                <label class="form-check-label text-muted w-mxc" for="privacyForm_isPublic">Public
                                     profile</label>
                             </div>
                             <div class="w-auto input-group">
