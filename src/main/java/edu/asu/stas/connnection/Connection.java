@@ -20,7 +20,7 @@ import java.util.Map;
 @Setter
 public class Connection implements OAuth2User {
     @Id
-    @GeneratedValue
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     @NonNull

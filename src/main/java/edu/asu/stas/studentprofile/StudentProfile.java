@@ -30,7 +30,7 @@ public class StudentProfile implements Serializable {
     private static final String PUBLIC_BASE_URI = "/profile/";
 
     @Id
-    @GeneratedValue
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     @NonNull
