@@ -41,7 +41,7 @@
         </div>
         <div class="mt-3 ">
             <div class="card-body">
-                <div id="profileCards" class="row row-cols-1 row-cols-md-2">
+                <div id="profileCards" class="row row-cols-1 row-cols-sm-2 row-cols-lg-3 row-cols-xl-4">
                 </div>
                 <div class="w-100 d-flex justify-content-center align-content-center">
                     <button id="loadMoreBtn" type="button" class="btn btn-sm btn-primary d-none">Load more</button>
@@ -58,17 +58,17 @@
     <div class="p-0 card card-border-grey h-100 user-select-none btn bg-hover animate__animated animate__fadeIn animate__faster profile-card">
         <img src="${imageUri}" data-prop="imageUri" class="card-img-top"
              alt="Profile Picture">
-        <div class="card-body d-flex flex-column flex-grow-1 w-100 align-items-start align-content-start text-start">
+        <div class="card-body d-flex flex-column flex-grow-1 w-100 align-content-start text-start">
             <h5 class="card-title" data-prop="name">${name}</h5>
             <h6 class="card-subtitle mb-2 text-muted overflow-hidden text-truncate"
                 data-prop="major">${major}</h6>
             <div class="text-muted fs-6 overflow-hidden text-truncate">
                 <@default.icon name="location" fallback="web" class="mx-1"/>
-                <span data-prop="location" class="profile-view-item text-truncate">${location}</span>
+                <span data-prop="location" class="profile-view-item">${location}</span>
             </div>
             <div class="text-muted fs-6 overflow-hidden text-truncate">
                 <@default.icon name="university" fallback="web" class="mx-1"/>
-                <span data-prop="university" class="profile-view-item text-truncate">${university}</span>
+                <span data-prop="university" class="profile-view-item">${university}</span>
             </div>
             <a data-prop="publicUri" href="${publicUri}" class="stretched-link"></a>
         </div>
