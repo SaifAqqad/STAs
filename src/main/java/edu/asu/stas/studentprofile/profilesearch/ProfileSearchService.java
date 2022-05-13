@@ -35,6 +35,6 @@ public class ProfileSearchService {
 
     private void sanitizeSearch(ProfileSearch profileSearch) {
         String query = Objects.requireNonNullElse(profileSearch.getQuery(), "");
-        profileSearch.setQuery(query.replaceAll("[^a-zA-Z\\d\\s,_]", "\s"));
+        profileSearch.setQuery(query.replaceAll("[@!#$%^&*(){}~`\":;./?\\\\]", "\s"));
     }
 }
