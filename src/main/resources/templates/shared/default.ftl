@@ -120,52 +120,55 @@
                 <span class="navbar-toggler-icon"></span>
             </button>
             <div class="collapse navbar-collapse" id="navbarSupportedContent">
-                <ul class="navbar-nav me-auto mb-2 mb-md-0">
-                    <#-- General links -->
-                    <li class="nav-item">
-                        <a class="nav-link ps-2 ps-sm-p75 ${home}" href="<@spring.url relativeUrl="/"/>">Home</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link ps-2 ps-sm-p75 ${search}" href="<@spring.url relativeUrl="/search"/>">Search</a>
-                    </li>
+                <ul class="navbar-nav me-auto">
                     <#-- STUDENT-only links -->
                     <@requiredRole roles.student>
                         <li class="nav-item">
-                            <a class="nav-link ps-2 ps-sm-p75 ${profile}" href="<@spring.url relativeUrl="/profile"/>">Profile</a>
-                        </li>
-                    </@requiredRole>
-                    <#-- ADMIN-only links -->
-                    <@requiredRole roles.admin>
-                        <li class="nav-item">
-                            <a class="nav-link ps-2 ps-sm-p75 ${dashboard}"
-                               href="<@spring.url relativeUrl="/dashboard"/>">Dashboard</a>
+                            <a class="nav-link ps-2 ps-sm-p75 d-inline-flex align-content-center w-100 ${profile}"
+                               href="<@spring.url relativeUrl="/profile"/>">
+                                <@icon name="mdi:card-account-details-outline" class="me-1" height="20"/>
+                                My profile
+                            </a>
                         </li>
                     </@requiredRole>
                 </ul>
                 <#-- Login/Logout links -->
                 <div class="d-flex">
                     <ul class="navbar-nav me-2 mb-2 mb-md-0 w-100">
+                        <li class="nav-item">
+                            <a class="nav-link ps-2 ps-sm-p75 d-inline-flex align-items-center w-100 ${search}"
+                               href="<@spring.url relativeUrl="/search"/>">
+                                <@icon name="mdi:magnify" class="me-1" height="20"/>
+                                Search
+                            </a>
+                        </li>
                         <#-- if the user is authenticated -->
                         <#if authenticatedUser??>
                             <li class="nav-item"> <#-- user's fName lName -->
                                 <#local user = authenticatedUser/>
-                                <a class="nav-link ps-2 ps-sm-p75 ${account}"
+                                <a class="nav-link ps-2 ps-sm-p75 d-inline-flex align-content-center w-100 ${account}"
                                    href="<@spring.url relativeUrl="/account"/>">
-                                    <#if user.firstName??>
-                                        ${user.getFirstName()} ${user.getLastName()!""}
-                                    </#if>
+                                    <@icon class="me-1" name="mdi:account-outline" height="20"/>
+                                    ${user.getFirstName()} ${user.getLastName()!""}
                                 </a>
                             </li>
                             <li class="nav-item"> <#-- logout button -->
                                 <form action="/logout" method="post" class="d-inline">
                                     <input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}"/>
-                                    <input type="submit" class="btn w-100 text-start nav-link ps-2 ps-sm-p75 border-0"
-                                           value="Logout">
+                                    <button type="submit"
+                                            class="btn text-start nav-link ps-2 ps-sm-p75 border-0 d-inline-flex align-content-center w-100">
+                                        <@icon name="mdi:logout-variant" class="me-1" height="20"/>
+                                        Logout
+                                    </button>
                                 </form>
                             </li>
                         <#else>
                             <li class="nav-item">
-                                <a class="nav-link ps-2 ps-sm-p75 ${login}" href="<@spring.url relativeUrl="/login"/>">Login</a>
+                                <a class="nav-link ps-2 ps-sm-p75 d-inline-flex align-content-center w-100 ${login}"
+                                   href="<@spring.url relativeUrl="/login"/>">
+                                    <@icon name="mdi:login-variant" class="me-1" height="20"/>
+                                    Login
+                                </a>
                             </li>
                         </#if>
                     </ul>
