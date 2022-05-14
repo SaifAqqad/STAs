@@ -61,6 +61,10 @@ public class StudentProfileController {
     public String getProfileByUuid(@PathVariable String uuid, Model model) {
         StudentProfile profile = studentProfileService.getProfileByUuid(uuid);
         if (Objects.nonNull(profile) && profile.isPublic()) {
+            User authedUser = UserService.getAuthenticatedUser();
+            if(Objects.nonNull(authedUser) && studentProfileService.getProfileByUser(authedUser).equals(profile)) {
+                return "redirect:/profile";
+            }
             model.addAttribute("profile", profile);
             model.addAttribute("isEditing", false);
             model.addAttribute("isPublicView", true);
