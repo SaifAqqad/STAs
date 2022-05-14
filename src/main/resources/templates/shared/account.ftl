@@ -4,7 +4,7 @@
 
 <#macro sidebar accountDetails="" accountSecurity="" accountConnections="">
     <div class="mb-2 user-select-none">
-        <span class="fs-4"><@default.icon name="mdi:account-box"/>
+        <span class="fs-4"><@default.icon name="mdi:account-outline"/>
             My Account</span>
         <hr/>
         <div class="list-group mx-2 mx-md-0">
