@@ -42,10 +42,8 @@
 </#macro>
 
 <#macro scripts>
-    <script src="<@spring.url "/webjars/bootstrap/js/bootstrap.bundle.min.js"/>"></script>
     <script src="<@spring.url "/webjars/iconify__iconify/dist/iconify.min.js"/>"></script>
-    <script src="<@spring.url "/webjars/dompurify/dist/purify.min.js"/>"></script>
-    <script src="<@spring.url "/webjars/marked/marked.min.js"/>"></script>
+    <script src="<@spring.url "/webjars/bootstrap/js/bootstrap.bundle.min.js"/>"></script>
     <script>
         function _clearForm(form) {
             form.querySelectorAll("input:not([name='_csrf'])").forEach((elem) => elem.value = "")
