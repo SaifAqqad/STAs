@@ -24,8 +24,8 @@
 <@default.navbar search="active"/>
 <div class="container-fluid container-lg my-3 user-select-none">
     <div class="container mt-5">
-        <div class="d-flex w-100">
-            <div class="input-group">
+        <div class="d-flex justify-content-center w-100">
+            <div class="input-group w-75">
                 <input class="form-control border-end-0 border shadow-none" name="query" id="query"
                        placeholder="Search for a profile" aria-label="Search for a profile">
                 <div class="input-group-text bg-white border-start-0 border shadow-none">
@@ -35,7 +35,7 @@
                 </div>
                 <button id="searchBtn" type="submit"
                         class="btn btn-primary d-flex align-items-center align-content-center">
-                    <@default.icon name="mdi:magnify" height="24"/>Search
+                    <@default.icon name="mdi:magnify" height="24"/>
                 </button>
             </div>
         </div>
@@ -76,7 +76,7 @@
 </#macro>
 
 <#macro emptyResult>
-    <div class="card w-100 min-h-100 d-flex justify-content-center align-items-center animate__animated animate__fadeIn animate__faster">
+    <div class="w-100 min-h-100 d-flex justify-content-center align-items-center animate__animated animate__fadeIn animate__faster">
         <span class="fs-6 text-muted user-select-none">No matching profiles</span>
     </div>
 </#macro>
@@ -111,6 +111,7 @@
         const clearBtn = document.getElementById('clearBtn');
         const loadMoreBtn = document.getElementById('loadMoreBtn');
         const profileCards = document.getElementById('profileCards');
+        const backendQuery = "${(query!"")?js_string?no_esc}";
 
         // Functions
         const createProfileCard = (profile) => {
@@ -140,6 +141,7 @@
         }
         const doSearch = async (query) => {
             setResultsArea(loadingResultTemplate);
+            history.replaceState({}, '', "/search?query=" + encodeURIComponent(query));
             let response = await fetch(searchUri + "?" + new URLSearchParams({query}))
             if (response.ok) {
                 const search = await response.json();
@@ -170,6 +172,7 @@
         });
         clearBtn.addEventListener('click', () => {
             queryInput.value = "";
+            history.replaceState({}, '', "/search");
             clearResultsArea();
         });
         queryInput.addEventListener('keypress', (event) => {
@@ -211,6 +214,11 @@
                 }
             }
         });
+        // do an initial search if there's a query in the model
+        if(backendQuery.length > 0) {
+            queryInput.value = backendQuery;
+            doSearch(backendQuery);
+        }
     })()
 </script>
 
