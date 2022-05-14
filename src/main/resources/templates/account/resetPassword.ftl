@@ -30,7 +30,7 @@
         <#else>
             <#if showResetForm??>
             <#-- show reset password form -->
-                <@infoCard title="Reset your password" border="1" style="text-dark bg-light">
+                <@infoCard title="Reset your password" border="1" style="text-dark bg-white">
                     <form action="<@spring.url "/reset-password/do"/>" method="post">
                         <@default.csrfInput/>
                         <@account.hiddenFormElement path="resetPasswordForm.resetToken"/>
@@ -50,7 +50,7 @@
                 </@infoCard>
             <#else>
             <#-- show request reset password form -->
-                <@infoCard title="Reset your password" border="1" style="text-dark bg-light">
+                <@infoCard title="Reset your password" border="1" style="text-dark bg-white">
                     <p class="card-text">
                         Enter your account's verified email address, and we will send you a password reset link.
                     </p>
@@ -62,7 +62,7 @@
                             <label class="form-label text-muted" for="email">Email</label>
                         </div>
                         <div class="mt-3">
-                            <input class="btn btn-outline-primary" value="Send password reset email" type="submit"/>
+                            <input class="btn btn-primary" value="Send password reset email" type="submit"/>
                         </div>
                     </form>
                 </@infoCard>
