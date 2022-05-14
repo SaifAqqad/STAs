@@ -6,7 +6,7 @@
 <!DOCTYPE html>
 <html lang="en">
 
-<@default.head title="Profile - STAs">
+<@default.head title="${profile.name} - STAs">
     <style>
         #aboutContent h1 {
             font-size: 1.75rem;
