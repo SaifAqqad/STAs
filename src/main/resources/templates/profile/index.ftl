@@ -355,7 +355,10 @@
 </div>
 
 
-<@default.scripts/>
+<@default.scripts>
+    <script src="<@spring.url "/webjars/dompurify/dist/purify.min.js"/>"></script>
+    <script src="<@spring.url "/webjars/marked/marked.min.js"/>"></script>
+</@default.scripts>
 <@default.toast/>
 <@ownOnly>
     <script>
