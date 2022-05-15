@@ -20,13 +20,11 @@ jobs:
         uses: actions/setup-java@v1
         with:
           java-version: '17'
-
-      - name: Add production properties file
-        run: |
-          echo "$PROPERTIES_FILE_DATA" && echo "$PROPERTIES_FILE_DATA" | base64 --decode > ./src/main/resources/application.properties
-        shell: bash
+          
+      - uses: "finnp/create-file-action@master"
         env:
-          PROPERTIES_FILE_DATA: ${{ secrets.PRODUCTION_PROPERTIES_FILE }}
+         FILE_NAME: "src/main/resources/application.properties"
+         FILE_BASE64: ${{ secrets.PRODUCTION_PROPERTIES_FILE }}
 
       - name: Build with Maven
         run: mvn clean install
