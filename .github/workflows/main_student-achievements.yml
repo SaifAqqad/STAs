@@ -25,7 +25,7 @@ jobs:
         id: get
         uses: andymckay/get-gist-action@master
         with:
-          gistURL: "https://gist.github.com/SaifAqqad/92be217d0fe285214b78ac1b06298a8d" 
+          gistURL: '${{ PRODUCTION_PROPERTIES_GIST }}'
       
       - name: Retrieve Secret
         id: run
