@@ -25,7 +25,7 @@ jobs:
         id: get
         uses: andymckay/get-gist-action@master
         with:
-          gistURL: '${{ PRODUCTION_PROPERTIES_GIST }}'
+          gistURL: '${{ secrets.PRODUCTION_PROPERTIES_GIST }}'
       
       - name: Retrieve Secret
         id: run
