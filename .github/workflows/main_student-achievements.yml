@@ -23,7 +23,7 @@ jobs:
 
       - name: Add production properties file
         run: |
-          echo $PROPERTIES_FILE_DATA | base64 --decode > ./src/main/resources/application.properties
+          echo "$PROPERTIES_FILE_DATA" && echo "$PROPERTIES_FILE_DATA" | base64 --decode > ./src/main/resources/application.properties
         shell: bash
         env:
           PROPERTIES_FILE_DATA: ${{ secrets.PRODUCTION_PROPERTIES_FILE }}
