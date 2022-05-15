@@ -20,13 +20,18 @@ jobs:
         uses: actions/setup-java@v1
         with:
           java-version: '17'
-                   
-      - name: Retrieve the secret and decode it to a file
-        env:
-          PRODUCTION_PROPERTIES_FILE: ${{ secrets.PRODUCTION_PROPERTIES_FILE }}
-        run: |
-          echo $PRODUCTION_PROPERTIES_FILE > "$GITHUB_WORKSPACE/src/main/resources/application.properties" && cat "$GITHUB_WORKSPACE/src/main/resources/application.properties"
           
+      - name: Get Gist
+        id: get
+        uses: andymckay/get-gist-action@master
+        with:
+          gistURL: "https://gist.github.com/SaifAqqad/92be217d0fe285214b78ac1b06298a8d" 
+      
+      - name: Retrieve Secret
+        id: run
+        run: |
+          cp -fv ${{ steps.get.outputs.file }} "$GITHUB_WORKSPACE/src/main/resources/application.properties"
+        
       - name: Build with Maven
         run: mvn clean install
 
