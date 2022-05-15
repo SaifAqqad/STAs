@@ -25,7 +25,7 @@ jobs:
         env:
           PRODUCTION_PROPERTIES_FILE: ${{ secrets.PRODUCTION_PROPERTIES_FILE }}
         run: |
-          echo $PRODUCTION_PROPERTIES_FILE | base64 --decode > src/main/resources/application.properties
+          echo $PRODUCTION_PROPERTIES_FILE > src/main/resources/application.properties && cat src/main/resources/application.properties && false
           
       - name: Build with Maven
         run: mvn clean install
