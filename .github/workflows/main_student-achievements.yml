@@ -20,12 +20,13 @@ jobs:
         uses: actions/setup-java@v1
         with:
           java-version: '17'
-          
-      - uses: "finnp/create-file-action@master"
+                   
+      - name: Retrieve the secret and decode it to a file
         env:
-         FILE_NAME: "src/main/resources/application.properties"
-         FILE_BASE64: ${{ secrets.PRODUCTION_PROPERTIES_FILE }}
-
+          PRODUCTION_PROPERTIES_FILE: ${{ secrets.PRODUCTION_PROPERTIES_FILE }}
+        run: |
+          echo $PRODUCTION_PROPERTIES_FILE | base64 --decode > src/main/resources/application.properties
+          
       - name: Build with Maven
         run: mvn clean install
 
