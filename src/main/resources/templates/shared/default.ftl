@@ -35,14 +35,14 @@
         <link rel="icon" type="image/svg+xml" href="<@spring.url "/images/favicon.svg"/>">
         <link rel="manifest" href="<@spring.url "/js/site.webmanifest"/>">
 
-        <link rel="stylesheet" href="<@spring.url "/webjars/bootswatch/dist/zephyr/bootstrap.min.css"/>"/>
-        <link rel="stylesheet" href="<@spring.url "/css/styles.css"/>"/>
+        <link rel="preload stylesheet" as="style" href="<@spring.url "/webjars/bootswatch/dist/zephyr/bootstrap.min.css"/>"/>
+        <link rel="preload stylesheet" as="style" href="<@spring.url "/css/styles.css"/>"/>
+        <script src="<@spring.url "/webjars/iconify__iconify/dist/iconify.min.js"/>"></script>
         <#nested/>
     </head>
 </#macro>
 
 <#macro scripts>
-    <script src="<@spring.url "/webjars/iconify__iconify/dist/iconify.min.js"/>"></script>
     <script src="<@spring.url "/webjars/bootstrap/js/bootstrap.bundle.min.js"/>"></script>
     <script>
         function _clearForm(form) {
