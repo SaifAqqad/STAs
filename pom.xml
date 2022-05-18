@@ -91,7 +91,7 @@
         <dependency>
             <groupId>org.webjars.npm</groupId>
             <artifactId>marked</artifactId>
-            <version>4.0.14</version>
+            <version>4.0.16</version>
         </dependency>
         <dependency>
             <groupId>org.webjars.npm</groupId>
