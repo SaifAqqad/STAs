@@ -88,8 +88,12 @@
                             <#-- profile picture -->
                             <div class="d-flex justify-content-center p-3 user-select-none">
                                 <div class="position-relative">
-                                    <img class="img-w-100 rounded-circle object-fit-cover" src="${profile.imageUri}"
-                                         id="profilePicture" alt="profile picture"/>
+                                    <div class="img-placeholder img-w-100 rounded-circle object-fit-cover">
+                                        <#if (profile.imageUri!"")?has_content>
+                                            <img class="img-w-100 rounded-circle object-fit-cover" src="${profile.imageUri}"
+                                                 onerror="this.remove()" id="profilePicture" alt="Profile picture"/>
+                                        </#if>
+                                    </div>
                                     <@editOnly>
                                         <div class="image-mask img-w-100 rounded-circle clickable"
                                              id="profilePictureEditButton">
@@ -217,11 +221,7 @@
                             </form>
                             <div class="clearfix">
                                 <div class="float-start">
-                                    <a href="https://www.markdownguide.org/cheat-sheet/#basic-syntax" target="_blank"
-                                       class="text-decoration-none text-muted text-hover-dark">
-                                        <@default.icon name="mdi:language-markdown-outline" height="24"
-                                        class="align-top me-1"/>Markdown is supported
-                                    </a>
+                                    <@default.mdDisclaimer/>
                                 </div>
                                 <div class="float-end text-muted user-select-none" id="aboutCharCount">0/5000</div>
                             </div>

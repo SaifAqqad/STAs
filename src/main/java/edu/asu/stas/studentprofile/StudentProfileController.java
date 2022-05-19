@@ -149,7 +149,7 @@ public class StudentProfileController {
         StudentProfile profile = Objects.requireNonNull(getStudentProfile());
         String imageName = profile.getImageUri().substring(profile.getImageUri().lastIndexOf('/') + 1);
         contentService.removeResource("profile", profile.getId().toString() + "_" + imageName);
-        profile.setImageUri(StudentProfile.DEFAULT_IMAGE_URI);
+        profile.setImageUri(null);
         studentProfileService.saveProfile(profile);
         redirectAttributes.addFlashAttribute("toast", "Profile picture removed successfully");
         return "redirect:/profile";

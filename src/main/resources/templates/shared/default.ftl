@@ -35,7 +35,8 @@
         <link rel="icon" type="image/svg+xml" href="<@spring.url "/images/favicon.svg"/>">
         <link rel="manifest" href="<@spring.url "/js/site.webmanifest"/>">
 
-        <link rel="preload stylesheet" as="style" href="<@spring.url "/webjars/bootswatch/dist/zephyr/bootstrap.min.css"/>"/>
+        <link rel="preload stylesheet" as="style"
+              href="<@spring.url "/webjars/bootswatch/dist/zephyr/bootstrap.min.css"/>"/>
         <link rel="preload stylesheet" as="style" href="<@spring.url "/css/styles.css"/>"/>
         <script src="<@spring.url "/webjars/iconify__iconify/dist/iconify.min.js"/>"></script>
         <#nested/>
@@ -44,57 +45,7 @@
 
 <#macro scripts>
     <script src="<@spring.url "/webjars/bootstrap/js/bootstrap.bundle.min.js"/>"></script>
-    <script>
-        function _clearForm(form) {
-            form.querySelectorAll("input:not([name='_csrf'])").forEach((elem) => elem.value = "")
-            form.querySelectorAll("textarea").forEach((elem) => elem.value = "")
-            form.querySelectorAll("img").forEach((elem) => elem.src = "")
-            form.querySelectorAll("select").forEach((elem) => elem.innerHTML = "")
-        }
-
-        function _applyJsonToForm(formId, json) {
-            for (const prop in json) {
-                const elem = document.getElementById(formId + "_" + prop)
-                if (elem) {
-                    elem.value = json[prop]
-                }
-            }
-        }
-
-        function _showElems(elems, show) {
-            elems.forEach(element => element.classList[show ? "remove" : "add"]("d-none"))
-        }
-
-        function _assignDefaultValue(target, src) {
-            for (const targetKey in target) {
-                const value = target[targetKey];
-                if (!src[targetKey]) {
-                    src[targetKey] = value
-                }
-            }
-            return src
-        }
-
-        function _updateAutoTextArea(textArea) {
-            if (!(textArea instanceof HTMLElement))
-                textArea = document.querySelector(textArea)
-            textArea.style.height = '3.5rem';
-            textArea.style.height = textArea.scrollHeight + 'px';
-        }
-
-        function _setupAutoTextArea(textArea) {
-            if (!(textArea instanceof HTMLElement))
-                textArea = document.querySelector(textArea)
-            // set initial textarea height
-            textArea.setAttribute("style", "height:3.5rem;overflow-y:hidden;")
-            // textarea onInput
-            textArea.addEventListener("input", _updateAutoTextArea.bind(this, textArea))
-        }
-
-        function _sleep(ms) {
-            return new Promise(resolve => setTimeout(resolve, ms));
-        }
-    </script>
+    <script src="<@spring.url "/js/shared.js"/>"></script>
     <#nested >
 </#macro>
 
@@ -196,6 +147,14 @@
             });
         }
     </script>
+</#macro>
+
+<#macro mdDisclaimer>
+    <a href="https://www.markdownguide.org/cheat-sheet/#basic-syntax" target="_blank"
+       class="text-decoration-none text-muted text-hover-dark">
+        <@default.icon name="mdi:language-markdown-outline" height="24"
+        class="align-top me-1"/>Markdown is supported
+    </a>
 </#macro>
 
 <#macro jsStr>

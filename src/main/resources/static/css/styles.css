@@ -50,7 +50,13 @@
     .w-lg-100 {
         width: 100% !important;
     }
+}
 
+@media (min-width: 1200px) {
+    .w-xl-50{
+        width: 50% !important;
+
+    }
 }
 
 body {
@@ -102,6 +108,12 @@ pre {
 
 .image-mask:hover {
     opacity: 0.5;
+}
+
+.img-placeholder{
+    background-image: url("/images/generic_profile.jpeg");
+    background-size: cover;
+    background-position: center;
 }
 
 .clickable {

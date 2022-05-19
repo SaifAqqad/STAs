@@ -26,7 +26,6 @@ import java.util.Objects;
 public class StudentProfile implements Serializable {
     @Serial
     private static final long serialVersionUID = 1L;
-    public static final String DEFAULT_IMAGE_URI = "/images/generic_profile.png";
     private static final String PUBLIC_BASE_URI = "/profile/";
 
     @Id
@@ -50,7 +49,7 @@ public class StudentProfile implements Serializable {
 
     private String major;
 
-    private String imageUri = DEFAULT_IMAGE_URI;
+    private String imageUri;
 
     private String uuid;
 
