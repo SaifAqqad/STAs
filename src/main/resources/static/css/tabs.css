@@ -5,7 +5,7 @@
 
 .tab {
     position: absolute;
-    transition: all 100ms ease-in-out;
+    transition: opacity 100ms ease-in-out;
 }
 
 .tab-hidden {

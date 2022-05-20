@@ -152,7 +152,7 @@
 <#macro mdDisclaimer>
     <a href="https://www.markdownguide.org/cheat-sheet/#basic-syntax" target="_blank"
        class="text-decoration-none text-muted text-hover-dark">
-        <@default.icon name="mdi:language-markdown-outline" height="24"
+        <@icon name="mdi:language-markdown" height="24"
         class="align-top me-1"/>Markdown is supported
     </a>
 </#macro>
