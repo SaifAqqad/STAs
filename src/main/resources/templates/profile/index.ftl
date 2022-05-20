@@ -88,11 +88,12 @@
                             <#-- profile picture -->
                             <div class="d-flex justify-content-center p-3 user-select-none">
                                 <div class="position-relative">
-                                    <div class="img-placeholder img-w-100 rounded-circle object-fit-cover">
-                                        <#if (profile.imageUri!"")?has_content>
-                                            <img class="img-w-100 rounded-circle object-fit-cover" src="${profile.imageUri}"
-                                                 onerror="this.remove()" id="profilePicture" alt="Profile picture"/>
-                                        </#if>
+                                    <div class="img-w-100 rounded-circle object-fit-cover">
+                                        <img class="img-w-100 rounded-circle object-fit-cover" id="profilePicture"
+                                             src="${profile.imageUri!""}"
+                                             onerror="_setPlaceholder(this)"
+                                             data-placeholder="/images/generic_profile.jpeg"
+                                             alt="Profile picture"/>
                                     </div>
                                     <@editOnly>
                                         <div class="image-mask img-w-100 rounded-circle clickable"
@@ -546,7 +547,7 @@ overviewPopupDetails={
     "buttonId" : "addLinkButton"
     }
     />
-    <@popups.picturePopup popupId="profilePicturePopup" formId="profilePictureForm" uriBase="/profile/picture" defaultValue={"imageUri": profile.imageUri}
+    <@popups.picturePopup popupId="profilePicturePopup" formId="profilePictureForm" uriBase="/profile/picture" defaultValue={"imageUri": profile.imageUri!""}
     detailsPopup={
     "popupTitle" : "Profile picture",
     "deleteButtonId" : "profilePictureDeleteButton",

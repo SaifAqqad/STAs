@@ -62,7 +62,7 @@ public class StudentProfileController {
         StudentProfile profile = studentProfileService.getProfileByUuid(uuid);
         if (Objects.nonNull(profile) && profile.isPublic()) {
             User authedUser = UserService.getAuthenticatedUser();
-            if(Objects.nonNull(authedUser) && studentProfileService.getProfileByUser(authedUser).equals(profile)) {
+            if (Objects.nonNull(authedUser) && profile.equals(studentProfileService.getProfileByUser(authedUser))) {
                 return "redirect:/profile";
             }
             model.addAttribute("profile", profile);
@@ -99,11 +99,12 @@ public class StudentProfileController {
         studentProfileService.updateProfileInfo(profile,
                                                 profileInfo,
                                                 links.entrySet()
-                                                        .stream()
-                                                        .filter(entry -> entry.getKey().startsWith("link_") &&
-                                                                !entry.getValue().isBlank())
-                                                        .collect(Collectors.toMap(entry -> entry.getKey()
-                                                                .replaceFirst("link_", ""), Map.Entry::getValue)));
+                                                     .stream()
+                                                     .filter(entry -> entry.getKey().startsWith("link_") &&
+                                                             !entry.getValue().isBlank())
+                                                     .collect(Collectors.toMap(entry -> entry.getKey()
+                                                                                             .replaceFirst("link_", ""),
+                                                                               Map.Entry::getValue)));
         redirectAttributes.addFlashAttribute("toast", "Profile updated successfully");
         return "redirect:/profile";
     }
@@ -147,10 +148,12 @@ public class StudentProfileController {
     @PostMapping("/profile/picture/delete")
     public String deleteProfilePicture(RedirectAttributes redirectAttributes) {
         StudentProfile profile = Objects.requireNonNull(getStudentProfile());
-        String imageName = profile.getImageUri().substring(profile.getImageUri().lastIndexOf('/') + 1);
-        contentService.removeResource("profile", profile.getId().toString() + "_" + imageName);
-        profile.setImageUri(null);
-        studentProfileService.saveProfile(profile);
+        if (Objects.nonNull(profile.getImageUri())) {
+            String imageName = profile.getImageUri().substring(profile.getImageUri().lastIndexOf('/') + 1);
+            contentService.removeResource("profile", profile.getId().toString() + "_" + imageName);
+            profile.setImageUri(null);
+            studentProfileService.saveProfile(profile);
+        }
         redirectAttributes.addFlashAttribute("toast", "Profile picture removed successfully");
         return "redirect:/profile";
     }

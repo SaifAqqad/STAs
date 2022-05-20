@@ -28,6 +28,10 @@ function _assignDefaultValue(target, src) {
     return src
 }
 
+function _setPlaceholder(elem) {
+    elem.src = elem.dataset.placeholder
+}
+
 function _updateAutoTextArea(textArea) {
     if (!(textArea instanceof HTMLElement))
         textArea = document.querySelector(textArea)
