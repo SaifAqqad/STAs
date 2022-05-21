@@ -1,14 +1,16 @@
 function switchToTab(tabIndex) {
     const tabsContainer = document.querySelector('.tabs');
     const currentTab = {
-        element: document.querySelector('.tab-active'),
+        element: document.querySelector('.tab.tab-active'),
         index: document.querySelector('.tab.tab-active')?.getAttribute('data-tab-index'),
     }
     const nextTab = {
         element: document.querySelector(`.tab[data-tab-index="${tabIndex}"]`),
         index: tabIndex,
     }
-    if (!currentTab.element || !nextTab.element || currentTab.index === tabIndex)
+    // emit tab-changing event to check if the tab is allowed to be switched
+    const shouldChange = tabsContainer.dispatchEvent(new Event('tab-changing',{cancelable:true}));
+    if (!shouldChange || !currentTab.element || !nextTab.element || currentTab.index === tabIndex)
         return currentTab.index;
     // set correct animation
     if (currentTab.index < nextTab.index) {

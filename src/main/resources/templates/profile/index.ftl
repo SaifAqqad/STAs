@@ -8,35 +8,6 @@
 
 <@default.head title="${profile.name} - STAs">
     <style>
-        #aboutContent h1 {
-            font-size: 1.75rem;
-        }
-
-        #aboutContent h2 {
-            font-size: 1.5rem;
-        }
-
-        #aboutContent h3 {
-            font-size: 1.25rem;
-        }
-
-        #aboutContent h4 {
-            font-size: 1rem;
-        }
-
-        #aboutContent h5 {
-            font-size: 0.75rem;
-        }
-
-        #aboutContent h6 {
-            font-size: 0.5rem;
-        }
-
-        #aboutContent * {
-            max-width: 100% !important;
-            color: inherit !important;
-        }
-
         .scrollable-box {
             max-height: 600px;
             overflow: auto;
@@ -51,9 +22,9 @@
 </@default.head>
 
 <body>
-<@default.navbar profile="active" marginBreak="xl"/>
+<@default.navbar profile=(isPublicView!false)?then("","active") marginBreak="xl"/>
 
-<div class="container-fluid container-xl my-3">
+<div class="container-fluid container-xl my-3 animate__animated animate__fadeIn animate__faster">
     <div id="profile">
         <div class="row">
             <#-- Left column -->
@@ -198,7 +169,7 @@
                             </@editOnly>
                         </div>
                     <#-- Content -->
-                        <div class="card-text" id="aboutContent"></div>
+                        <div class="md-content card-text" id="aboutContent"></div>
                     </@profileCard>
                     <@editOnly>
                         <@profileCard class="edit-card d-none">

@@ -249,6 +249,36 @@ pre {
     }
 }
 
+/* markdown content */
+.md-content h1 {
+    font-size: 1.75rem;
+}
+
+.md-content h2 {
+    font-size: 1.5rem;
+}
+
+.md-content h3 {
+    font-size: 1.25rem;
+}
+
+.md-content h4 {
+    font-size: 1rem;
+}
+
+.md-content h5 {
+    font-size: 0.75rem;
+}
+
+.md-content h6 {
+    font-size: 0.5rem;
+}
+
+.md-content * {
+    max-width: 100% !important;
+    color: inherit !important;
+}
+
 /* Linkedin button */
 
 .btn-linkedin {

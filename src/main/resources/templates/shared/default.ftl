@@ -38,6 +38,9 @@
         <link rel="preload stylesheet" as="style"
               href="<@spring.url "/webjars/bootswatch/dist/zephyr/bootstrap.min.css"/>"/>
         <link rel="preload stylesheet" as="style" href="<@spring.url "/css/styles.css"/>"/>
+        <link rel="preload stylesheet" as="style" href="<@spring.url "/webjars/animate.css/animate.min.css"/>"/>
+        <link rel="preload" as="script" href="<@spring.url "/webjars/bootstrap/js/bootstrap.bundle.min.js"/>"/>
+        <script src="<@spring.url "/js/shared.js"/>"></script>
         <script src="<@spring.url "/webjars/iconify__iconify/dist/iconify.min.js"/>"></script>
         <#nested/>
     </head>
@@ -45,7 +48,6 @@
 
 <#macro scripts>
     <script src="<@spring.url "/webjars/bootstrap/js/bootstrap.bundle.min.js"/>"></script>
-    <script src="<@spring.url "/js/shared.js"/>"></script>
     <#nested >
 </#macro>
 

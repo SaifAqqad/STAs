@@ -75,7 +75,7 @@ public class StudentProfileController {
 
     @GetMapping("/profile/create")
     public String getCreatePage() {
-        return "profile/create";
+        return "profile/create/index";
     }
 
     @PostMapping("/profile/about")
