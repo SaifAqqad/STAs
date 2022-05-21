@@ -11,7 +11,7 @@
 <body>
 <@default.navbar login="active"/>
 
-<div class="container">
+<div class="container animate__animated animate__fadeIn animate__faster">
     <div class="d-flex align-items-center justify-content-center mt-5 mx-md-5-5 mx-lg-6">
         <div class="card card-light text-dark mb-3 w-100 <#if auth2FAError??>border-danger</#if>">
             <div class="card-body">

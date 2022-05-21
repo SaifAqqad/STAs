@@ -9,7 +9,7 @@
 <body>
 <@default.navbar/>
 
-<div class="container mt-3">
+<div class="container mt-3 animate__animated animate__fadeIn animate__faster">
     <div class="card card-light text-dark mb-3 w-100">
         <div class="card-body">
             <h6 class="mb-1">Create a new account</h6>

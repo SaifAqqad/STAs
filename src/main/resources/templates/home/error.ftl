@@ -8,7 +8,7 @@
 <body>
 <@default.navbar />
 <div class="container">
-    <div class="d-flex align-items-center justify-content-center mt-5 mx-md-5 mx-lg-5-5">
+    <div class="d-flex align-items-center justify-content-center mt-5 mx-md-5 mx-lg-5-5 animate__animated animate__fadeIn animate__faster">
         <div class="card card-light mb-3 w-75">
             <div class="card-header">
                 <div class="d-flex align-items-center justify-content-between">

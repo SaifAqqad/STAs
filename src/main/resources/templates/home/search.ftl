@@ -22,10 +22,10 @@
 
 <body>
 <@default.navbar search="active"/>
-<div class="container-fluid container-lg my-3 user-select-none">
+<div class="container-fluid container-lg my-3 user-select-none animate__animated animate__fadeIn animate__faster">
     <div class="container mt-5">
         <div class="d-flex justify-content-center w-100">
-            <div class="input-group w-100 w-sm-75">
+            <div class="input-group w-100 w-sm-75 ">
                 <input class="form-control border-end-0 border shadow-none" name="query" id="query"
                        placeholder="Search for a profile" aria-label="Search for a profile">
                 <div class="input-group-text bg-white border-start-0 border shadow-none">
