@@ -9,7 +9,7 @@
 <body>
 <@default.navbar />
 
-<div class="container mt-3">
+<div class="container mt-3 animate__animated animate__fadeIn animate__faster">
     <div class="d-flex align-items-center justify-content-center mt-5 mx-md-5">
         <#if resetSuccess??>
         <#-- show success message -->

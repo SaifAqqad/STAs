@@ -15,7 +15,7 @@
         <div class="col-md-3">
             <@account.sidebar accountConnections="active"/>
         </div>
-        <div class="col-md-9">
+        <div class="col-md-9 animate__animated animate__fadeIn animate__faster">
             <div class="container mt-2">
                 <div class="fs-4 user-select-none"><@default.icon name="connection"/>
                     Connections

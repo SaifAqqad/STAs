@@ -50,7 +50,13 @@
     .w-lg-100 {
         width: 100% !important;
     }
+}
 
+@media (min-width: 1200px) {
+    .w-xl-50{
+        width: 50% !important;
+
+    }
 }
 
 body {
@@ -102,6 +108,12 @@ pre {
 
 .image-mask:hover {
     opacity: 0.5;
+}
+
+.img-placeholder{
+    background-image: url("/images/generic_profile.jpeg");
+    background-size: cover;
+    background-position: center;
 }
 
 .clickable {
@@ -235,6 +247,36 @@ pre {
         left: 0 !important;
         margin-bottom: 10px;
     }
+}
+
+/* markdown content */
+.md-content h1 {
+    font-size: 1.75rem;
+}
+
+.md-content h2 {
+    font-size: 1.5rem;
+}
+
+.md-content h3 {
+    font-size: 1.25rem;
+}
+
+.md-content h4 {
+    font-size: 1rem;
+}
+
+.md-content h5 {
+    font-size: 0.75rem;
+}
+
+.md-content h6 {
+    font-size: 0.5rem;
+}
+
+.md-content * {
+    max-width: 100% !important;
+    color: inherit !important;
 }
 
 /* Linkedin button */

@@ -22,10 +22,10 @@
 
 <body>
 <@default.navbar search="active"/>
-<div class="container-fluid container-lg my-3 user-select-none">
+<div class="container-fluid container-lg my-3 user-select-none animate__animated animate__fadeIn animate__faster">
     <div class="container mt-5">
         <div class="d-flex justify-content-center w-100">
-            <div class="input-group w-100 w-sm-75">
+            <div class="input-group w-100 w-sm-75 ">
                 <input class="form-control border-end-0 border shadow-none" name="query" id="query"
                        placeholder="Search for a profile" aria-label="Search for a profile">
                 <div class="input-group-text bg-white border-start-0 border shadow-none">
@@ -56,8 +56,8 @@
 
 <#macro profileCard name="_" imageUri="_" publicUri="_" major="_" location="_" university="_">
     <div class="p-0 card card-border-grey h-100 user-select-none btn bg-hover animate__animated animate__fadeIn animate__faster profile-card">
-        <img src="${imageUri}" data-prop="imageUri" class="card-img-top"
-             alt="Profile Picture">
+        <img src="${imageUri}" data-prop="imageUri" class="card-img-top" onerror="_setPlaceholder(this)"
+             data-placeholder="/images/generic_profile.jpeg" alt="Profile Picture">
         <div class="card-body d-flex flex-column flex-grow-1 w-100 align-content-start text-start">
             <h5 class="card-title" data-prop="name">${name}</h5>
             <h6 class="card-subtitle mb-2 text-muted overflow-hidden text-truncate"
@@ -123,7 +123,7 @@
             profileCard.querySelector('[data-prop="location"]').innerText = profile["location"];
             profileCard.querySelector('[data-prop="university"]').innerText = profile["university"];
             profileCard.querySelector('[data-prop="publicUri"]').href = profile["publicUri"];
-            profileCard.querySelector('[data-prop="imageUri"]').src = profile["imageUri"];
+            profileCard.querySelector('[data-prop="imageUri"]').src = profile["imageUri"] || "";
             const column = document.createElement('div');
             column.classList.add('col', 'mb-3', 'd-flex', 'justify-content-center', 'justify-content-md-start');
             column.appendChild(profileCard);
@@ -215,7 +215,7 @@
             }
         });
         // do an initial search if there's a query in the model
-        if(backendQuery.length > 0) {
+        if (backendQuery.length > 0) {
             queryInput.value = backendQuery;
             doSearch(backendQuery);
         }
