@@ -53,7 +53,7 @@
 }
 
 @media (min-width: 1200px) {
-    .w-xl-50{
+    .w-xl-50 {
         width: 50% !important;
 
     }
@@ -110,7 +110,7 @@ pre {
     opacity: 0.5;
 }
 
-.img-placeholder{
+.img-placeholder {
     background-image: url("/images/generic_profile.jpeg");
     background-size: cover;
     background-position: center;
@@ -277,6 +277,35 @@ pre {
 .md-content * {
     max-width: 100% !important;
     color: inherit !important;
+}
+
+.md-content code{
+    -webkit-user-select: text !important;
+    -moz-user-select: text !important;
+    user-select: text !important;
+}
+
+.md-content table {
+    border: solid 1px #e7e9eb !important;
+    border-collapse: collapse !important;
+    border-spacing: 0 !important;
+    table-layout: fixed;
+    width: 100%;
+}
+
+.md-content table thead th,
+.md-content table th {
+    background-color: #e7e9eb !important;
+    border: solid 1px #e7e9eb !important;
+    text-align: left !important;
+    text-shadow: 1px 1px 1px #fff !important;
+}
+
+.md-content table tbody td,
+.md-content table td {
+    border: solid 1px #e7e9eb !important;
+    color: #333 !important;
+    text-shadow: 1px 1px 1px #fff !important;
 }
 
 /* Linkedin button */

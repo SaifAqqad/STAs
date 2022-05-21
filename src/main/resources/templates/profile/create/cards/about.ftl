@@ -38,29 +38,32 @@
     <script src="/webjars/marked/marked.min.js"></script>
     <script>
         <#noparse>
-        document.addEventListener("DOMContentLoaded", () => {
+        (() => {
             const aboutElem = document.querySelector("#about");
             const aboutCharCount = document.querySelector("#aboutCharCount");
-            _setupAutoTextArea(aboutElem);
-            aboutElem.addEventListener("input", () => {
-                _updateAutoTextArea(aboutElem);
-                aboutCharCount.textContent = `${aboutElem.value.length}/5000`;
+
+            document.addEventListener("DOMContentLoaded", () => {
+                _setupAutoTextArea(aboutElem);
+                aboutElem.addEventListener("input", () => {
+                    _updateAutoTextArea(aboutElem);
+                    aboutCharCount.textContent = `${aboutElem.value.length}/5000`;
+                });
             });
-        });
-        document.querySelector("#aboutPreview").addEventListener("change", (e) => {
-            const isChecked = e.target.checked;
-            const mdEdit = document.querySelector(".md-edit");
-            const mdContent = document.querySelector(".md-content");
-            const aboutTextArea = mdEdit.querySelector("textarea[data-profile-prop='about']");
-            if (isChecked) {
-                mdEdit.classList.add("d-none");
-                mdContent.innerHTML = marked.parse(aboutTextArea.value.trim(), {sanitizer: DOMPurify.sanitizeFn});
-                mdContent.classList.remove("d-none");
-            } else {
-                mdEdit.classList.remove("d-none");
-                mdContent.classList.add("d-none");
-            }
-        });
+            document.querySelector("#aboutPreview").addEventListener("change", (e) => {
+                const isChecked = e.target.checked;
+                const mdEdit = document.querySelector(".md-edit");
+                const mdContent = document.querySelector(".md-content");
+                const aboutTextArea = mdEdit.querySelector("textarea[data-profile-prop='about']");
+                if (isChecked) {
+                    mdEdit.classList.add("d-none");
+                    mdContent.innerHTML = DOMPurify.sanitize(marked.parse(aboutTextArea.value.trim()));
+                    mdContent.classList.remove("d-none");
+                } else {
+                    mdEdit.classList.remove("d-none");
+                    mdContent.classList.add("d-none");
+                }
+            });
+        })()
         </#noparse>
     </script>
 </#macro>

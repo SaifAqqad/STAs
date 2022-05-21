@@ -351,7 +351,7 @@
         view.textElement = view.card.querySelector("#aboutContent")
         view.content = "${profile.about?js_string?no_esc}";
         // set initial content
-        view.textElement.innerHTML = marked.parse(view.content, {sanitizer: DOMPurify.sanitizeFn})
+        view.textElement.innerHTML = DOMPurify.sanitize(marked.parse(view.content));
 
         <@editOnly>
         const edit = {card: document.querySelector("#profileAbout div.card.edit-card")}
