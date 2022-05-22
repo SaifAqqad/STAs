@@ -26,7 +26,7 @@ public class UserToken {
     @NonNull
     private UserToken.Type type;
 
-    @OneToOne(optional = false)
+    @ManyToOne(optional = false)
     @JoinColumn(nullable = false, name = "user_id")
     @NonNull
     private User user;
