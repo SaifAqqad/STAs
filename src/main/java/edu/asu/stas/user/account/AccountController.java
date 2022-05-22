@@ -14,6 +14,8 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
+import javax.servlet.ServletException;
+import javax.servlet.http.HttpServletRequest;
 import java.util.Objects;
 import java.util.stream.Collectors;
 
@@ -130,8 +132,9 @@ public class AccountController {
     @PostMapping("/account/security/delete")
     public String deleteAccount(
             @RequestParam(required = false) String code2FA,
+            HttpServletRequest request,
             RedirectAttributes redirectAttributes
-    ) {
+    ) throws ServletException {
         User user = Objects.requireNonNull(UserService.getAuthenticatedUser());
         if (user.isUsing2FA() && !userService.is2FACodeValid(user, code2FA)) {
             redirectAttributes.addFlashAttribute("toastColor", "danger");
@@ -144,6 +147,7 @@ public class AccountController {
             redirectAttributes.addFlashAttribute("toast", "Account deletion failed");
             return "redirect:/account/security";
         }
+        request.logout();
         redirectAttributes.addFlashAttribute("toast", "Account deleted successfully");
         return "redirect:/";
     }

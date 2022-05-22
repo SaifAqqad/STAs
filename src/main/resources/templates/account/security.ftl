@@ -83,6 +83,14 @@
                             </#if>
                         </div>
                     </div>
+                    <div class="card mt-3 w-100">
+                        <div class="card-body">
+                            <h6>Delete account</h6>
+                            <div class="text-danger fw-bold">This will delete all your data, including your portfolio.
+                            </div>
+                            <button class="btn btn-danger mt-2" id="accountDeleteBtn">Delete my account</button>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
@@ -132,39 +140,87 @@
     </div>
 </div>
 
+<div class="modal fade" id="accountDeleteModal" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header pb-0">
+                <h5 class="modal-title">Delete account</h5>
+            </div>
+            <div class="modal-body">
+                <div class="text-danger fw-bold">
+                    Are you sure you want to delete your account?
+                    <br>
+                    Once you delete your account, there is no going back.
+                </div>
+                <form id="formDelete" action="<@spring.url "/account/security/delete"/>" method="post">
+                    <@default.csrfInput/>
+                    <#if (twoFactorState!false)>
+                        <div class="mt-1">You have 2FA enabled, please open the two-factor authenticator (TOTP) app on your mobile device to view your authentication
+                            code.
+                        </div>
+                        <div class="form-floating my-3">
+                            <input class="form-control" type="text" name="code2FA" id="accountDeleteCode2FA"
+                                   placeholder="Authentication code" required/>
+                            <label class="form-label text-muted" for="accountDeleteCode2FA">Authentication code</label>
+                        </div>
+                    </#if>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-primary" data-bs-dismiss="modal">Cancel</button>
+                <input class="btn btn-danger" type="submit" value="Delete my account" form="formDelete"/>
+            </div>
+        </div>
+    </div>
+</div>
+
+
 <@account.confirmPasswordScript passwordId="newPassword" confirmPasswordId="confirmNewPassword" confirmPasswordFeedbackId="confirmNewPasswordFeedback"/>
 <@default.scripts />
 <@default.toast />
 <script>
-    const twoFactorSwitch = document.getElementById("twoFactorSwitch");
-    const twoFactorSecret = "${twoFactorSecret!""}";
-    const twoFactorForm = document.getElementById("form2fa");
-    const twoFactorState = document.getElementById("twoFactorState");
-    const twoFactorModal = document.getElementById("twoFactorModal")
-    const revealSecretModal = document.getElementById("revealSecretModal")
-    const revealSecretButton = document.getElementById("revealSecretButton");
+    (() => {
+        const twoFactorSwitch = document.getElementById("twoFactorSwitch");
+        const twoFactorSecret = "${twoFactorSecret!""}";
+        const twoFactorForm = document.getElementById("form2fa");
+        const twoFactorState = document.getElementById("twoFactorState");
+        const twoFactorModal = document.getElementById("twoFactorModal")
+        const revealSecretModal = document.getElementById("revealSecretModal")
+        const revealSecretButton = document.getElementById("revealSecretButton");
 
-    twoFactorSwitch.addEventListener("click", () => {
-        const switchState = twoFactorSwitch.checked;
-        twoFactorState.value = switchState;
-        if (switchState)
-            return twoFactorForm.submit();
-        if (twoFactorSecret) {
-            document.getElementById("twoFactorCode").value = twoFactorSecret
-            return twoFactorForm.submit();
-        }
-        let modal = new bootstrap.Modal(twoFactorModal);
-        twoFactorModal.addEventListener("shown.bs.modal", () => document.getElementById("twoFactorCode").focus());
-        twoFactorModal.addEventListener("hide.bs.modal", () => twoFactorState.value = twoFactorSwitch.checked = !switchState);
-        modal.show(null);
-    });
-
-    if (revealSecretButton) {
-        revealSecretButton.addEventListener("click", () => {
-            let modal = new bootstrap.Modal(revealSecretModal);
+        twoFactorSwitch.addEventListener("click", () => {
+            const switchState = twoFactorSwitch.checked;
+            twoFactorState.value = switchState;
+            if (switchState)
+                return twoFactorForm.submit();
+            if (twoFactorSecret) {
+                document.getElementById("twoFactorCode").value = twoFactorSecret
+                return twoFactorForm.submit();
+            }
+            let modal = new bootstrap.Modal(twoFactorModal);
+            twoFactorModal.addEventListener("shown.bs.modal", () => document.getElementById("twoFactorCode").focus());
+            twoFactorModal.addEventListener("hide.bs.modal", () => twoFactorState.value = twoFactorSwitch.checked = !switchState);
             modal.show(null);
         });
-    }
+
+        if (revealSecretButton) {
+            revealSecretButton.addEventListener("click", () => {
+                let modal = new bootstrap.Modal(revealSecretModal);
+                modal.show(null);
+            });
+        }
+    })()
+</script>
+<script>
+    (() => {
+        const accountDeleteBtn = document.getElementById("accountDeleteBtn");
+        const accountDeleteModal = document.getElementById("accountDeleteModal");
+        accountDeleteBtn.addEventListener("click", ()=>{
+            let modal = new bootstrap.Modal(accountDeleteModal);
+            accountDeleteModal.addEventListener("shown.bs.modal", () => document.getElementById("accountDeleteCode2FA").focus());
+            modal.show(null);
+        })
+    })()
 </script>
 </body>
 </html>
