@@ -86,9 +86,7 @@
                     <div class="card mt-3 w-100">
                         <div class="card-body">
                             <h6>Delete account</h6>
-                            <div class="text-danger fw-bold">This will delete all your data, including your portfolio.
-                            </div>
-                            <button class="btn btn-danger mt-2" id="accountDeleteBtn">Delete my account</button>
+                            <button class="btn btn-outline-danger mt-2" id="accountDeleteBtn">Delete my account</button>
                         </div>
                     </div>
                 </div>
@@ -147,24 +145,21 @@
                 <h5 class="modal-title">Delete account</h5>
             </div>
             <div class="modal-body">
-                <div class="text-danger fw-bold">
-                    Are you sure you want to delete your account?
-                    <br>
-                    Once you delete your account, there is no going back.
-                </div>
                 <form id="formDelete" action="<@spring.url "/account/security/delete"/>" method="post">
                     <@default.csrfInput/>
+                    <div>Are you sure you want to delete your account?</div>
                     <#if (twoFactorState!false)>
-                        <div class="mt-1">You have 2FA enabled, please open the two-factor authenticator (TOTP) app on your mobile device to view your authentication
-                            code.
-                        </div>
-                        <div class="form-floating my-3">
+                        <div class="mt-2">Enter your 2FA code to confirm</div>
+                        <div class="form-floating mb-3 mt-1">
                             <input class="form-control" type="text" name="code2FA" id="accountDeleteCode2FA"
                                    placeholder="Authentication code" required/>
                             <label class="form-label text-muted" for="accountDeleteCode2FA">Authentication code</label>
                         </div>
                     </#if>
                 </form>
+                <div class="text-danger fw-bold">
+                    This will delete all your data, including your portfolio.
+                </div>
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-primary" data-bs-dismiss="modal">Cancel</button>
@@ -215,7 +210,7 @@
     (() => {
         const accountDeleteBtn = document.getElementById("accountDeleteBtn");
         const accountDeleteModal = document.getElementById("accountDeleteModal");
-        accountDeleteBtn.addEventListener("click", ()=>{
+        accountDeleteBtn.addEventListener("click", () => {
             let modal = new bootstrap.Modal(accountDeleteModal);
             accountDeleteModal.addEventListener("shown.bs.modal", () => document.getElementById("accountDeleteCode2FA").focus());
             modal.show(null);
