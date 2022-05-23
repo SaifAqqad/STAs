@@ -21,16 +21,12 @@
 <#macro scripts>
     <script src="<@spring.url "/js/tabs.js"/>"></script>
     <script>
-        // setup initial tab
-        document.addEventListener("DOMContentLoaded", () => {
-            updateTabsHeight();
-            updateTabIndicators(0);
-        });
         // setup tab-switching buttons
         const onTabSwitchBtn = (newIndex) => {
             newIndex = switchToTab(newIndex);
             if (newIndex !== undefined && newIndex !== null) {
                 updateTabIndicators(newIndex);
+                window.localStorage.setItem("currentTab", newIndex)
             }
         }
         document.querySelectorAll("button[data-tab-index]").forEach(button =>
@@ -42,25 +38,48 @@
         document.querySelectorAll("button.back-btn").forEach(button =>
             button.addEventListener('click', () => onTabSwitchBtn(getActiveTabIndex() - 1))
         );
+        // setup initial tab
+        document.addEventListener("DOMContentLoaded", () => {
+            // load previous tab from localstorage
+            const tab = Number(window.localStorage.getItem("currentTab") || 0)
+            onTabSwitchBtn(tab)
+        });
         <#noparse>
         const profile = {
-            name: null,
-            contactEmail: null,
-            contactPhone: null,
-            location: null,
-            about: null,
-            university: null,
-            major: null,
-            imageUri: null,
-            imageData: null,
-            isPublic: false,
-            includeInSearch: false,
-            links: {},
-            courses: [],
-            activities: [],
-            projects: [],
-            experiences: [],
-        }
+            setItem: null,
+            getItem: null,
+            save: null,
+            clear: null,
+        };
+        document.addEventListener("DOMContentLoaded", () => {
+            const defaultProfile = {
+                name: null,
+                contactEmail: null,
+                contactPhone: null,
+                location: null,
+                about: null,
+                university: null,
+                major: null,
+                imageUri: null,
+                imageData: null,
+                isPublic: false,
+                includeInSearch: false,
+                links: {},
+                courses: [],
+                activities: [],
+                projects: [],
+                experiences: [],
+            };
+            let profileData = JSON.parse(window.localStorage.getItem("profileData")) || Object.assign({}, defaultProfile);
+            profile.setItem = (key, value) => profileData[key] = value;
+            profile.getItem = (key) => profileData[key];
+            profile.save = () => window.localStorage.setItem("profileData", JSON.stringify(profileData));
+            profile.clear = () => {
+                window.localStorage.removeItem("profileData");
+                profileData = Object.assign({}, defaultProfile)
+            };
+            document.dispatchEvent(new Event('profile-loaded'));
+        });
         // TODO: add profile submit functionality
         </#noparse>
     </script>

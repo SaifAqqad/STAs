@@ -15,14 +15,14 @@
                 <label class="form-label text-muted" for="location">Location</label>
             </div>
             <div class="form-floating mt-3">
+                <input class="form-control" required type="email" data-profile-prop="contactEmail"
+                       id="contactEmail" placeholder="Email">
+                <label class="form-label text-muted" for="contactEmail">Email</label>
+            </div>
+            <div class="form-floating mt-3">
                 <input class="form-control" type="text" data-profile-prop="contactPhone" id="contactPhone"
                        placeholder="Phone number">
                 <label class="form-label text-muted" for="contactPhone">Phone number</label>
-            </div>
-            <div class="form-floating mt-3">
-                <input class="form-control" type="email" data-profile-prop="contactEmail"
-                       id="contactEmail" placeholder="Email">
-                <label class="form-label text-muted" for="contactEmail">Email</label>
             </div>
             <div class="mt-4 clearfix">
                 <@shared.nextBtn id="contactInfoNext"/>
@@ -38,6 +38,7 @@
             const card = document.querySelector('#contactInfoCard');
             const currentTab = card.parentElement;
 
+            // validate the form
             const validate = () => {
                 let isValid = true;
                 card.querySelectorAll("[data-profile-prop]").forEach(input => {
@@ -46,25 +47,33 @@
                     } else {
                         _animateCSS(input, 'headShake');
                         input.classList.add('is-invalid');
+                        input.addEventListener('input', () => input.classList.remove('is-invalid'), {once: true});
                         isValid = false;
                     }
                 });
                 return isValid;
             };
 
-            card.querySelectorAll("[data-profile-prop]").forEach(input => {
-                input.addEventListener('input', () => input.classList.remove('is-invalid'));
-            });
-
+            // when the tab is changing, validate and save the form
             tabsContainer.addEventListener('tab-changing', (event) => {
-                if (currentTab.classList.contains('tab-hidden'))
+                // if we're not the active tab -> don't handle it
+                if (!currentTab.classList.contains('tab-active'))
                     return;
                 if (validate()) {
-                    // TODO: save data to shared profile object
-                    console.log('saving data');
+                    card.querySelectorAll("[data-profile-prop]").forEach(element => {
+                        profile.setItem(element.getAttribute("data-profile-prop"), element.value);
+                    });
+                    profile.save();
                 } else {
                     event.preventDefault();
                 }
+            });
+
+            // when the profile data is loaded, fill the form
+            document.addEventListener("profile-loaded", () => {
+                card.querySelectorAll("[data-profile-prop]").forEach(element => {
+                    element.value = profile.getItem(element.getAttribute("data-profile-prop")) || "";
+                })
             });
         })()
     </script>
