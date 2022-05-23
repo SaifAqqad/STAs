@@ -2,7 +2,7 @@
 <#import "../shared.ftl" as shared/>
 
 <#macro card>
-    <div class="card rounded-3 user-select-none w-100">
+    <div id="aboutCard" class="card rounded-3 user-select-none w-100">
         <div class="card-body">
             <div class="d-flex justify-content-between align-items-center">
                 <h6 class="card-title mb-1">Write a short bio</h6>
@@ -41,6 +41,13 @@
         (() => {
             const aboutElem = document.querySelector("#about");
             const aboutCharCount = document.querySelector("#aboutCharCount");
+            const tabsContainer = document.querySelector('.tabs');
+            const card = document.querySelector('#aboutCard');
+            const currentTab = card.parentElement;
+            const saveAbout = () => {
+                profile.setItem("about", aboutElem.value)
+                profile.save()
+            };
 
             document.addEventListener("DOMContentLoaded", () => {
                 _setupAutoTextArea(aboutElem);
@@ -49,6 +56,7 @@
                     aboutCharCount.textContent = `${aboutElem.value.length}/5000`;
                 });
             });
+
             document.querySelector("#aboutPreview").addEventListener("change", (e) => {
                 const isChecked = e.target.checked;
                 const mdEdit = document.querySelector(".md-edit");
@@ -58,11 +66,24 @@
                     mdEdit.classList.add("d-none");
                     mdContent.innerHTML = DOMPurify.sanitize(marked.parse(aboutTextArea.value.trim()));
                     mdContent.classList.remove("d-none");
+                    saveAbout()
                 } else {
                     mdEdit.classList.remove("d-none");
                     mdContent.classList.add("d-none");
                 }
             });
+
+            tabsContainer.addEventListener("tab-changing", () => {
+                // if we're not the active tab -> don't handle it
+                if (!currentTab.classList.contains('tab-active'))
+                    return;
+                saveAbout()
+            })
+
+            document.addEventListener("profile-loaded", () => {
+                aboutElem.value = profile.getItem("about") || ""
+            })
+
         })()
         </#noparse>
     </script>
