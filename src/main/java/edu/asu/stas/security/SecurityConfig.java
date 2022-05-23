@@ -48,16 +48,24 @@ public class SecurityConfig {
 
             .authorizeHttpRequests(authorizeRequests ->
                 authorizeRequests
+                    .mvcMatchers(HttpMethod.POST, "/profile/**").authenticated()
+                    .mvcMatchers(HttpMethod.POST, "/login").denyAll()
                     .mvcMatchers(
                         "/account/**",
                         "/connect/**",
-                        "/profile/**",
+                        "/profile/create/**",
+                        "/profile/privacy/**",
+                        "/profile/activities/**",
+                        "/profile/courses/**",
+                        "/profile/experiences/**",
+                        "/profile/projects/**",
+                        "/profile",
                         "/connections/**").authenticated()
                     .mvcMatchers(
                         "/profile/{uuid}",
                         "/profile/{uuid}/**",
                         "/profile/search").permitAll()
-                    .mvcMatchers(HttpMethod.POST, "/login").denyAll()
+
             )
 
             .formLogin(formLogin ->
