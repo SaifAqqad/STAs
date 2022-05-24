@@ -1,4 +1,4 @@
-function switchToTab(tabIndex) {
+function switchToTab(tabIndex, isFirstLoad = false) {
     const tabsContainer = document.querySelector('.tabs');
     const currentTab = {
         element: document.querySelector('.tab.tab-active'),
@@ -11,7 +11,7 @@ function switchToTab(tabIndex) {
 
     // emit tab-changing event to check if the tab is allowed to be switched
     const shouldChange = tabsContainer.dispatchEvent(new Event('tab-changing', {cancelable: true}));
-    if (!shouldChange || !nextTab.element || currentTab.index === tabIndex)
+    if (!shouldChange || !nextTab.element || (!currentTab.element && !isFirstLoad) || currentTab.index === tabIndex)
         return currentTab.index;
 
     // set correct animation

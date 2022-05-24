@@ -22,8 +22,8 @@
     <script src="<@spring.url "/js/tabs.js"/>"></script>
     <script>
         // setup tab-switching buttons
-        const onTabSwitchBtn = (newIndex) => {
-            newIndex = switchToTab(newIndex);
+        const onTabSwitchBtn = (newIndex, isFirstLoad = false) => {
+            newIndex = switchToTab(newIndex, isFirstLoad);
             if (newIndex !== undefined && newIndex !== null) {
                 updateTabIndicators(newIndex);
                 window.localStorage.setItem("currentTab", newIndex)
@@ -42,7 +42,7 @@
         document.addEventListener("DOMContentLoaded", () => {
             // load previous tab from localstorage
             const tab = Number(window.localStorage.getItem("currentTab") || 0)
-            onTabSwitchBtn(tab)
+            onTabSwitchBtn(tab, true)
         });
         <#noparse>
         const profile = {

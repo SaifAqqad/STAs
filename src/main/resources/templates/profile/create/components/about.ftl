@@ -49,30 +49,34 @@
                 profile.save()
             };
 
-            document.addEventListener("DOMContentLoaded", () => {
-                _setupAutoTextArea(aboutElem);
-                aboutElem.addEventListener("input", () => {
-                    _updateAutoTextArea(aboutElem);
-                    aboutCharCount.textContent = `${aboutElem.value.length}/5000`;
-                });
+            // setup auto-expanding textarea
+            _setupAutoTextArea(aboutElem);
+            aboutElem.addEventListener("input", () => {
+                _updateAutoTextArea(aboutElem);
+                aboutCharCount.textContent = `${aboutElem.value.length}/5000`;
             });
 
+            // save about content on blur
+            aboutElem.addEventListener("change", () => {
+                saveAbout();
+            });
+
+            // preview switch
             document.querySelector("#aboutPreview").addEventListener("change", (e) => {
                 const isChecked = e.target.checked;
                 const mdEdit = document.querySelector(".md-edit");
                 const mdContent = document.querySelector(".md-content");
-                const aboutTextArea = mdEdit.querySelector("textarea[data-profile-prop='about']");
                 if (isChecked) {
                     mdEdit.classList.add("d-none");
-                    mdContent.innerHTML = DOMPurify.sanitize(marked.parse(aboutTextArea.value.trim()));
+                    mdContent.innerHTML = DOMPurify.sanitize(marked.parse(aboutElem.value.trim()));
                     mdContent.classList.remove("d-none");
-                    saveAbout()
                 } else {
                     mdEdit.classList.remove("d-none");
                     mdContent.classList.add("d-none");
                 }
             });
 
+            // handle tab changing event
             tabsContainer.addEventListener("tab-changing", () => {
                 // if we're not the active tab -> don't handle it
                 if (!currentTab.classList.contains('tab-active'))
@@ -80,10 +84,11 @@
                 saveAbout()
             })
 
+            // load existing about text
             document.addEventListener("profile-loaded", () => {
                 aboutElem.value = profile.getItem("about") || ""
+                _updateAutoTextArea(aboutElem);
             })
-
         })()
         </#noparse>
     </script>
