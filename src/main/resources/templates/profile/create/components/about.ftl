@@ -44,10 +44,6 @@
             const tabsContainer = document.querySelector('.tabs');
             const card = document.querySelector('#aboutCard');
             const currentTab = card.parentElement;
-            const saveAbout = () => {
-                profile.setItem("about", aboutElem.value)
-                profile.save()
-            };
 
             // setup auto-expanding textarea
             _setupAutoTextArea(aboutElem);
@@ -58,7 +54,8 @@
 
             // save about content on blur
             aboutElem.addEventListener("change", () => {
-                saveAbout();
+                Profile.setItem("about", aboutElem.value)
+                Profile.saveProfile()
             });
 
             // preview switch
@@ -81,12 +78,22 @@
                 // if we're not the active tab -> don't handle it
                 if (!currentTab.classList.contains('tab-active'))
                     return;
-                saveAbout()
+                Profile.setItem("about", aboutElem.value)
+                Profile.saveProfile()
+            })
+
+            // handle tab changed event
+            tabsContainer.addEventListener("tab-changed", () => {
+                // if we're hidden -> don't handle it
+                if (currentTab.classList.contains('tab-hidden'))
+                    return;
+                _updateAutoTextArea(aboutElem);
             })
 
             // load existing about text
             document.addEventListener("profile-loaded", () => {
-                aboutElem.value = profile.getItem("about") || ""
+                aboutElem.value = Profile.getItem("about") || ""
+                aboutCharCount.textContent = `${aboutElem.value.length}/5000`;
                 _updateAutoTextArea(aboutElem);
             })
         })()

@@ -45,14 +45,9 @@
             onTabSwitchBtn(tab, true)
         });
         <#noparse>
-        const profile = {
-            setItem: null,
-            getItem: null,
-            save: null,
-            clear: null,
-        };
-        document.addEventListener("DOMContentLoaded", () => {
-            const defaultProfile = {
+
+        class Profile {
+            static #defaultProfile = {
                 name: null,
                 contactEmail: null,
                 contactPhone: null,
@@ -69,17 +64,35 @@
                 activities: [],
                 projects: [],
                 experiences: [],
-            };
-            let profileData = JSON.parse(window.localStorage.getItem("profileData")) || Object.assign({}, defaultProfile);
-            profile.setItem = (key, value) => profileData[key] = value;
-            profile.getItem = (key) => profileData[key];
-            profile.save = () => window.localStorage.setItem("profileData", JSON.stringify(profileData));
-            profile.clear = () => {
-                window.localStorage.removeItem("profileData");
-                profileData = Object.assign({}, defaultProfile)
-            };
-            document.dispatchEvent(new Event('profile-loaded'));
-        });
+            }
+            static #profile;
+            static {
+                Profile.#profile = JSON.parse(window.localStorage.getItem("profile")) || Object.assign({}, this.#defaultProfile);
+                document.addEventListener("DOMContentLoaded", () => {
+                    document.dispatchEvent(new Event('profile-loaded'));
+                })
+            }
+
+            static setItem(key, value) {
+                if (Profile.#profile.hasOwnProperty(key)) {
+                    Profile.#profile[key] = value;
+                }
+            }
+
+            static getItem(key) {
+                return Profile.#profile[key];
+            }
+
+            static saveProfile() {
+                window.localStorage.setItem("profile", JSON.stringify(Profile.#profile));
+            }
+
+            static clearProfile() {
+                Profile.#profile = Object.assign({}, this.#defaultProfile);
+                window.localStorage.removeItem("profile");
+            }
+        }
+
         // TODO: add profile submit functionality
         </#noparse>
     </script>

@@ -61,9 +61,9 @@
                     return;
                 if (validate()) {
                     card.querySelectorAll("[data-profile-prop]").forEach(element => {
-                        profile.setItem(element.getAttribute("data-profile-prop"), element.value);
+                        Profile.setItem(element.getAttribute("data-profile-prop"), element.value);
                     });
-                    profile.save();
+                    Profile.saveProfile();
                 } else {
                     event.preventDefault();
                 }
@@ -72,7 +72,7 @@
             // when the profile data is loaded, fill the form
             document.addEventListener("profile-loaded", () => {
                 card.querySelectorAll("[data-profile-prop]").forEach(element => {
-                    element.value = profile.getItem(element.getAttribute("data-profile-prop")) || "";
+                    element.value = Profile.getItem(element.getAttribute("data-profile-prop")) || "";
                 })
             });
         })()

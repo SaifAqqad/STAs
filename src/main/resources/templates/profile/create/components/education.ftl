@@ -49,23 +49,20 @@
                 if (!currentTab.classList.contains("tab-active"))
                     return;
                 card.querySelectorAll("[data-profile-prop]").forEach(element => {
-                    profile.setItem(element.getAttribute("data-profile-prop"), element.value)
+                    Profile.setItem(element.getAttribute("data-profile-prop"), element.value)
                 });
-                profile.save();
+                courses.save();
+                Profile.saveProfile();
             });
 
             document.addEventListener("profile-loaded", () => {
                 card.querySelectorAll("[data-profile-prop]").forEach(element => {
-                    element.value = profile.getItem(element.getAttribute("data-profile-prop"))
+                    element.value = Profile.getItem(element.getAttribute("data-profile-prop"))
                 });
                 // TODO: add a new card for each course in the data
             })
 
         })()
-    </script>
-    <#-- Courses script -->
-    <script>
-
     </script>
 </#macro>
 
