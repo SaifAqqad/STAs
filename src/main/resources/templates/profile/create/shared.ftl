@@ -65,6 +65,29 @@
                 projects: [],
                 experiences: [],
             }
+            static Course = (class {
+                id = null;
+                name = null;
+                description = null;
+                studentComment = null;
+                publisher = null;
+                url = null;
+                imageUrl = null;
+                imageData = null;
+
+                constructor(obj = null) {
+                    if (obj === null)
+                        return;
+                    this.id = obj.id
+                    this.name = obj.name
+                    this.description = obj.description
+                    this.studentComment = obj.studentComment
+                    this.publisher = obj.publisher
+                    this.url = obj.url
+                    this.imageUrl = obj.imageUrl
+                    this.imageData = obj.imageData
+                }
+            });
             static #profile;
             static {
                 Profile.#profile = JSON.parse(window.localStorage.getItem("profile")) || Object.assign({}, this.#defaultProfile);
