@@ -14,12 +14,15 @@ import edu.asu.stas.lib.TokenGenerator;
 import edu.asu.stas.login.ResetPasswordForm;
 import edu.asu.stas.mail.MailService;
 import edu.asu.stas.registration.RegistrationForm;
+import edu.asu.stas.studentprofile.StudentProfile;
+import edu.asu.stas.studentprofile.StudentProfileService;
 import edu.asu.stas.user.account.AccountDetails;
 import edu.asu.stas.user.account.ChangePasswordForm;
 import edu.asu.stas.user.account.MfaSecret;
 import edu.asu.stas.user.token.UserToken;
 import edu.asu.stas.user.token.UserTokenRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.DataAccessException;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -47,6 +50,7 @@ import java.util.Objects;
 public class UserService implements UserDetailsService, OAuth2UserService<OAuth2UserRequest, OAuth2User> {
     private final UserRepository userRepository;
     private final UserTokenRepository userTokenRepository;
+    private final StudentProfileService studentProfileService;
     private final PasswordEncoder passwordEncoder;
     private final TokenGenerator tokenGenerator;
     private final MailService mailService;
@@ -61,6 +65,7 @@ public class UserService implements UserDetailsService, OAuth2UserService<OAuth2
     public UserService(
             UserRepository userRepository,
             UserTokenRepository userTokenRepository,
+            StudentProfileService studentProfileService,
             PasswordEncoder passwordEncoder,
             TokenGenerator tokenGenerator,
             MailService mailService,
@@ -72,6 +77,7 @@ public class UserService implements UserDetailsService, OAuth2UserService<OAuth2
     ) {
         this.userRepository = userRepository;
         this.userTokenRepository = userTokenRepository;
+        this.studentProfileService = studentProfileService;
         this.passwordEncoder = passwordEncoder;
         this.tokenGenerator = tokenGenerator;
         this.mailService = mailService;
@@ -86,10 +92,11 @@ public class UserService implements UserDetailsService, OAuth2UserService<OAuth2
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         if (Objects.nonNull(authentication) && authentication.isAuthenticated()) {
             Object principle = authentication.getPrincipal();
-            if (principle instanceof User user)
+            if (principle instanceof User user) {
                 return user;
-            else if (principle instanceof Connection connection)
+            } else if (principle instanceof Connection connection) {
                 return connection.getUser();
+            }
         }
         return null;
     }
@@ -131,12 +138,15 @@ public class UserService implements UserDetailsService, OAuth2UserService<OAuth2
     public void sendVerificationEmail(String email) {
         // check if there's a user with the email
         User user = findByEmail(email.toLowerCase());
-        if (Objects.isNull(user) || user.isEnabled())
+        if (Objects.isNull(user) || user.isEnabled()) {
             return;
+        }
         // check if the user has an existing verification token
-        UserToken existingToken = userTokenRepository.findByUserIdAndTypeEquals(user.getId(), UserToken.Type.VERIFICATION);
-        if (Objects.nonNull(existingToken))
+        UserToken existingToken = userTokenRepository.findByUserIdAndTypeEquals(user.getId(),
+                                                                                UserToken.Type.VERIFICATION);
+        if (Objects.nonNull(existingToken)) {
             userTokenRepository.delete(existingToken);
+        }
         // generate a new token
         UserToken newToken = new UserToken(
                 tokenGenerator.generateToken(64),
@@ -178,8 +188,9 @@ public class UserService implements UserDetailsService, OAuth2UserService<OAuth2
     public void resetUserPassword(ResetPasswordForm resetPasswordForm) {
         UserToken token = userTokenRepository.findByToken(resetPasswordForm.getResetToken());
         // if the token doesn't exist or is expired
-        if (Objects.isNull(token) || token.getExpiryDate().isBefore(LocalDateTime.now()))
+        if (Objects.isNull(token) || token.getExpiryDate().isBefore(LocalDateTime.now())) {
             return;
+        }
         User user = token.getUser();
         user.setPassword(passwordEncoder.encode(resetPasswordForm.getNewPassword()));
         userRepository.save(user);
@@ -196,9 +207,11 @@ public class UserService implements UserDetailsService, OAuth2UserService<OAuth2
         // if the user exists and is enabled
         if (Objects.nonNull(user) && user.isEnabled()) {
             // if an existing reset token exists -> remove it first
-            UserToken existingToken = userTokenRepository.findByUserIdAndTypeEquals(user.getId(), UserToken.Type.RESET_PASSWORD);
-            if (Objects.nonNull(existingToken))
+            UserToken existingToken = userTokenRepository.findByUserIdAndTypeEquals(user.getId(),
+                                                                                    UserToken.Type.RESET_PASSWORD);
+            if (Objects.nonNull(existingToken)) {
                 userTokenRepository.delete(existingToken);
+            }
             // generate the new token
             UserToken token = new UserToken();
             token.setUser(user);
@@ -224,22 +237,33 @@ public class UserService implements UserDetailsService, OAuth2UserService<OAuth2
         String serviceUserId = userProfile.getUniqueId();
 
         // check if there's an existing UserConnection
-        Connection existingConnection = connectionRepository.findByServiceNameAndServiceUserId(serviceName, serviceUserId);
+        Connection existingConnection = connectionRepository.findByServiceNameAndServiceUserId(serviceName,
+                                                                                               serviceUserId);
         if (existingConnection != null) {
             // if there is no authenticated user OR the existing userConnection belongs to the authenticated user
-            if (authedUser == null || authedUser.getId().equals(existingConnection.getUser().getId()))
+            if (authedUser == null || authedUser.getId().equals(existingConnection.getUser().getId())) {
                 return updateUserConnection(existingConnection, userRequest, userProfile);
-            else
-                throw new OAuth2AuthenticationException(new OAuth2Error(OAuth2ErrorCodes.ACCESS_DENIED, "This %s account is already connected to another user.".formatted(userRequest.getClientRegistration().getClientName()), ""));
+            } else {
+                throw new OAuth2AuthenticationException(new OAuth2Error(OAuth2ErrorCodes.ACCESS_DENIED,
+                                                                        "This %s account is already connected to another user.".formatted(
+                                                                                userRequest.getClientRegistration()
+                                                                                           .getClientName()),
+                                                                        ""));
+            }
         }
 
         // check if the user is already authenticated and tried to oauth
         if (authedUser != null) {
             // check if the user is already connected to another account from the service
-            if (Objects.nonNull(connectionRepository.findByUserAndServiceName(authedUser, serviceName)))
-                throw new OAuth2AuthenticationException(new OAuth2Error(OAuth2ErrorCodes.ACCESS_DENIED, "You can only connect a single %s account.".formatted(userRequest.getClientRegistration().getClientName()), ""));
-            else
+            if (Objects.nonNull(connectionRepository.findByUserAndServiceName(authedUser, serviceName))) {
+                throw new OAuth2AuthenticationException(new OAuth2Error(OAuth2ErrorCodes.ACCESS_DENIED,
+                                                                        "You can only connect a single %s account.".formatted(
+                                                                                userRequest.getClientRegistration()
+                                                                                           .getClientName()),
+                                                                        ""));
+            } else {
                 return createUserConnection(authedUser, userRequest, userProfile);
+            }
         }
 
         // check if there's an existing user with a matching email address
@@ -251,12 +275,18 @@ public class UserService implements UserDetailsService, OAuth2UserService<OAuth2
         return createUserConnection(existingUser, userRequest, userProfile);
     }
 
-    private Connection updateUserConnection(Connection connection, OAuth2UserRequest userRequest, OAuthProfile userProfile) {
+    private Connection updateUserConnection(
+            Connection connection,
+            OAuth2UserRequest userRequest,
+            OAuthProfile userProfile
+    ) {
         connection.setServiceToken(userRequest.getAccessToken().getTokenValue());
-        connection.setServiceRefreshToken((String) userRequest.getAdditionalParameters().get(OAuth2ParameterNames.REFRESH_TOKEN));
+        connection.setServiceRefreshToken((String) userRequest.getAdditionalParameters()
+                                                              .get(OAuth2ParameterNames.REFRESH_TOKEN));
         Instant expiresAt = userRequest.getAccessToken().getExpiresAt();
-        if (expiresAt != null && Duration.between(expiresAt, Instant.now()).abs().toSeconds() > 60L)
+        if (expiresAt != null && Duration.between(expiresAt, Instant.now()).abs().toSeconds() > 60L) {
             connection.setServiceTokenExpiry(LocalDateTime.ofInstant(expiresAt, ZoneOffset.UTC));
+        }
         connection.setServiceUserProfile(userProfile);
         return connectionRepository.save(connection);
     }
@@ -306,10 +336,10 @@ public class UserService implements UserDetailsService, OAuth2UserService<OAuth2
 
     private String generateQrUri(String secret, String label) {
         QrData data = qrDataFactory.newBuilder()
-                .label(label)
-                .secret(secret)
-                .issuer("STAs")
-                .build();
+                                   .label(label)
+                                   .secret(secret)
+                                   .issuer("STAs")
+                                   .build();
 
         try {
             return Utils.getDataUriForImage(
@@ -325,5 +355,19 @@ public class UserService implements UserDetailsService, OAuth2UserService<OAuth2
         user.setToken2FA(null);
         user.setUsing2FA(false);
         userRepository.save(user);
+    }
+
+    @Transactional
+    public boolean deleteUser(User user) {
+        StudentProfile profile = studentProfileService.getProfileByUser(user);
+        try {
+            if (Objects.nonNull(profile)) {
+                studentProfileService.deleteProfile(profile);
+            }
+            userRepository.delete(user);
+        } catch (DataAccessException exception) {
+            return false;
+        }
+        return true;
     }
 }

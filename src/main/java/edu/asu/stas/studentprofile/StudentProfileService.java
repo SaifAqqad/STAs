@@ -116,4 +116,8 @@ public class StudentProfileService {
         profile = studentProfileRepository.save(profile);
         return new ProfilePrivacy(profile.isPublic(), profile.getUuid(), profile.isIncludeInSearch());
     }
+
+    public void deleteProfile(@NonNull StudentProfile studentProfile) {
+        studentProfileRepository.delete(studentProfile);
+    }
 }

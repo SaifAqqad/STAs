@@ -8,7 +8,7 @@
 
 <@default.head title="Account information - STAs"/>
 
-<body>
+<body class="min-vh-100">
 <@default.navbar account="active"/>
 
 <div class="container-fluid container-lg my-3">

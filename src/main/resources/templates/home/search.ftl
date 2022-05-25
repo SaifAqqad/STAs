@@ -20,7 +20,7 @@
     </style>
 </@default.head>
 
-<body>
+<body class="min-vh-100">
 <@default.navbar search="active"/>
 <div class="container-fluid container-lg my-3 user-select-none animate__animated animate__fadeIn animate__faster">
     <div class="container mt-5">

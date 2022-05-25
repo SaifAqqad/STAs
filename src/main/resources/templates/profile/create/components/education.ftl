@@ -1,7 +1,9 @@
+<#import "../../../shared/default.ftl" as default/>
 <#import "../shared.ftl" as shared/>
+<#import "../../popup.ftl" as popups />
 
 <#macro card>
-    <div class="card rounded-3 user-select-none w-100">
+    <div id="educationCard" class="card rounded-3 user-select-none w-100">
         <div class="card-body">
             <h6 class="card-title mb-1">What about your education?</h6>
             <div class="form-floating mt-3">
@@ -38,6 +40,29 @@
 
 <#macro script>
     <script>
+        (() => {
+            const tabsContainer = document.querySelector('.tabs');
+            const card = document.querySelector('#educationCard');
+            const currentTab = card.parentElement;
 
+            tabsContainer.addEventListener("tab-changing", () => {
+                if (!currentTab.classList.contains("tab-active"))
+                    return;
+                card.querySelectorAll("[data-profile-prop]").forEach(element => {
+                    Profile.setItem(element.getAttribute("data-profile-prop"), element.value)
+                });
+                courses.save();
+                Profile.saveProfile();
+            });
+
+            document.addEventListener("profile-loaded", () => {
+                card.querySelectorAll("[data-profile-prop]").forEach(element => {
+                    element.value = Profile.getItem(element.getAttribute("data-profile-prop"))
+                });
+                // TODO: add a new card for each course in the data
+            })
+
+        })()
     </script>
 </#macro>
+

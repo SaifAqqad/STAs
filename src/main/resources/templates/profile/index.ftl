@@ -21,7 +21,7 @@
     </style>
 </@default.head>
 
-<body>
+<body class="min-vh-100">
 <@default.navbar profile=(isPublicView!false)?then("","active") marginBreak="xl"/>
 
 <div class="container-fluid container-xl my-3 animate__animated animate__fadeIn animate__faster">
@@ -351,7 +351,7 @@
         view.textElement = view.card.querySelector("#aboutContent")
         view.content = "${profile.about?js_string?no_esc}";
         // set initial content
-        view.textElement.innerHTML = marked.parse(view.content, {sanitizer: DOMPurify.sanitizeFn})
+        view.textElement.innerHTML = DOMPurify.sanitize(marked.parse(view.content));
 
         <@editOnly>
         const edit = {card: document.querySelector("#profileAbout div.card.edit-card")}

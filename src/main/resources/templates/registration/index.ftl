@@ -6,7 +6,7 @@
 <!DOCTYPE html>
 <html lang="en">
 <@default.head title="Create a new account - STAs"/>
-<body>
+<body class="min-vh-100">
 <@default.navbar/>
 
 <div class="container mt-3 animate__animated animate__fadeIn animate__faster">

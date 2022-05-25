@@ -7,11 +7,10 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.converter.FormHttpMessageConverter;
 import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
+import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
-import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.crypto.factory.PasswordEncoderFactories;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.oauth2.client.endpoint.DefaultAuthorizationCodeTokenResponseClient;
@@ -20,6 +19,9 @@ import org.springframework.security.oauth2.client.endpoint.OAuth2AuthorizationCo
 import org.springframework.security.oauth2.client.http.OAuth2ErrorResponseErrorHandler;
 import org.springframework.security.oauth2.core.OAuth2AuthenticationException;
 import org.springframework.security.oauth2.core.http.converter.OAuth2AccessTokenResponseHttpMessageConverter;
+import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.authentication.logout.HeaderWriterLogoutHandler;
+import org.springframework.security.web.header.writers.ClearSiteDataHeaderWriter;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.servlet.FlashMap;
 import org.springframework.web.servlet.FlashMapManager;
@@ -27,10 +29,12 @@ import org.springframework.web.servlet.support.SessionFlashMapManager;
 
 import java.util.Arrays;
 
+import static org.springframework.security.web.header.writers.ClearSiteDataHeaderWriter.Directive.*;
+
 @Configuration
 @EnableWebSecurity
 @EnableMethodSecurity
-public class SecurityConfig extends WebSecurityConfigurerAdapter {
+public class SecurityConfig {
     private final UserService userService;
 
     @Autowired
@@ -39,57 +43,82 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     }
 
     @Bean
-    public static PasswordEncoder passwordEncoder() {
-        return PasswordEncoderFactories.createDelegatingPasswordEncoder();
-    }
-
-    @Override
-    protected void configure(HttpSecurity http) throws Exception {
+    public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http
 
-                .authorizeRequests()
-                    .mvcMatchers("/profile/{uuid}", "/profile/{uuid}/**", "/profile/search").permitAll()
-                    .mvcMatchers("/account/**", "/connect/**", "/profile/**", "/connections/**").authenticated()
+            .authorizeHttpRequests(authorizeRequests ->
+                authorizeRequests
+                    .mvcMatchers(HttpMethod.POST, "/profile/**").authenticated()
                     .mvcMatchers(HttpMethod.POST, "/login").denyAll()
-                .and()
+                    .mvcMatchers(
+                        "/account/**",
+                        "/connect/**",
+                        "/profile/create/**",
+                        "/profile/privacy/**",
+                        "/profile/activities/**",
+                        "/profile/courses/**",
+                        "/profile/experiences/**",
+                        "/profile/projects/**",
+                        "/profile",
+                        "/connections/**").authenticated()
+                    .mvcMatchers(
+                        "/profile/{uuid}",
+                        "/profile/{uuid}/**",
+                        "/profile/search").permitAll()
 
-                .formLogin()
+            )
+
+            .formLogin(formLogin ->
+                formLogin
                     .loginPage("/login")
                     .usernameParameter("email")
-                .and()
+            )
 
-                .logout()
+            .logout(logout ->
+                logout
                     .logoutSuccessUrl("/")
                     .deleteCookies("JSESSIONID")
-                .and()
+                    .addLogoutHandler(new HeaderWriterLogoutHandler(
+                        new ClearSiteDataHeaderWriter(CACHE, COOKIES, STORAGE)
+                    ))
+            )
 
-                .oauth2Login()
+            .oauth2Login(oauth2 ->
+                oauth2
                     // set custom oauth login page
                     .loginPage("/login")
-                    // set the user service responsible for getting the appropriate user.principle
-                    .userInfoEndpoint()
-                        .userService(userService) // assign the userService to use for oauth2 users
-                    .and()
-                    // set authorization url to {baseUrl}/login/oauth/{registrationId}
-                    .authorizationEndpoint()
-                        .baseUri("/login/oauth/")
-                    .and()
-                    // set redirect url to {baseUrl}/oauth/redirect/{registrationId}
-                    .redirectionEndpoint()
-                        .baseUri("/oauth/redirect/*")
-                    .and()
 
-                    .tokenEndpoint()
-                        .accessTokenResponseClient(authorizationCodeTokenResponseClient())
-                    .and()
+                    .userInfoEndpoint(userInfo ->
+                        userInfo
+                            // set the user service responsible for getting the appropriate user.principle
+                            .userService(userService)
+                    )
+
+                    // set authorization url to {baseUrl}/login/oauth/{registrationId}
+                    .authorizationEndpoint(authorizationEndpoint ->
+                        authorizationEndpoint
+                            .baseUri("/login/oauth/")
+                    )
+
+                    // set redirect url to {baseUrl}/oauth/redirect/{registrationId}
+                    .redirectionEndpoint(redirectionEndpoint ->
+                        redirectionEndpoint
+                            .baseUri("/oauth/redirect/*")
+                    )
+
+                    .tokenEndpoint(tokenEndpoint ->
+                        tokenEndpoint
+                            .accessTokenResponseClient(authorizationCodeTokenResponseClient())
+                    )
 
                     .failureHandler((request, response, exception) -> {
                         if (exception != null) {
                             String errorMsg;
-                            if (exception instanceof OAuth2AuthenticationException e)
+                            if (exception instanceof OAuth2AuthenticationException e) {
                                 errorMsg = e.getError().getDescription();
-                            else
+                            } else {
                                 errorMsg = exception.getMessage();
+                            }
                             final FlashMap flashMap = new FlashMap();
                             flashMap.put("oauthError", errorMsg);
                             final FlashMapManager flashMapManager = new SessionFlashMapManager();
@@ -97,37 +126,33 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                         }
                         response.sendRedirect("/error");
                     })
-                .and()
+            )
         ;
+        return http.build();
     }
 
-    @Override
-    protected void configure(AuthenticationManagerBuilder auth) throws Exception {
-        auth
-                .userDetailsService(userService)
-                .passwordEncoder(passwordEncoder())
-        ;
+    @Bean
+    public static PasswordEncoder passwordEncoder() {
+        return PasswordEncoderFactories.createDelegatingPasswordEncoder();
     }
+
+    @Bean
+    public AuthenticationManager authenticationManager(AuthenticationConfiguration authenticationConfiguration) throws Exception {
+        return authenticationConfiguration.getAuthenticationManager();
+    }
+
 
     private OAuth2AccessTokenResponseClient<OAuth2AuthorizationCodeGrantRequest> authorizationCodeTokenResponseClient() {
-        OAuth2AccessTokenResponseHttpMessageConverter tokenResponseHttpMessageConverter =
-                new OAuth2AccessTokenResponseHttpMessageConverter();
-        tokenResponseHttpMessageConverter.setAccessTokenResponseConverter(new CustomAccessTokenResponseConverter());
+        var messageConverter = new OAuth2AccessTokenResponseHttpMessageConverter();
+        messageConverter.setAccessTokenResponseConverter(new CustomAccessTokenResponseConverter());
 
-        RestTemplate restTemplate = new RestTemplate(Arrays.asList(
-                new FormHttpMessageConverter(), tokenResponseHttpMessageConverter));
+        var restTemplate = new RestTemplate(Arrays.asList(new FormHttpMessageConverter(), messageConverter));
         restTemplate.setErrorHandler(new OAuth2ErrorResponseErrorHandler());
 
         DefaultAuthorizationCodeTokenResponseClient tokenResponseClient = new DefaultAuthorizationCodeTokenResponseClient();
         tokenResponseClient.setRestOperations(restTemplate);
 
         return tokenResponseClient;
-    }
-
-    @Bean
-    @Override
-    public AuthenticationManager authenticationManagerBean() throws Exception {
-        return super.authenticationManagerBean();
     }
 
 }

@@ -1,4 +1,4 @@
-function switchToTab(tabIndex) {
+function switchToTab(tabIndex, isFirstLoad = false) {
     const tabsContainer = document.querySelector('.tabs');
     const currentTab = {
         element: document.querySelector('.tab.tab-active'),
@@ -8,29 +8,38 @@ function switchToTab(tabIndex) {
         element: document.querySelector(`.tab[data-tab-index="${tabIndex}"]`),
         index: tabIndex,
     }
+
     // emit tab-changing event to check if the tab is allowed to be switched
-    const shouldChange = tabsContainer.dispatchEvent(new Event('tab-changing',{cancelable:true}));
-    if (!shouldChange || !currentTab.element || !nextTab.element || currentTab.index === tabIndex)
+    const shouldChange = tabsContainer.dispatchEvent(new Event('tab-changing', {cancelable: true}));
+    if (!shouldChange || !nextTab.element || (!currentTab.element && !isFirstLoad) || currentTab.index === tabIndex)
         return currentTab.index;
+
     // set correct animation
     if (currentTab.index < nextTab.index) {
         currentTab.animation = 'fadeOutLeft';
         nextTab.animation = 'fadeInRight';
-    } else {
+    } else if (currentTab.index) {
         currentTab.animation = 'fadeOutRight';
         nextTab.animation = 'fadeInLeft';
+    } else {
+        nextTab.animation = 'fadeIn'
     }
-    // animate then hide the current tab
-    currentTab.element.classList.remove('tab-active');
-    _animateCSS(currentTab.element, currentTab.animation).then(() => {
-        currentTab.element.classList.add('tab-hidden');
-    });
+
+    if (currentTab.element) {
+        // animate then hide the current tab
+        currentTab.element.classList.remove('tab-active');
+        _animateCSS(currentTab.element, currentTab.animation).then(() => {
+            currentTab.element.classList.add('tab-hidden');
+        });
+    }
+
     // show then animate the next tab
     nextTab.element.classList.remove('tab-hidden');
     _animateCSS(nextTab.element, nextTab.animation).then(() => {
         nextTab.element.classList.add('tab-active');
         updateTabsHeight();
     });
+
     // emit a new tab-changed event
     tabsContainer.dispatchEvent(new Event('tab-changed'));
     return nextTab.index;

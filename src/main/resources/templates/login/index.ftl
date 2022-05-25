@@ -8,7 +8,7 @@
 <@default.head title="Login - STAs">
 </@default.head>
 
-<body>
+<body class="min-vh-100">
 <@default.navbar login="active"/>
 <#assign loginError = authError?? && RequestParameters.error??/>
 

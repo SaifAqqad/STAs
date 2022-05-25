@@ -1,5 +1,7 @@
 package edu.asu.stas.user;
 
+import edu.asu.stas.connnection.Connection;
+import edu.asu.stas.user.token.UserToken;
 import lombok.*;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.security.core.GrantedAuthority;
@@ -43,6 +45,12 @@ public class User implements UserDetails {
     private boolean isUsing2FA;
 
     private boolean isEnabled;
+
+    @OneToMany(mappedBy = "user", orphanRemoval = true)
+    private List<UserToken> tokens;
+
+    @OneToMany(mappedBy = "user", orphanRemoval = true)
+    private List<Connection> connections;
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
