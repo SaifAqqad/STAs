@@ -8,7 +8,7 @@
 <@default.head title="2-Factor authentication - STAs">
 </@default.head>
 
-<body>
+<body class="min-vh-100">
 <@default.navbar login="active"/>
 
 <div class="container animate__animated animate__fadeIn animate__faster">

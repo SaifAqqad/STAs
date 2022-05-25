@@ -7,7 +7,7 @@
 
 <@default.head title="Student achievements - STAs"/>
 
-<body>
+<body class="min-vh-100">
 <@default.navbar home="active"/>
 
 

@@ -6,7 +6,7 @@
 <!DOCTYPE html>
 <html lang="en">
 <@default.head title="Reset your password - STAs"/>
-<body>
+<body class="min-vh-100">
 <@default.navbar />
 
 <div class="container mt-3 animate__animated animate__fadeIn animate__faster">

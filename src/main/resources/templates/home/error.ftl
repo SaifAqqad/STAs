@@ -5,7 +5,7 @@
 <!DOCTYPE html>
 <html lang="en">
 <@default.head title="Error - STAs"/>
-<body>
+<body class="min-vh-100">
 <@default.navbar />
 <div class="container">
     <div class="d-flex align-items-center justify-content-center mt-5 mx-md-5 mx-lg-5-5 animate__animated animate__fadeIn animate__faster">

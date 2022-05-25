@@ -14,7 +14,7 @@
     <link rel="stylesheet" href="<@spring.url "/css/tabs.css"/>"/>
 </@default.head>
 
-<body>
+<body class="min-vh-100">
 <@default.navbar profile="active"/>
 
 <div class="container-fluid container-sm mb-3 animate__animated animate__fadeIn animate__faster">

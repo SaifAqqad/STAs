@@ -21,7 +21,7 @@
     </style>
 </@default.head>
 
-<body>
+<body class="min-vh-100">
 <@default.navbar profile=(isPublicView!false)?then("","active") marginBreak="xl"/>
 
 <div class="container-fluid container-xl my-3 animate__animated animate__fadeIn animate__faster">
