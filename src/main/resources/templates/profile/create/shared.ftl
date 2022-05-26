@@ -18,6 +18,29 @@
     </div>
 </#macro>
 
+<#macro emptyContainer>
+    <div class="w-100 min-h-100 d-flex justify-content-center align-items-center empty-container">
+        <span class="fs-6 text-muted user-select-none">You haven't added anything yet</span>
+    </div>
+</#macro>
+
+<#macro itemCard cardType>
+    <div class="card card-border-grey w-100 h-100 user-select-none btn bg-hover ${cardType}">
+        <div class="d-flex flex-column flex-sm-row align-content-between align-items-center w-100">
+            <div class="h-75 ${cardType}-image-container">
+                <img src="" class="w-100 h-100 rounded-1 img-w-limit object-fit-contain ${cardType}-image"
+                     alt="${cardType}-image">
+            </div>
+            <div class="card-body d-flex flex-column flex-grow-1 w-100">
+                <h5 class="card-title user-select-none ${cardType}-title"></h5>
+                <h6 class="card-subtitle mb-2 text-muted ${cardType}-subtitle"></h6>
+                <p class="card-text limit-lines-4 ${cardType}-text"></p>
+                <#nested/>
+            </div>
+        </div>
+    </div>
+</#macro>
+
 <#macro scripts>
     <script src="<@spring.url "/js/tabs.js"/>"></script>
     <script>
@@ -65,6 +88,28 @@
                 projects: [],
                 experiences: [],
             }
+            static Course = (class {
+                id = null;
+                name = null;
+                description = null;
+                studentComment = null;
+                publisher = null;
+                url = null;
+                imageUri = null;
+
+                constructor(obj = null) {
+                    if (obj === null)
+                        return;
+                    this.id = obj.id
+                    this.name = obj.name
+                    this.description = obj.description
+                    this.studentComment = obj.studentComment
+                    this.publisher = obj.publisher
+                    this.url = obj.url
+                    this.imageUri = obj.imageUri
+                    this.imageData = obj.imageData
+                }
+            });
             static #profile;
             static {
                 Profile.#profile = JSON.parse(window.localStorage.getItem("profile")) || Object.assign({}, this.#defaultProfile);

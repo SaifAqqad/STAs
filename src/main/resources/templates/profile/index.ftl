@@ -8,11 +8,6 @@
 
 <@default.head title="${profile.name} - STAs">
     <style>
-        .scrollable-box {
-            max-height: 600px;
-            overflow: auto;
-        }
-
         <#--noinspection CssUnusedSymbol-->
         .card-body .card-body {
             padding-left: 0.5rem;
