@@ -132,6 +132,24 @@ pre {
     background-color: #FAFAFA;
 }
 
+.btn-style-group {
+    font-size: .875rem;
+    font-weight: 400;
+    line-height: 1.5;
+    color: #495057;
+    background-color: #f8f9fa !important;
+    border: 1px solid #ced4da !important;
+}
+
+.btn-style-group:hover {
+    background-color: #ecedee !important;
+}
+
+.scrollable-box {
+    max-height: 600px;
+    overflow: auto;
+}
+
 .smooth {
     transition: color .15s ease-in-out, background-color .15s ease-in-out, border-color .15s ease-in-out, box-shadow .15s ease-in-out;
 }
@@ -172,6 +190,7 @@ pre {
     -webkit-line-clamp: 4;
     -webkit-box-orient: vertical;
     overflow: hidden;
+    word-break: break-word;
 }
 
 .limit-lines-8 {
@@ -180,6 +199,7 @@ pre {
     -webkit-line-clamp: 8;
     -webkit-box-orient: vertical;
     overflow: hidden;
+    word-break: break-word;
 }
 
 .card-border-grey {
@@ -279,7 +299,7 @@ pre {
     color: inherit !important;
 }
 
-.md-content code{
+.md-content code {
     -webkit-user-select: text !important;
     -moz-user-select: text !important;
     user-select: text !important;

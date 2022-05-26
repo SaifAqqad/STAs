@@ -96,7 +96,6 @@
                 publisher = null;
                 url = null;
                 imageUri = null;
-                imageData = null;
 
                 constructor(obj = null) {
                     if (obj === null)

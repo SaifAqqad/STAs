@@ -76,11 +76,16 @@
                         <div class="mt-3">
                             <label class="form-label text-muted" for="">Course image</label>
                             <div class="card w-100 mt-3">
-                                <img id="" class="card-img-top" alt="" src="">
+                                <img data-course-prop="imagePreview" class="card-img-top" alt="" src="">
                                 <div class="card-body">
                                     <input type="hidden" data-course-prop="imageUri" id=""/>
-                                    <input class="form-control" type="file" accept="image/*" name="imageUriData" id=""
-                                           placeholder="Course image"/>
+                                    <div class="input-group">
+                                        <input class="form-control" type="file" accept="image/png, image/jpeg"
+                                               data-course-prop="imageUriData" placeholder="Course image"/>
+                                        <button id="imageClearButton" type="button" class="btn btn-style-group">Clear
+                                        </button>
+                                    </div>
+                                    <sub class="text-danger fw-bold text-center" id="imageUriDataFeedback"></sub>
                                 </div>
                             </div>
                         </div>
@@ -88,7 +93,7 @@
                 </div>
                 <div class="d-block modal-footer clearfix">
                     <div class="float-start">
-                        <button id="courseDeleteButton" class="btn btn-danger d-none">Delete</button>
+                        <button id="courseDeleteButton" class="btn btn-outline-danger d-none">Delete</button>
                     </div>
                     <div class="float-end">
                         <button id="courseSaveButton" class="btn btn-primary">Save</button>
@@ -192,33 +197,34 @@
             hide: null,
         };
         (() => {
-            const popupElem = document.getElementById("coursePopup");
-            const popupTitleElem = popupElem.querySelector(".modal-title");
-            const popup = new bootstrap.Modal(popupElem);
-            const form = document.getElementById("courseForm");
-            const addBtn = document.getElementById("addCourseButton");
-            const saveBtn = document.getElementById("courseSaveButton");
-            const deleteBtn = document.getElementById("courseDeleteButton");
-            const applyCourseToForm = (courseObj) => {
-                form.querySelector("[data-course-prop='id']").value = courseObj.id;
-                form.querySelector("[data-course-prop='name']").value = courseObj.name;
-                form.querySelector("[data-course-prop='description']").value = courseObj.description;
-                form.querySelector("[data-course-prop='studentComment']").value = courseObj.studentComment;
-                form.querySelector("[data-course-prop='publisher']").value = courseObj.publisher;
-                form.querySelector("[data-course-prop='url']").value = courseObj.url;
-                form.querySelector("[data-course-prop='imageUri']").value = courseObj.imageUri;
-            }
-            const applyFormToCourse = (courseObj) => {
-                courseObj.name = form.querySelector("[data-course-prop='name']").value;
-                courseObj.description = form.querySelector("[data-course-prop='description']").value;
-                courseObj.studentComment = form.querySelector("[data-course-prop='studentComment']").value;
-                courseObj.publisher = form.querySelector("[data-course-prop='publisher']").value;
-                courseObj.url = form.querySelector("[data-course-prop='url']").value;
-                courseObj.imageUri = form.querySelector("[data-course-prop='imageUri']").value;
-                courseObj.imageData = form.querySelector("[name='imageUriData']").files[0];
-            };
+            const popupElem = document.getElementById("coursePopup"),
+                popupTitleElem = popupElem.querySelector(".modal-title"), popup = new bootstrap.Modal(popupElem),
+                form = document.getElementById("courseForm"),
+                imageData = form.querySelector("[data-course-prop='imageUriData']"),
+                imageDataFeedback = form.querySelector("#imageUriDataFeedback"),
+                imagePreview = form.querySelector("[data-course-prop='imagePreview']"),
+                imageClearButton = form.querySelector("#imageClearButton"),
+                imageUri = form.querySelector("[data-course-prop='imageUri']"),
+                addBtn = document.getElementById("addCourseButton"),
+                saveBtn = document.getElementById("courseSaveButton"),
+                deleteBtn = document.getElementById("courseDeleteButton"),
+                applyCourseToForm = (courseObj) => {
+                    form.querySelectorAll("[data-course-prop]").forEach(elem => {
+                        elem.value = courseObj[elem.getAttribute("data-course-prop")];
+                    });
+                    imageUri.value = courseObj.imageUri;
+                    imagePreview.src = courseObj.imageUri || "";
+                    imageData.value = "";
+                },
+                applyFormToCourse = (courseObj) => {
+                    courseObj.name = form.querySelector("[data-course-prop='name']").value.trim();
+                    courseObj.description = form.querySelector("[data-course-prop='description']").value.trim();
+                    courseObj.studentComment = form.querySelector("[data-course-prop='studentComment']").value.trim();
+                    courseObj.publisher = form.querySelector("[data-course-prop='publisher']").value.trim();
+                    courseObj.url = form.querySelector("[data-course-prop='url']").value.trim();
+                    courseObj.imageUri = imageUri.value;
+                };
 
-            // scope abuse incoming :D
             coursePopup.show = (courseObj = null, courseCard = null) => {
                 let saveBtnListener = null;
                 let deleteBtnListener = null;
@@ -294,10 +300,41 @@
                 });
             });
 
+            // when an image is selected, encode it and show it in the image preview
+            imageData.addEventListener("change", (e) => {
+                const file = e.target.files[0];
+                if (file.size <= 1048576) {
+                    const reader = new FileReader();
+                    reader.onload = (e) => {
+                        imagePreview.src = e.target.result;
+                        imageUri.value = e.target.result;
+                    };
+                    reader.readAsDataURL(file);
+                } else {
+                    imageData.value = "";
+                    imageData.classList.add("is-invalid");
+                    imageDataFeedback.textContent = "Image size must be less than 1MB";
+                    imageData.addEventListener("change", (e) => {
+                        imageData.classList.remove("is-invalid");
+                        imageDataFeedback.textContent = "";
+                    }, {once: true});
+                }
+            });
+
+            imageClearButton.addEventListener("click", () => {
+                imagePreview.src = "";
+                imageUri.value = "";
+                imageData.value = "";
+                imageData.classList.remove("is-invalid");
+                imageDataFeedback.textContent = "";
+            });
+
             // when hiding the popup, clear the form
             // and reset the text-area's height
             popupElem.addEventListener("hidden.bs.modal", () => {
                 _clearForm(form);
+                imageData.classList.remove("is-invalid");
+                imageDataFeedback.textContent = "";
                 form.querySelectorAll("textarea").forEach((textArea) => {
                     textArea.style.height = 4 + "rem";
                 });
@@ -330,27 +367,30 @@
             const card = document.querySelector('#educationCard');
             const currentTab = card.parentElement;
 
+            // handle tab changing event
             tabsContainer.addEventListener("tab-changing", () => {
                 if (!currentTab.classList.contains("tab-active"))
                     return;
+                // update profile data
                 card.querySelectorAll("[data-profile-prop]").forEach(element => {
                     Profile.setItem(element.getAttribute("data-profile-prop"), element.value)
                 });
                 Profile.saveProfile();
             });
 
+            // handle existing profile data
             document.addEventListener("profile-loaded", () => {
+                // update form inputs
                 card.querySelectorAll("[data-profile-prop]").forEach(element => {
                     element.value = Profile.getItem(element.getAttribute("data-profile-prop"))
                 });
-
+                // create a course card for each existing course
                 const coursesArray = Profile.getItem("courses");
                 coursesArray.forEach(course => {
-                    const card = courseCards.add(course);
-                    card.addEventListener("click", () => coursePopup.show(course, card));
-                })
+                    const courseCard = courseCards.add(course);
+                    courseCard.addEventListener("click", () => coursePopup.show(course, courseCard));
+                });
             })
-
         })()
     </script>
 </#macro>
