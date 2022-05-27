@@ -4,6 +4,9 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.SerializationFeature;
+import com.fasterxml.jackson.databind.util.StdDateFormat;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 
@@ -13,13 +16,19 @@ import java.util.Map;
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class JsonHelper {
     private static final ObjectMapper defaultObjectMapper = new ObjectMapper();
-    private static final TypeReference<Map<String, Object>> MAP_STRING_TYPE_REFERENCE = new TypeReference<>() {};
+    public static final TypeReference<Map<String, Object>> MAP_STRING_TYPE_REFERENCE = new TypeReference<>() {
+    };
 
     static {
-        defaultObjectMapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
+        defaultObjectMapper.registerModule(new JavaTimeModule())
+                           .setDateFormat(new StdDateFormat())
+                           .disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS)
+                           .configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
     }
 
-    public static ObjectMapper objectMapper(){return JsonHelper.defaultObjectMapper;}
+    public static ObjectMapper objectMapper() {
+        return JsonHelper.defaultObjectMapper;
+    }
 
     public static Map<String, Object> jsonToMap(String json) {
         try {
