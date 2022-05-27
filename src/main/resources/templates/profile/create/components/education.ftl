@@ -76,12 +76,12 @@
                         <div class="mt-3">
                             <label class="form-label text-muted" for="">Course image</label>
                             <div class="card w-100 mt-3">
-                                <img data-course-prop="imagePreview" class="card-img-top" alt="" src="">
+                                <img id="imagePreview" class="card-img-top" alt="" src="">
                                 <div class="card-body">
                                     <input type="hidden" data-course-prop="imageUri" id=""/>
                                     <div class="input-group">
                                         <input class="form-control" type="file" accept="image/png, image/jpeg"
-                                               data-course-prop="imageUriData" placeholder="Course image"/>
+                                               id="imageUriData" placeholder="Course image"/>
                                         <button id="imageClearButton" type="button" class="btn btn-style-group">Clear
                                         </button>
                                     </div>
@@ -200,9 +200,9 @@
             const popupElem = document.getElementById("coursePopup"),
                 popupTitleElem = popupElem.querySelector(".modal-title"), popup = new bootstrap.Modal(popupElem),
                 form = document.getElementById("courseForm"),
-                imageData = form.querySelector("[data-course-prop='imageUriData']"),
+                imageData = form.querySelector("#imageUriData"),
                 imageDataFeedback = form.querySelector("#imageUriDataFeedback"),
-                imagePreview = form.querySelector("[data-course-prop='imagePreview']"),
+                imagePreview = form.querySelector("#imagePreview"),
                 imageClearButton = form.querySelector("#imageClearButton"),
                 imageUri = form.querySelector("[data-course-prop='imageUri']"),
                 addBtn = document.getElementById("addCourseButton"),
@@ -212,7 +212,6 @@
                     form.querySelectorAll("[data-course-prop]").forEach(elem => {
                         elem.value = courseObj[elem.getAttribute("data-course-prop")];
                     });
-                    imageUri.value = courseObj.imageUri;
                     imagePreview.src = courseObj.imageUri || "";
                     imageData.value = "";
                 },
