@@ -1,8 +1,10 @@
 function _clearForm(form) {
-    form.querySelectorAll("input:not([name='_csrf'])").forEach((elem) => elem.value = "")
-    form.querySelectorAll("textarea").forEach((elem) => elem.value = "")
-    form.querySelectorAll("img").forEach((elem) => elem.src = "")
-    form.querySelectorAll("select").forEach((elem) => elem.innerHTML = "")
+    form.reset()
+    form.querySelectorAll("img").forEach((elem) => elem.src = "");
+    form.querySelectorAll("select").forEach((elem) => elem.innerHTML = "");
+    const csrfInput = form.querySelector("input[type='hidden'][name='_csrf']");
+    if (csrfInput)
+        csrfInput.value = document.querySelector("meta[name='_csrf']").getAttribute("content");
 }
 
 function _applyJsonToForm(formId, json) {

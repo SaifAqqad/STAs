@@ -649,6 +649,7 @@
                     options.modal.show(null)
                 })
             }
+            // setup form's image previews
             if (options.imageInputSelector) {
                 document.querySelectorAll(options.imageInputSelector).forEach(input => {
                     input.addEventListener("change", event => {
@@ -663,6 +664,18 @@
                     })
                 })
             }
+            // setup form validation event listeners
+            options.formElement.querySelectorAll("input,select,textarea").forEach(elem => {
+                elem.addEventListener("invalid", () => {
+                    elem.classList.add("is-invalid");
+                    _animateCSS(elem, "headShake");
+                    elem.addEventListener("input", () => elem.classList.remove("is-invalid"), {once: true});
+                })
+            });
+            options.modalElement.addEventListener('hide.bs.modal', () => {
+                options.formElement.querySelectorAll("input,select,textarea").forEach(elem => elem.classList.remove("is-invalid"))
+            });
+            // setup overview popup
             if (options.overviewPopup) {
                 document.querySelectorAll(options.overviewPopup.elementSelector).forEach(element => {
                     element.addEventListener("click", async () => {

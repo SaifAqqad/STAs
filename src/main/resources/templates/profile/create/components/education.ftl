@@ -36,7 +36,7 @@
     </div>
 </#macro>
 
-<#macro script>
+<#macro popup>
     <div class="modal fade" id="coursePopup" tabindex="-1">
         <div class="modal-dialog modal-dialog-centered">
             <div class="modal-content">
@@ -103,8 +103,11 @@
             </div>
         </div>
     </div>
-    <script>
+</#macro>
 
+<#macro script>
+    <@popup/>
+    <script>
         // courses data functions
         const courses = {
             add: null,
@@ -339,11 +342,11 @@
                 });
             });
 
-            // add an 'invalid' event listener to the form's inputs
-            // to remove the invalid state on the inputs
+            // style and animate the form's inputs when they're invalid
             form.querySelectorAll("input").forEach(input => {
                 input.addEventListener("invalid", () => {
                     input.classList.add("is-invalid");
+                    _animateCSS(input, "headShake");
                     input.addEventListener("input", () => {
                         input.classList.remove("is-invalid");
                     }, {once: true});
