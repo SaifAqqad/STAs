@@ -48,7 +48,7 @@
                     <div id="courseParser">
                         <div class="mx-2">
                             <div class="card-text mb-2">Autofill using the course's link</div>
-                            <div class="input-group">
+                            <div class="input-group flex-nowrap">
                                 <div class="flex-grow-1 form-floating">
                                     <input class="form-control rounded-0 rounded-start" required type="url"
                                            id="courseParserInput"
@@ -185,11 +185,10 @@
                 card.querySelector(".course-card-subtitle").innerText = courseObj.publisher;
                 card.querySelector(".course-card-text").innerText = courseObj.studentComment || courseObj.description;
 
-                const cardImage = card.querySelector(".course-card-image");
                 if (courseObj.imageUri)
-                    cardImage.src = courseObj.imageUri;
+                    card.querySelector(".course-card-image").src = courseObj.imageUri;
                 else // remove the image element if there's no image
-                    cardImage.remove();
+                    card.querySelector(".course-card-image-container").remove();
 
                 // create the card's column and add it to the cardsContainer
                 const col = document.createElement("div");
@@ -246,10 +245,10 @@
                     this.setLoading = (isLoading) => {
                         if (isLoading) {
                             this.button.querySelector(".btn-spinner").classList.remove("d-none");
-                            this.button.querySelector(".btn-text").innerText = "Fetching...";
+                            this.button.querySelector(".btn-text").classList.add("d-none");
                         } else {
                             this.button.querySelector(".btn-spinner").classList.add("d-none");
-                            this.button.querySelector(".btn-text").innerText = "Fetch";
+                            this.button.querySelector(".btn-text").classList.remove("d-none");
                         }
                     };
                 },

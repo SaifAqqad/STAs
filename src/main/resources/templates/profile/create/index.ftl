@@ -33,7 +33,7 @@
             <button data-tab-index="3" class="p-2 me-1 border rounded-circle"></button>
         </div>
 
-        <div class="tabs w-100 w-sm-75 w-xl-50">
+        <div class="tabs w-100 w-lg-75 w-xl-50">
             <div class="tab tab-hidden animate__fast w-100" data-tab-index="0"><@contactInfo.card/></div>
             <div class="tab tab-hidden animate__fast w-100" data-tab-index="1"><@about.card/></div>
             <div class="tab tab-hidden animate__fast w-100" data-tab-index="2"><@education.card/></div>
