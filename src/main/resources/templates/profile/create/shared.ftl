@@ -26,10 +26,10 @@
 
 <#macro itemCard cardType>
     <div class="card card-border-grey w-100 h-100 user-select-none btn bg-hover ${cardType}">
-        <div class="d-flex flex-column flex-sm-row align-content-between align-items-center w-100">
+        <div class="d-flex flex-column flex-md-row align-content-between align-items-center w-100">
             <div class="h-75 ${cardType}-image-container">
-                <img src="" class="w-100 h-100 rounded-1 img-w-limit object-fit-contain ${cardType}-image"
-                     alt="${cardType}-image">
+                <img src="" class="w-100 h-100 rounded-1 img-w-limit object-fit-cover ${cardType}-image"
+                     alt="${cardType}-image" style="aspect-ratio: 1;">
             </div>
             <div class="card-body d-flex flex-column flex-grow-1 w-100">
                 <h5 class="card-title user-select-none ${cardType}-title"></h5>

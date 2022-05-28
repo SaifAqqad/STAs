@@ -45,7 +45,28 @@
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body">
-                    <form id="courseForm" method="post">
+                    <div id="courseParser">
+                        <div class="mx-2">
+                            <div class="card-text mb-2">Autofill using the course's link</div>
+                            <div class="input-group">
+                                <div class="flex-grow-1 form-floating">
+                                    <input class="form-control rounded-0 rounded-start" required type="url"
+                                           id="courseParserInput"
+                                           placeholder="Link">
+                                    <label for="courseParserInput">Link</label>
+                                </div>
+                                <button type="button" class="btn btn-primary" id="courseParserButton">
+                                    <span class="btn-spinner spinner-border spinner-border-sm d-none" role="status"
+                                          aria-hidden="true"></span>
+                                    <span class="btn-text">Fetch</span>
+                                </button>
+                            </div>
+                            <sub class="text-danger fw-bold" id="courseParserFeedback"></sub>
+                        </div>
+                        <hr>
+                        <div class="card-text mb-2 mx-2">Or manually enter the course's information</div>
+                    </div>
+                    <form class="mx-2" id="courseForm" method="post">
                         <@default.csrfInput/>
                         <input type="hidden" data-course-prop="id" id=""/>
                         <div class="form-floating">
@@ -82,7 +103,8 @@
                                     <div class="input-group">
                                         <input class="form-control" type="file" accept="image/png, image/jpeg"
                                                id="courseImageFile" placeholder="Course image"/>
-                                        <button id="courseImageClearButton" type="button" class="btn btn-style-group">Clear
+                                        <button id="courseImageClearButton" type="button" class="btn btn-style-group">
+                                            Clear
                                         </button>
                                     </div>
                                     <sub class="text-danger fw-bold text-center" id="courseImageFileFeedback"></sub>
@@ -205,6 +227,32 @@
                     this.title = this.element.querySelector(".modal-title");
                     this.object = new bootstrap.Modal(this.element);
                 },
+                courseParser = new function () {
+                    this.group = document.getElementById("courseParser");
+                    this.input = this.group.querySelector("#courseParserInput");
+                    this.button = this.group.querySelector("#courseParserButton");
+                    this.feedback = this.group.querySelector("#courseParserFeedback");
+                    this.endpoint = "/courses";
+                    this.isRunning = false;
+                    this.setValidity = (validity, message = null) => {
+                        if (validity) {
+                            this.input.classList.remove("is-invalid");
+                            this.feedback.innerText = "";
+                        } else {
+                            this.input.classList.add("is-invalid");
+                            this.feedback.innerText = message;
+                        }
+                    };
+                    this.setLoading = (isLoading) => {
+                        if (isLoading) {
+                            this.button.querySelector(".btn-spinner").classList.remove("d-none");
+                            this.button.querySelector(".btn-text").innerText = "Fetching...";
+                        } else {
+                            this.button.querySelector(".btn-spinner").classList.add("d-none");
+                            this.button.querySelector(".btn-text").innerText = "Fetch";
+                        }
+                    };
+                },
                 form = new function () {
                     this.element = document.getElementById("courseForm");
                     this.image = {
@@ -224,14 +272,16 @@
                 saveBtn = document.getElementById("courseSaveButton"),
                 deleteBtn = document.getElementById("courseDeleteButton"),
                 applyCourseToForm = (courseObj) => {
-                    form.name.value = courseObj.name;
-                    form.description.value = courseObj.description;
-                    form.studentComment.value = courseObj.studentComment;
-                    form.publisher.value = courseObj.publisher;
-                    form.url.value = courseObj.url;
-                    form.image.uriElem.value = courseObj.imageUri;
+                    form.name.value = courseObj.name || "";
+                    form.description.value = courseObj.description || "";
+                    form.studentComment.value = courseObj.studentComment || "";
+                    form.publisher.value = courseObj.publisher || "";
+                    form.url.value = courseObj.url || "";
+                    form.image.uriElem.value = courseObj.imageUri || "";
                     form.image.previewElem.src = courseObj.imageUri || "";
                     form.image.fileElem.value = "";
+                    _updateAutoTextArea(form.description);
+                    _updateAutoTextArea(form.studentComment);
                 },
                 applyFormToCourse = (courseObj) => {
                     courseObj.name = form.name.value.trim();
@@ -248,6 +298,8 @@
                 _clearForm(form.element)
                 if (courseObj && courseCard) { // we're editing an existing course
                     popup.title.textContent = "Edit course";
+                    // hide course parser group
+                    courseParser.group.classList.add("d-none");
                     applyCourseToForm(courseObj);
                     // set delete event listener
                     deleteBtnListener = () => {
@@ -273,6 +325,8 @@
                     };
                 } else { // we're adding a new course
                     popup.title.textContent = "Add a new course";
+                    // show course parser group
+                    courseParser.group.classList.remove("d-none");
                     // hide delete button
                     deleteBtn.classList.add("d-none");
                     // set save event listener
@@ -350,6 +404,8 @@
             // and reset the text-area's height
             popup.element.addEventListener("hidden.bs.modal", () => {
                 _clearForm(form.element);
+                courseParser.setValidity(true);
+                courseParser.setLoading(false);
                 form.image.fileElem.classList.remove("is-invalid");
                 form.image.fileFeedback.textContent = "";
                 form.element.querySelectorAll("textarea").forEach((textArea) => {
@@ -374,6 +430,47 @@
             });
 
             addBtn.addEventListener("click", () => coursePopup.show());
+
+            // set up course parser functionality
+            courseParser.button.addEventListener("click", async () => {
+                if (courseParser.isRunning)
+                    return;
+                courseParser.isRunning = true;
+                // check if input is valid
+                if (courseParser.input.reportValidity()) {
+                    courseParser.setValidity(true);
+                    courseParser.setLoading(true);
+                    // fetch the course data
+                    const response = await fetch(courseParser.endpoint + "?" + new URLSearchParams({
+                        url: courseParser.input.value,
+                    }));
+                    courseParser.setLoading(false);
+                    // check if response is valid
+                    if (response.ok) {
+                        const course = await response.json();
+                        // check for a courseParser error
+                        if (course.error) {
+                            courseParser.setValidity(false, course.error);
+                        } else {
+                            // empty the url input and apply the course data
+                            courseParser.input.value = "";
+                            applyCourseToForm({
+                                name: course["name"],
+                                description: course["description"],
+                                imageUri: course["imageUrl"],
+                                url: course["url"],
+                                publisher: course["publisher"],
+                            });
+                        }
+                    } else {
+                        courseParser.setValidity(false, "An error has occurred");
+                    }
+                } else {
+                    courseParser.setValidity(false, "Please enter a valid URL");
+                    await _animateCSS(courseParser.input, "headShake");
+                }
+                courseParser.isRunning = false;
+            });
         })()
     </script>
 
