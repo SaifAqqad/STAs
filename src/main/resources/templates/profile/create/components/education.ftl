@@ -36,7 +36,7 @@
     </div>
 </#macro>
 
-<#macro script>
+<#macro popup>
     <div class="modal fade" id="coursePopup" tabindex="-1">
         <div class="modal-dialog modal-dialog-centered">
             <div class="modal-content">
@@ -45,7 +45,28 @@
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body">
-                    <form id="courseForm" method="post">
+                    <div id="courseParser">
+                        <div class="mx-2">
+                            <div class="card-text mb-2">Autofill using the course's link</div>
+                            <div class="input-group">
+                                <div class="flex-grow-1 form-floating">
+                                    <input class="form-control rounded-0 rounded-start" required type="url"
+                                           id="courseParserInput"
+                                           placeholder="Link">
+                                    <label for="courseParserInput">Link</label>
+                                </div>
+                                <button type="button" class="btn btn-primary" id="courseParserButton">
+                                    <span class="btn-spinner spinner-border spinner-border-sm d-none" role="status"
+                                          aria-hidden="true"></span>
+                                    <span class="btn-text">Fetch</span>
+                                </button>
+                            </div>
+                            <sub class="text-danger fw-bold" id="courseParserFeedback"></sub>
+                        </div>
+                        <hr>
+                        <div class="card-text mb-2 mx-2">Or manually enter the course's information</div>
+                    </div>
+                    <form class="mx-2" id="courseForm" method="post">
                         <@default.csrfInput/>
                         <input type="hidden" data-course-prop="id" id=""/>
                         <div class="form-floating">
@@ -74,18 +95,19 @@
                             <label class="form-label text-muted" for="courseUrl">Link</label>
                         </div>
                         <div class="mt-3">
-                            <label class="form-label text-muted" for="">Course image</label>
+                            <label class="form-label text-muted" for="courseImageFile">Course image</label>
                             <div class="card w-100 mt-3">
-                                <img data-course-prop="imagePreview" class="card-img-top" alt="" src="">
+                                <img id="courseImagePreview" class="card-img-top" alt="" src="">
                                 <div class="card-body">
                                     <input type="hidden" data-course-prop="imageUri" id=""/>
                                     <div class="input-group">
                                         <input class="form-control" type="file" accept="image/png, image/jpeg"
-                                               data-course-prop="imageUriData" placeholder="Course image"/>
-                                        <button id="imageClearButton" type="button" class="btn btn-style-group">Clear
+                                               id="courseImageFile" placeholder="Course image"/>
+                                        <button id="courseImageClearButton" type="button" class="btn btn-style-group">
+                                            Clear
                                         </button>
                                     </div>
-                                    <sub class="text-danger fw-bold text-center" id="imageUriDataFeedback"></sub>
+                                    <sub class="text-danger fw-bold text-center" id="courseImageFileFeedback"></sub>
                                 </div>
                             </div>
                         </div>
@@ -103,8 +125,11 @@
             </div>
         </div>
     </div>
-    <script>
+</#macro>
 
+<#macro script>
+    <@popup/>
+    <script>
         // courses data functions
         const courses = {
             add: null,
@@ -197,53 +222,97 @@
             hide: null,
         };
         (() => {
-            const popupElem = document.getElementById("coursePopup"),
-                popupTitleElem = popupElem.querySelector(".modal-title"), popup = new bootstrap.Modal(popupElem),
-                form = document.getElementById("courseForm"),
-                imageData = form.querySelector("[data-course-prop='imageUriData']"),
-                imageDataFeedback = form.querySelector("#imageUriDataFeedback"),
-                imagePreview = form.querySelector("[data-course-prop='imagePreview']"),
-                imageClearButton = form.querySelector("#imageClearButton"),
-                imageUri = form.querySelector("[data-course-prop='imageUri']"),
+            const popup = new function () {
+                    this.element = document.getElementById("coursePopup");
+                    this.title = this.element.querySelector(".modal-title");
+                    this.object = new bootstrap.Modal(this.element);
+                },
+                courseParser = new function () {
+                    this.group = document.getElementById("courseParser");
+                    this.input = this.group.querySelector("#courseParserInput");
+                    this.button = this.group.querySelector("#courseParserButton");
+                    this.feedback = this.group.querySelector("#courseParserFeedback");
+                    this.endpoint = "/courses";
+                    this.isRunning = false;
+                    this.setValidity = (validity, message = null) => {
+                        if (validity) {
+                            this.input.classList.remove("is-invalid");
+                            this.feedback.innerText = "";
+                        } else {
+                            this.input.classList.add("is-invalid");
+                            this.feedback.innerText = message;
+                        }
+                    };
+                    this.setLoading = (isLoading) => {
+                        if (isLoading) {
+                            this.button.querySelector(".btn-spinner").classList.remove("d-none");
+                            this.button.querySelector(".btn-text").innerText = "Fetching...";
+                        } else {
+                            this.button.querySelector(".btn-spinner").classList.add("d-none");
+                            this.button.querySelector(".btn-text").innerText = "Fetch";
+                        }
+                    };
+                },
+                form = new function () {
+                    this.element = document.getElementById("courseForm");
+                    this.image = {
+                        fileElem: this.element.querySelector("#courseImageFile"),
+                        fileFeedback: this.element.querySelector("#courseImageFileFeedback"),
+                        previewElem: this.element.querySelector("#courseImagePreview"),
+                        clearButton: this.element.querySelector("#courseImageClearButton"),
+                        uriElem: this.element.querySelector("[data-course-prop='imageUri']"),
+                    }
+                    this.name = this.element.querySelector("[data-course-prop='name']");
+                    this.description = this.element.querySelector("[data-course-prop='description']");
+                    this.studentComment = this.element.querySelector("[data-course-prop='studentComment']");
+                    this.publisher = this.element.querySelector("[data-course-prop='publisher']");
+                    this.url = this.element.querySelector("[data-course-prop='url']");
+                },
                 addBtn = document.getElementById("addCourseButton"),
                 saveBtn = document.getElementById("courseSaveButton"),
                 deleteBtn = document.getElementById("courseDeleteButton"),
                 applyCourseToForm = (courseObj) => {
-                    form.querySelectorAll("[data-course-prop]").forEach(elem => {
-                        elem.value = courseObj[elem.getAttribute("data-course-prop")];
-                    });
-                    imageUri.value = courseObj.imageUri;
-                    imagePreview.src = courseObj.imageUri || "";
-                    imageData.value = "";
+                    form.name.value = courseObj.name || "";
+                    form.description.value = courseObj.description || "";
+                    form.studentComment.value = courseObj.studentComment || "";
+                    form.publisher.value = courseObj.publisher || "";
+                    form.url.value = courseObj.url || "";
+                    form.image.uriElem.value = courseObj.imageUri || "";
+                    form.image.previewElem.src = courseObj.imageUri || "";
+                    form.image.fileElem.value = "";
+                    _updateAutoTextArea(form.description);
+                    _updateAutoTextArea(form.studentComment);
                 },
                 applyFormToCourse = (courseObj) => {
-                    courseObj.name = form.querySelector("[data-course-prop='name']").value.trim();
-                    courseObj.description = form.querySelector("[data-course-prop='description']").value.trim();
-                    courseObj.studentComment = form.querySelector("[data-course-prop='studentComment']").value.trim();
-                    courseObj.publisher = form.querySelector("[data-course-prop='publisher']").value.trim();
-                    courseObj.url = form.querySelector("[data-course-prop='url']").value.trim();
-                    courseObj.imageUri = imageUri.value;
+                    courseObj.name = form.name.value.trim();
+                    courseObj.description = form.description.value.trim();
+                    courseObj.studentComment = form.studentComment.value.trim();
+                    courseObj.publisher = form.publisher.value.trim();
+                    courseObj.url = form.url.value.trim();
+                    courseObj.imageUri = form.image.uriElem.value;
                 };
 
             coursePopup.show = (courseObj = null, courseCard = null) => {
                 let saveBtnListener = null;
                 let deleteBtnListener = null;
-                _clearForm(form)
+                _clearForm(form.element)
                 if (courseObj && courseCard) { // we're editing an existing course
-                    popupTitleElem.textContent = "Edit course";
+                    popup.title.textContent = "Edit course";
+                    // hide course parser group
+                    courseParser.group.classList.add("d-none");
                     applyCourseToForm(courseObj);
                     // set delete event listener
                     deleteBtnListener = () => {
                         courseCards.remove(courseCard);
                         courses.remove(courseObj.id);
-                        popup.hide();
+                        popup.object.hide();
                     };
                     // show delete button and register event listener
                     deleteBtn.classList.remove("d-none");
                     deleteBtn.addEventListener("click", deleteBtnListener);
                     // set save event listener
                     saveBtnListener = () => {
-                        if (form.reportValidity()) {
+                        if (form.element.reportValidity()) {
                             applyFormToCourse(courseObj);
                             courseObj = courses.update(courseObj);
                             courseCards.remove(courseCard);
@@ -251,16 +320,18 @@
                             courseCard.addEventListener("click", () => {
                                 coursePopup.show(courseObj, courseCard);
                             });
-                            popup.hide();
+                            popup.object.hide();
                         }
                     };
                 } else { // we're adding a new course
-                    popupTitleElem.textContent = "Add a new course";
+                    popup.title.textContent = "Add a new course";
+                    // show course parser group
+                    courseParser.group.classList.remove("d-none");
                     // hide delete button
                     deleteBtn.classList.add("d-none");
                     // set save event listener
                     saveBtnListener = () => {
-                        if (form.reportValidity()) {
+                        if (form.element.reportValidity()) {
                             courseObj = new Profile.Course();
                             applyFormToCourse(courseObj);
                             courseObj = courses.add(courseObj);
@@ -268,31 +339,31 @@
                             card.addEventListener("click", () => {
                                 coursePopup.show(courseObj, card);
                             });
-                            popup.hide();
+                            popup.object.hide();
                         }
                     };
                 }
                 // register save button event listener
                 saveBtn.addEventListener("click", saveBtnListener);
                 // remove buttons event listeners when hiding popup
-                popupElem.addEventListener("hidden.bs.modal", () => {
+                popup.element.addEventListener("hidden.bs.modal", () => {
                     if (saveBtnListener)
                         saveBtn.removeEventListener("click", saveBtnListener);
                     if (deleteBtnListener)
                         deleteBtn.removeEventListener("click", deleteBtnListener);
 
                 }, {once: true});
-                popup.show(courseCard);
+                popup.object.show(courseCard);
 
             };
 
             coursePopup.hide = () => {
-                popup.hide();
+                popup.object.hide();
             };
 
             // when showing the popup, animate the text-area's height
-            popupElem.addEventListener("shown.bs.modal", () => {
-                form.querySelectorAll("textarea").forEach(async (textArea) => {
+            popup.element.addEventListener("shown.bs.modal", () => {
+                form.element.querySelectorAll("textarea").forEach(async (textArea) => {
                     textArea.classList.add("height-transition")
                     _updateAutoTextArea(textArea)
                     await _sleep(200)
@@ -301,50 +372,52 @@
             });
 
             // when an image is selected, encode it and show it in the image preview
-            imageData.addEventListener("change", (e) => {
+            form.image.fileElem.addEventListener("change", (e) => {
                 const file = e.target.files[0];
                 if (file.size <= 1048576) {
                     const reader = new FileReader();
                     reader.onload = (e) => {
-                        imagePreview.src = e.target.result;
-                        imageUri.value = e.target.result;
+                        form.image.previewElem.src = e.target.result;
+                        form.image.uriElem.value = e.target.result;
                     };
                     reader.readAsDataURL(file);
-                } else {
-                    imageData.value = "";
-                    imageData.classList.add("is-invalid");
-                    imageDataFeedback.textContent = "Image size must be less than 1MB";
-                    imageData.addEventListener("change", (e) => {
-                        imageData.classList.remove("is-invalid");
-                        imageDataFeedback.textContent = "";
+                } else { // image size is too large
+                    form.image.fileFeedback.textContent = "Image size must be less than 1MB";
+                    form.image.fileElem.value = "";
+                    form.image.fileElem.classList.add("is-invalid");
+                    form.image.fileElem.addEventListener("change", (e) => {
+                        form.image.fileElem.classList.remove("is-invalid");
+                        form.image.fileFeedback.textContent = "";
                     }, {once: true});
                 }
             });
 
-            imageClearButton.addEventListener("click", () => {
-                imagePreview.src = "";
-                imageUri.value = "";
-                imageData.value = "";
-                imageData.classList.remove("is-invalid");
-                imageDataFeedback.textContent = "";
+            form.image.clearButton.addEventListener("click", () => {
+                form.image.previewElem.src = "";
+                form.image.uriElem.value = "";
+                form.image.fileElem.value = "";
+                form.image.fileElem.classList.remove("is-invalid");
+                form.image.fileFeedback.textContent = "";
             });
 
             // when hiding the popup, clear the form
             // and reset the text-area's height
-            popupElem.addEventListener("hidden.bs.modal", () => {
-                _clearForm(form);
-                imageData.classList.remove("is-invalid");
-                imageDataFeedback.textContent = "";
-                form.querySelectorAll("textarea").forEach((textArea) => {
+            popup.element.addEventListener("hidden.bs.modal", () => {
+                _clearForm(form.element);
+                courseParser.setValidity(true);
+                courseParser.setLoading(false);
+                form.image.fileElem.classList.remove("is-invalid");
+                form.image.fileFeedback.textContent = "";
+                form.element.querySelectorAll("textarea").forEach((textArea) => {
                     textArea.style.height = 4 + "rem";
                 });
             });
 
-            // add an 'invalid' event listener to the form's inputs
-            // to remove the invalid state on the inputs
-            form.querySelectorAll("input").forEach(input => {
+            // style and animate the form's inputs when they're invalid
+            form.element.querySelectorAll("input").forEach(input => {
                 input.addEventListener("invalid", () => {
                     input.classList.add("is-invalid");
+                    _animateCSS(input, "headShake");
                     input.addEventListener("input", () => {
                         input.classList.remove("is-invalid");
                     }, {once: true});
@@ -352,11 +425,52 @@
             });
 
             // set up auto-expanding text-areas
-            form.querySelectorAll("textarea").forEach(textarea => {
+            form.element.querySelectorAll("textarea").forEach(textarea => {
                 _setupAutoTextArea(textarea);
             });
 
             addBtn.addEventListener("click", () => coursePopup.show());
+
+            // set up course parser functionality
+            courseParser.button.addEventListener("click", async () => {
+                if (courseParser.isRunning)
+                    return;
+                courseParser.isRunning = true;
+                // check if input is valid
+                if (courseParser.input.reportValidity()) {
+                    courseParser.setValidity(true);
+                    courseParser.setLoading(true);
+                    // fetch the course data
+                    const response = await fetch(courseParser.endpoint + "?" + new URLSearchParams({
+                        url: courseParser.input.value,
+                    }));
+                    courseParser.setLoading(false);
+                    // check if response is valid
+                    if (response.ok) {
+                        const course = await response.json();
+                        // check for a courseParser error
+                        if (course.error) {
+                            courseParser.setValidity(false, course.error);
+                        } else {
+                            // empty the url input and apply the course data
+                            courseParser.input.value = "";
+                            applyCourseToForm({
+                                name: course["name"],
+                                description: course["description"],
+                                imageUri: course["imageUrl"],
+                                url: course["url"],
+                                publisher: course["publisher"],
+                            });
+                        }
+                    } else {
+                        courseParser.setValidity(false, "An error has occurred");
+                    }
+                } else {
+                    courseParser.setValidity(false, "Please enter a valid URL");
+                    await _animateCSS(courseParser.input, "headShake");
+                }
+                courseParser.isRunning = false;
+            });
         })()
     </script>
 
