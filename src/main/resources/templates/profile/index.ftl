@@ -535,8 +535,8 @@ overviewPopupDetails={
          <#if id?has_content>data-id="${id}"</#if>>
         <div class="d-flex flex-column flex-sm-row align-content-between align-items-center w-100">
             <#if img?has_content>
-                <div class="h-75">
-                    <img src="${img}" class="w-100 h-100 rounded-1 img-w-limit object-fit-contain" alt="${img_alt}">
+                <div class="h-100 w-50 d-flex align-items-center">
+                    <img src="${img}" class="w-100 rounded-3 aspect-ratio-1 object-fit-cover" alt="${img_alt}">
                 </div>
             </#if>
             <div class="card-body d-flex flex-column flex-grow-1 w-100">

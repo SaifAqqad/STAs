@@ -184,6 +184,10 @@ pre {
     object-fit: cover;
 }
 
+.aspect-ratio-1 {
+    aspect-ratio: 1;
+}
+
 .limit-lines-4 {
     line-clamp: 4;
     display: -webkit-box;
