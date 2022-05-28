@@ -4,6 +4,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.PropertyNamingStrategies;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.databind.util.StdDateFormat;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
@@ -19,14 +20,16 @@ public class JsonHelper {
     public static final TypeReference<Map<String, Object>> MAP_STRING_TYPE_REFERENCE = new TypeReference<>() {
     };
 
-    static {
-        defaultObjectMapper.registerModule(new JavaTimeModule())
-                           .setDateFormat(new StdDateFormat())
-                           .disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS)
-                           .configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
+    private static void setDefaultConfig() {
+        JsonHelper.defaultObjectMapper.registerModule(new JavaTimeModule())
+                                      .setDateFormat(new StdDateFormat())
+                                      .disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS)
+                                      .setPropertyNamingStrategy(PropertyNamingStrategies.LOWER_CAMEL_CASE)
+                                      .configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
     }
 
     public static ObjectMapper objectMapper() {
+        setDefaultConfig();
         return JsonHelper.defaultObjectMapper;
     }
 
