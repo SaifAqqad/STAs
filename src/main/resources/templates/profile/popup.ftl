@@ -398,45 +398,139 @@
             }
         </script>
         <@formPopup addPopup=addPopup detailsPopup=detailsPopup popupId=popupId formId=formId uriBase=uriBase isMultiPartForm=true imageInputId=["${formId}_imageUri", "${formId}_imageUriData"] applyMethod="_applyCourseToForm">
-            <input type="hidden" name="id" id="${formId}_id"/>
-            <div class="form-floating">
-                <input class="form-control" required type="text" name="name" id="${formId}_name"
-                       placeholder="Name">
-                <label class="form-label text-muted" for="${formId}_name">Name</label>
+            <div id="courseParser" class="add-only">
+                <div class="mx-2">
+                    <div class="card-text mb-2">Autofill using the course's link</div>
+                    <div class="input-group flex-nowrap">
+                        <div class="flex-grow-1 form-floating">
+                            <input class="form-control rounded-0 rounded-start" type="url"
+                                   id="courseParserInput"
+                                   placeholder="Link">
+                            <label for="courseParserInput">Link</label>
+                        </div>
+                        <button type="button" class="btn btn-primary" id="courseParserButton">
+                                    <span class="btn-spinner spinner-border spinner-border-sm d-none" role="status"
+                                          aria-hidden="true"></span>
+                            <span class="btn-text">Fetch</span>
+                        </button>
+                    </div>
+                    <sub class="text-danger fw-bold" id="courseParserFeedback"></sub>
+                </div>
+                <hr>
+                <div class="card-text mb-2 mx-2">Or manually enter the course's information</div>
             </div>
-            <div class="form-floating mt-3 fix-floating-label">
-            <textarea class="form-control" name="description" id="${formId}_description"
-                      placeholder="Description"></textarea>
-                <label class="form-label text-muted" for="${formId}_description">Description</label>
-            </div>
-            <div class="form-floating mt-3 fix-floating-label">
-            <textarea class="form-control" name="studentComment" id="${formId}_studentComment"
-                      placeholder="Comment"></textarea>
-                <label class="form-label text-muted" for="${formId}_studentComment">Reflection</label>
-            </div>
-            <div class="form-floating mt-3">
-                <input class="form-control" type="text" name="publisher" id="${formId}_publisher"
-                       placeholder="Publisher">
-                <label class="form-label text-muted" for="${formId}_publisher">Publisher</label>
-            </div>
-            <div class="form-floating mt-3">
-                <input class="form-control" type="url" name="url" id="${formId}_url"
-                       placeholder="Link">
-                <label class="form-label text-muted" for="${formId}_url">Link</label>
-            </div>
-            <div class="mt-3">
-                <label class="form-label text-muted" for="${formId}_imageUriData">Course image</label>
-                <div class="card w-100 mt-3">
-                    <img id="${formId}_image" class="card-img-top" alt="" src="">
-                    <div class="card-body">
-                        <input type="hidden" name="imageUri" id="${formId}_imageUri"/>
-                        <input class="form-control" type="file" accept="image/*" name="imageUriData"
-                               id="${formId}_imageUriData"
-                               placeholder="Course image"/>
+            <div class="mx-2">
+                <input type="hidden" name="id" id="${formId}_id"/>
+                <div class="form-floating">
+                    <input class="form-control" required type="text" name="name" id="${formId}_name"
+                           placeholder="Name">
+                    <label class="form-label text-muted" for="${formId}_name">Name</label>
+                </div>
+                <div class="form-floating mt-3 fix-floating-label">
+                    <textarea class="form-control" name="description" id="${formId}_description"
+                              placeholder="Description"></textarea>
+                    <label class="form-label text-muted" for="${formId}_description">Description</label>
+                </div>
+                <div class="form-floating mt-3 fix-floating-label">
+                    <textarea class="form-control" name="studentComment" id="${formId}_studentComment"
+                              placeholder="Comment"></textarea>
+                    <label class="form-label text-muted" for="${formId}_studentComment">Reflection</label>
+                </div>
+                <div class="form-floating mt-3">
+                    <input class="form-control" type="text" name="publisher" id="${formId}_publisher"
+                           placeholder="Publisher">
+                    <label class="form-label text-muted" for="${formId}_publisher">Publisher</label>
+                </div>
+                <div class="form-floating mt-3">
+                    <input class="form-control" type="url" name="url" id="${formId}_url"
+                           placeholder="Link">
+                    <label class="form-label text-muted" for="${formId}_url">Link</label>
+                </div>
+                <div class="mt-3">
+                    <label class="form-label text-muted" for="${formId}_imageUriData">Course image</label>
+                    <div class="card w-100 mt-3">
+                        <img id="${formId}_image" class="card-img-top" alt="" src="">
+                        <div class="card-body">
+                            <input type="hidden" name="imageUri" id="${formId}_imageUri"/>
+                            <input class="form-control" type="file" accept="image/*" name="imageUriData"
+                                   id="${formId}_imageUriData"
+                                   placeholder="Course image"/>
+                        </div>
                     </div>
                 </div>
             </div>
         </@formPopup>
+        <script>
+            <#-- courseParser setup -->
+            (() => {
+                const formId = "${formId}";
+                const courseParser = new function () {
+                    this.group = document.getElementById("courseParser");
+                    this.input = this.group.querySelector("#courseParserInput");
+                    this.button = this.group.querySelector("#courseParserButton");
+                    this.feedback = this.group.querySelector("#courseParserFeedback");
+                    this.endpoint = "/courses";
+                    this.isRunning = false;
+                    this.setValidity = (validity, message = null) => {
+                        if (validity) {
+                            this.input.classList.remove("is-invalid");
+                            this.feedback.innerText = "";
+                        } else {
+                            this.input.classList.add("is-invalid");
+                            this.feedback.innerText = message;
+                        }
+                    };
+                    this.setLoading = (isLoading) => {
+                        if (isLoading) {
+                            this.button.querySelector(".btn-spinner").classList.remove("d-none");
+                            this.button.querySelector(".btn-text").classList.add("d-none");
+                        } else {
+                            this.button.querySelector(".btn-spinner").classList.add("d-none");
+                            this.button.querySelector(".btn-text").classList.remove("d-none");
+                        }
+                    };
+                };
+                courseParser.button.addEventListener("click", async () => {
+                    if (courseParser.isRunning)
+                        return;
+                    courseParser.isRunning = true;
+                    // check if input is valid
+                    if (courseParser.input.reportValidity()) {
+                        courseParser.setValidity(true);
+                        courseParser.setLoading(true);
+                        // fetch the course data
+                        const response = await fetch(courseParser.endpoint + "?" + new URLSearchParams({
+                            url: courseParser.input.value,
+                        }));
+                        courseParser.setLoading(false);
+                        // check if response is valid
+                        if (response.ok) {
+                            const course = await response.json();
+                            // check for a courseParser error
+                            if (course.error) {
+                                courseParser.setValidity(false, course.error);
+                            } else {
+                                // empty the url input and apply the course data
+                                courseParser.input.value = "";
+                                _applyCourseToForm(formId, {
+                                    name: course["name"],
+                                    description: course["description"],
+                                    imageUri: course["imageUrl"],
+                                    url: course["url"],
+                                    publisher: course["publisher"],
+                                });
+                            }
+                        } else {
+                            courseParser.setValidity(false, "An error has occurred");
+                        }
+                    } else {
+                        courseParser.setValidity(false, "Please enter a valid URL");
+                        await _animateCSS(courseParser.input, "headShake");
+                    }
+                    courseParser.isRunning = false;
+                });
+            })()
+        </script>
     </#if>
 </#macro>
 
@@ -602,6 +696,8 @@
             if (options.detailsPopup) {
                 document.querySelectorAll(options.detailsPopup.elementSelector).forEach(element => {
                     element.addEventListener("click", async () => {
+                        // hide add-only elements
+                        options.formElement.querySelectorAll(".add-only").forEach(e => e.classList.add("d-none"));
                         // clear the form
                         _clearForm(options.formElement)
                         // get the data id from the element
@@ -638,6 +734,8 @@
             // set up 'add new' popup
             if (options.addPopup) {
                 options.addPopup.addButton.addEventListener("click", () => {
+                    // show add-only elements
+                    options.formElement.querySelectorAll(".add-only").forEach(e => e.classList.remove("d-none"));
                     // clear the form
                     _clearForm(options.formElement)
                     // set the popup title
