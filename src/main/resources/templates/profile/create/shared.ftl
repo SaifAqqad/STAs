@@ -97,19 +97,16 @@
                 url = null;
                 imageUri = null;
 
+
                 constructor(obj = null) {
                     if (obj === null)
                         return;
-                    this.id = obj.id
-                    this.name = obj.name
-                    this.description = obj.description
-                    this.studentComment = obj.studentComment
-                    this.publisher = obj.publisher
-                    this.url = obj.url
-                    this.imageUri = obj.imageUri
-                    this.imageData = obj.imageData
+                    for (const prop in this) {
+                        this[prop] = obj[prop] || this[prop];
+                    }
                 }
             });
+
             static #profile;
             static {
                 Profile.#profile = JSON.parse(window.localStorage.getItem("profile")) || Object.assign({}, this.#defaultProfile);
@@ -137,8 +134,61 @@
                 window.localStorage.removeItem("profile");
             }
         }
-
         // TODO: add profile submit functionality
         </#noparse>
+
+        class itemCardFactory {
+            #emptyContainerTemplate = <@default.jsStr><@emptyContainer/></@default.jsStr>;
+            #cardTemplate;
+            #containerId;
+            #container;
+
+            constructor(containerId, cardTemplate) {
+                this.#containerId = containerId;
+                this.#cardTemplate = cardTemplate;
+                this.#container = document.getElementById(containerId);
+            }
+
+            // creates a card for the passed object and appends it to the container
+            add(obj) {
+                // remove empty container
+                if (this.#container.querySelector(".empty-container"))
+                    this.#container.replaceChildren();
+
+                // create card element and apply courseObj data
+                const template = document.createElement("template");
+                template.innerHTML = this.#cardTemplate;
+                const card = template.content.firstElementChild;
+                card.querySelector(".${cardType}-card-title").innerText = obj["title"];
+                card.querySelector(".${cardType}-card-subtitle").innerText = obj["subtitle"];
+                card.querySelector(".${cardType}-card-text").innerText = obj["text"];
+
+                if (obj["imageUri"])
+                    card.querySelector(".${cardType}-card-image").src = obj["imageUri"];
+                else // remove the image element if there's no image
+                    card.querySelector(".${cardType}-card-image-container").remove();
+
+                // create the card's column and append it to the container
+                const col = document.createElement("div");
+                col.classList.add("col", "mb-3");
+                col.appendChild(card);
+                this.#container.appendChild(col);
+                return this.#container.lastElementChild.firstElementChild;
+            }
+
+            // removes a course card from the container
+            remove(card){
+                // remove the card's column
+                const col = card.parentElement;
+                col.remove();
+                // insert empty container if there are no cards
+                if (this.#container.querySelectorAll(".col").length === 0) {
+                    const template = document.createElement("template");
+                    template.innerHTML = this.#emptyContainerTemplate;
+                    const emptyContainer = template.content.firstElementChild;
+                    this.#container.appendChild(emptyContainer);
+                }
+            }
+        }
     </script>
 </#macro>
