@@ -1,5 +1,6 @@
 function _clearForm(form) {
-    form.reset()
+    form.reset();
+    form.querySelectorAll("input[type='hidden']").forEach(elem => elem.value = "");
     form.querySelectorAll("img").forEach((elem) => elem.src = "");
     form.querySelectorAll("select").forEach((elem) => elem.innerHTML = "");
     const csrfInput = form.querySelector("input[type='hidden'][name='_csrf']");
