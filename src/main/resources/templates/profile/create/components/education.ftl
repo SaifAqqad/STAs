@@ -160,7 +160,7 @@
             };
         });
 
-        const courseCards = new itemCardFactory("coursesContainer", <@default.jsStr><@shared.itemCard cardType="course-card"/></@default.jsStr>);
+        const courseCards = new itemCardFactory("coursesContainer", "course", <@default.jsStr><@shared.itemCard cardType="course"/></@default.jsStr>);
 
         // courses popup functions
         const coursePopup = {
@@ -237,7 +237,12 @@
                             applyFormToCourse(courseObj);
                             courseObj = courses.update(courseObj);
                             courseCards.remove(courseCard);
-                            courseCard = courseCards.add(courseObj);
+                            courseCard = courseCards.add({
+                                title: courseObj.name,
+                                subtitle: courseObj.publisher,
+                                text: courseObj.studentComment || courseObj.description,
+                                imageUri: courseObj.imageUri,
+                            });
                             courseCard.addEventListener("click", () => {
                                 coursePopup.show(courseObj, courseCard);
                             });
@@ -256,7 +261,12 @@
                             courseObj = new Profile.Course();
                             applyFormToCourse(courseObj);
                             courseObj = courses.add(courseObj);
-                            const card = courseCards.add(courseObj);
+                            const card = courseCards.add({
+                                title: courseObj.name,
+                                subtitle: courseObj.publisher,
+                                text: courseObj.studentComment || courseObj.description,
+                                imageUri: courseObj.imageUri,
+                            });
                             card.addEventListener("click", () => {
                                 coursePopup.show(courseObj, card);
                             });
@@ -381,7 +391,12 @@
                 // create a course card for each existing course
                 const coursesArray = Profile.getItem("courses");
                 coursesArray.forEach(course => {
-                    const courseCard = courseCards.add(course);
+                    const courseCard = courseCards.add({
+                        title: course.name,
+                        subtitle: course.publisher,
+                        text: course.studentComment || course.description,
+                        imageUri: course.imageUri,
+                    });
                     courseCard.addEventListener("click", () => coursePopup.show(course, courseCard));
                 });
             })

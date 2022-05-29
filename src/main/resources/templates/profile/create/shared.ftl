@@ -25,16 +25,16 @@
 </#macro>
 
 <#macro itemCard cardType>
-    <div class="card card-border-grey w-100 h-100 user-select-none btn bg-hover ${cardType}">
+    <div class="card card-border-grey w-100 h-100 user-select-none btn bg-hover ${cardType}-card">
         <div class="d-flex flex-column flex-md-row align-content-between align-items-center w-100">
-            <div class="h-100 w-50 ${cardType}-image-container d-flex align-items-center">
-                <img src="" class="w-100 rounded-3 shadow-lg object-fit-cover aspect-ratio-1 ${cardType}-image"
-                     alt="${cardType}-image">
+            <div class="h-100 w-50 ${cardType}-card-image-container d-flex align-items-center">
+                <img src="" class="w-100 rounded-3 shadow-lg object-fit-cover aspect-ratio-1 ${cardType}-card-image"
+                     alt="${cardType}-card-image">
             </div>
             <div class="card-body d-flex flex-column flex-grow-1 w-100">
-                <h5 class="card-title user-select-none ${cardType}-title"></h5>
-                <h6 class="card-subtitle mb-2 text-muted ${cardType}-subtitle"></h6>
-                <p class="card-text limit-lines-4 ${cardType}-text"></p>
+                <h5 class="card-title user-select-none ${cardType}-card-title"></h5>
+                <h6 class="card-subtitle mb-2 text-muted ${cardType}-card-subtitle"></h6>
+                <p class="card-text limit-lines-4 ${cardType}-card-text"></p>
                 <#nested/>
             </div>
         </div>
@@ -134,18 +134,21 @@
                 window.localStorage.removeItem("profile");
             }
         }
+
         // TODO: add profile submit functionality
         </#noparse>
 
         class itemCardFactory {
             #emptyContainerTemplate = <@default.jsStr><@emptyContainer/></@default.jsStr>;
             #cardTemplate;
+            #cardType;
             #containerId;
             #container;
 
-            constructor(containerId, cardTemplate) {
+            constructor(containerId, cardType, cardTemplate) {
                 this.#containerId = containerId;
                 this.#cardTemplate = cardTemplate;
+                this.#cardType = cardType;
                 this.#container = document.getElementById(containerId);
             }
 
@@ -159,14 +162,14 @@
                 const template = document.createElement("template");
                 template.innerHTML = this.#cardTemplate;
                 const card = template.content.firstElementChild;
-                card.querySelector(".${cardType}-card-title").innerText = obj["title"];
-                card.querySelector(".${cardType}-card-subtitle").innerText = obj["subtitle"];
-                card.querySelector(".${cardType}-card-text").innerText = obj["text"];
+                card.querySelector("." + this.#cardType + "-card-title").innerText = obj["title"] || "";
+                card.querySelector("." + this.#cardType + "-card-subtitle").innerText = obj["subtitle"] || "";
+                card.querySelector("." + this.#cardType + "-card-text").innerText = obj["text"] || "";
 
                 if (obj["imageUri"])
-                    card.querySelector(".${cardType}-card-image").src = obj["imageUri"];
+                    card.querySelector("." + this.#cardType + "-card-image").src = obj["imageUri"];
                 else // remove the image element if there's no image
-                    card.querySelector(".${cardType}-card-image-container").remove();
+                    card.querySelector("." + this.#cardType + "-card-image-container").remove();
 
                 // create the card's column and append it to the container
                 const col = document.createElement("div");
@@ -177,7 +180,7 @@
             }
 
             // removes a course card from the container
-            remove(card){
+            remove(card) {
                 // remove the card's column
                 const col = card.parentElement;
                 col.remove();
