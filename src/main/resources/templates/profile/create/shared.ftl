@@ -1,3 +1,4 @@
+<#--noinspection JSUnresolvedVariable-->
 <#import "../../shared/default.ftl" as default />
 
 <#macro nextBtn id="">
@@ -97,6 +98,24 @@
                 url = null;
                 imageUri = null;
 
+                constructor(obj = null) {
+                    if (obj === null)
+                        return;
+                    for (const prop in this) {
+                        this[prop] = obj[prop] || this[prop];
+                    }
+                }
+            });
+
+            static Project = (class {
+                id = null;
+                name = null;
+                description = null;
+                category = null;
+                url = null;
+                imageUri = null;
+                startDate = null;
+                endDate = null;
 
                 constructor(obj = null) {
                     if (obj === null)
@@ -194,4 +213,78 @@
             }
         }
     </script>
+</#macro>
+
+<#macro popupHandlers>
+<#if false>
+    <script>
+        </#if>
+        // when showing the popup, animate the text-area's height
+        popup.element.addEventListener("shown.bs.modal", () => {
+            form.element.querySelectorAll("textarea").forEach(async (textArea) => {
+                textArea.classList.add("height-transition")
+                _updateAutoTextArea(textArea)
+                await _sleep(200)
+                textArea.classList.remove("height-transition")
+            });
+        });
+
+        // when an image is selected, encode it and show it in the image preview
+        form.image.fileElem.addEventListener("change", (e) => {
+            const file = e.target.files[0];
+            if (file.size <= 1048576) {
+                const reader = new FileReader();
+                reader.onload = (e) => {
+                    form.image.previewElem.src = e.target.result;
+                    form.image.uriElem.value = e.target.result;
+                };
+                reader.readAsDataURL(file);
+            } else { // image size is too large
+                form.image.fileFeedback.textContent = "Image size must be less than 1MB";
+                form.image.fileElem.value = "";
+                form.image.fileElem.classList.add("is-invalid");
+                form.image.fileElem.addEventListener("change", (e) => {
+                    form.image.fileElem.classList.remove("is-invalid");
+                    form.image.fileFeedback.textContent = "";
+                }, {once: true});
+            }
+        });
+
+        form.image.clearButton.addEventListener("click", () => {
+            form.image.previewElem.src = "";
+            form.image.uriElem.value = "";
+            form.image.fileElem.value = "";
+            form.image.fileElem.classList.remove("is-invalid");
+            form.image.fileFeedback.textContent = "";
+        });
+
+        // when hiding the popup, clear the form
+        // and reset the text-area's height
+        popup.element.addEventListener("hidden.bs.modal", () => {
+            _clearForm(form.element);
+            form.image.fileElem.classList.remove("is-invalid");
+            form.image.fileFeedback.textContent = "";
+            form.element.querySelectorAll("textarea").forEach((textArea) => {
+                textArea.style.height = 4 + "rem";
+            });
+        });
+
+        // style and animate the form's inputs when they're invalid
+        form.element.querySelectorAll("input").forEach(input => {
+            input.addEventListener("invalid", () => {
+                input.classList.add("is-invalid");
+                _animateCSS(input, "headShake");
+                input.addEventListener("input", () => {
+                    input.classList.remove("is-invalid");
+                }, {once: true});
+            });
+        });
+
+        // set up auto-expanding text-areas
+        form.element.querySelectorAll("textarea").forEach(textarea => {
+            _setupAutoTextArea(textarea);
+        });
+        <#if false>
+    </script>
+</#if>
 </#macro>
