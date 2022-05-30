@@ -17,7 +17,7 @@
                 <br/>
                 <form method="post">
                     <@default.csrfInput/>
-                    <div class="form-floating mt-3">
+                    <div class="form-floating">
                         <input class="form-control" type="email" name="email" id="email" placeholder="Email" required >
                         <label class="form-label text-muted" for="email">Email</label>
                     </div>

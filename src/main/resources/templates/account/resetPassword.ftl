@@ -77,9 +77,9 @@
 </#if>
 </html>
 <#macro infoCard border title style="" >
-    <div class="card border-${border} ${style} mb-3 w-75">
-        <div class="card-header">${title}</div>
+    <div class="card text-dark border-${border} ${style} mb-3 w-75">
         <div class="card-body">
+            <h6 class="mb-2">${title}</h6>
             <#nested/>
         </div>
     </div>
