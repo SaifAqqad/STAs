@@ -37,10 +37,10 @@
 </#macro>
 
 <#macro popup>
-    <div class="modal fade" id="coursePopup" tabindex="-1">
+    <div class="modal fade user-select-none" id="coursePopup" tabindex="-1">
         <div class="modal-dialog modal-dialog-centered">
             <div class="modal-content">
-                <div class="modal-header">
+                <div class="modal-header pb-1">
                     <h5 class="modal-title"></h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
