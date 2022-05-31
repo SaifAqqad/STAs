@@ -28,10 +28,10 @@ public class OAuthController {
 
     @Autowired
     public OAuthController(
-            TokenGenerator keyGenerator,
-            ClientRegistrationRepository clientRegistrationRepository,
-            OAuthClientHelper oAuthClientHelper,
-            UserService userService
+        TokenGenerator keyGenerator,
+        ClientRegistrationRepository clientRegistrationRepository,
+        OAuthClientHelper oAuthClientHelper,
+        UserService userService
     ) {
         this.keyGenerator = keyGenerator;
         this.clientRegistrationRepository = clientRegistrationRepository;
@@ -41,9 +41,9 @@ public class OAuthController {
 
     @GetMapping("/connect/{clientId}")
     public String connectToService(
-            @PathVariable String clientId,
-            @RequestParam(required = false, defaultValue = "/") String redirectUri,
-            Model model
+        @PathVariable String clientId,
+        @RequestParam(required = false, defaultValue = "/connect/landing") String redirectUri,
+        Model model
     ) {
         ClientRegistration clientRegistration = clientRegistrationRepository.findByRegistrationId(clientId);
         String state = keyGenerator.generateToken(46);
@@ -55,16 +55,16 @@ public class OAuthController {
 
     @GetMapping("/oauth/redirect/{registrationId}/connect")
     public String redirectFromService(
-            @RequestParam(required = false) String code,
-            @RequestParam String state,
-            @RequestParam(required = false) String error,
-            @RequestParam(required = false, name = "error_description") String errorDesc,
-            @PathVariable(name = "registrationId") String registrationId,
-            @SessionAttribute("state") String savedState,
-            @SessionAttribute("redirectUri") String redirectUri,
-            @SessionAttribute("clientRegistration") ClientRegistration clientRegistration,
-            RedirectAttributes redirectAttributes,
-            SessionStatus sessionStatus
+        @RequestParam(required = false) String code,
+        @RequestParam String state,
+        @RequestParam(required = false) String error,
+        @RequestParam(required = false, name = "error_description") String errorDesc,
+        @PathVariable(name = "registrationId") String registrationId,
+        @SessionAttribute("state") String savedState,
+        @SessionAttribute("redirectUri") String redirectUri,
+        @SessionAttribute("clientRegistration") ClientRegistration clientRegistration,
+        RedirectAttributes redirectAttributes,
+        SessionStatus sessionStatus
     ) {
         // clear the session
         sessionStatus.setComplete();
@@ -75,7 +75,7 @@ public class OAuthController {
             return "redirect:" + (redirectUri + "?error");
         }
         // check for an oauth-provider error
-        if(Objects.nonNull(error)){
+        if (Objects.nonNull(error)) {
             redirectAttributes.addFlashAttribute("toastColor", "danger");
             redirectAttributes.addFlashAttribute("toast", errorDesc);
             return "redirect:" + (redirectUri + "?error");
@@ -90,8 +90,17 @@ public class OAuthController {
             redirectAttributes.addFlashAttribute("toast", e.getError().getDescription());
             return "redirect:" + (redirectUri + "?error");
         }
-        redirectAttributes.addFlashAttribute("toast", StringUtils.capitalize(clientRegistration.getClientName()) + " account connected successfully");
+        redirectAttributes.addFlashAttribute(
+            "toast",
+            StringUtils.capitalize(clientRegistration.getClientName()) + " account connected successfully");
         return "redirect:" + redirectUri;
     }
 
+    @GetMapping("/connect/landing")
+    public String landingPage(Model model) {
+        if (model.containsAttribute("toast")) {
+            return "connect/landing";
+        }
+        return "redirect:/";
+    }
 }
