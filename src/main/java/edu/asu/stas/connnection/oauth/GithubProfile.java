@@ -24,6 +24,8 @@ public class GithubProfile implements OAuthProfile {
 
     private String uniqueId;
 
+    private String userName;
+
     private String firstName;
 
     private String lastName;
@@ -35,10 +37,10 @@ public class GithubProfile implements OAuthProfile {
 
     public static List<Repository> fetchUserRepositories(OAuth2AccessToken accessToken) {
         String response = http.get(
-                API_BASE_URL + "/user/repos?per_page=100",
-                Map.of(
-                        AUTHORIZATION, "bearer " + accessToken.getTokenValue()
-                )
+            API_BASE_URL + "/user/repos?per_page=100",
+            Map.of(
+                AUTHORIZATION, "bearer " + accessToken.getTokenValue()
+            )
         );
         try {
             return objectMapper().readValue(response, new TypeReference<>() {

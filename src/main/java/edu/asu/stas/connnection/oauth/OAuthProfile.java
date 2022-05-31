@@ -41,6 +41,7 @@ public interface OAuthProfile extends Serializable {
                 profile.setUniqueId(user.getName());
                 profile.setFirstName(fullName[0]);
                 profile.setLastName(fullName.length > 1 ? fullName[1] : "");
+                profile.setUserName(requireNonNull(user.getAttribute("login")));
                 profile.setEmail(requireNonNull(user.getAttribute("email")));
                 profile.getRepositories().addAll(repos);
                 yield profile;
