@@ -212,8 +212,8 @@
                             projectCards.remove(projectCard);
                             projectCard = projectCards.add({
                                 title: projectObj.name,
-                                subtitle: projectObj.publisher,
-                                text: projectObj.studentComment || projectObj.description,
+                                subtitle: projectObj.category,
+                                text: projectObj.description,
                                 imageUri: projectObj.imageUri,
                             });
                             projectCard.addEventListener("click", () => {
@@ -234,8 +234,8 @@
                             projectObj = projects.add(projectObj);
                             const card = projectCards.add({
                                 title: projectObj.name,
-                                subtitle: projectObj.publisher,
-                                text: projectObj.studentComment || projectObj.description,
+                                subtitle: projectObj.category,
+                                text: projectObj.description,
                                 imageUri: projectObj.imageUri,
                             });
                             card.addEventListener("click", () => {
@@ -266,7 +266,36 @@
             <@shared.popupHandlers/>
 
             addBtn.addEventListener("click", () => projectPopup.show());
+        })()
+    </script>
+<#-- Tabs script -->
+    <script>
+        (() => {
+            const tabsContainer = document.querySelector('.tabs');
+            const card = document.querySelector('#projectCard');
+            const currentTab = card.parentElement;
 
+            // add cards for existing projects
+            document.addEventListener("profile-loaded", () => {
+                const projectArray = Profile.getItem("projects");
+                projectArray.forEach(projectObj => {
+                    const projectCard = projectCards.add({
+                        title: projectObj.name,
+                        subtitle: projectObj.category,
+                        text: projectObj.description,
+                        imageUri: projectObj.imageUri,
+                    });
+                    projectCard.addEventListener("click", () => {
+                        projectPopup.show(projectObj, projectCard)
+                    });
+                });
+            });
+
+            document.addEventListener("tab-changing", () => {
+                if (!currentTab.classList.contains("tab-active"))
+                    return;
+                Profile.saveProfile();
+            });
 
         })()
     </script>
