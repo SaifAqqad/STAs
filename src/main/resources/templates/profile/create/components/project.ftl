@@ -25,14 +25,40 @@
 </#macro>
 
 <#macro popup>
-    <div class="modal fade" id="projectPopup" tabindex="-1">
+    <div class="modal fade user-select-none" id="projectPopup" tabindex="-1">
         <div class="modal-dialog modal-dialog-centered">
             <div class="modal-content">
-                <div class="modal-header">
+                <div class="modal-header pb-1">
                     <h5 class="modal-title"></h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body">
+                    <div id="githubImporter">
+                        <div class="mx-2">
+                            <div class="card-text mb-2">Import a project from a GitHub repository</div>
+                            <div class="gi-pre-login d-flex justify-content-center">
+                                <button type="button" class="gi-login-btn btn btn-dark w-75 mt-2">
+                                    <@default.icon name="github" width="24" class="align-bottom"/>
+                                    <span class="align-text-bottom">Log in with GitHub</span>
+                                </button>
+                            </div>
+                            <div class="gi-post-login">
+                                <div class="dropdown w-100 d-flex justify-content-center">
+                                    <button class="btn btn-dark w-75 dropdown-toggle" type="button" id="giDropDown"
+                                            data-bs-toggle="dropdown" aria-expanded="false">
+                                        <@default.icon name="github" width="24" class="align-bottom"/>
+                                        <span class="gi-username">GitHub</span>'s
+                                        repositories
+                                    </button>
+                                    <ul class="dropdown-menu overflow-auto w-75 gi-repos" aria-labelledby="giDropDown"
+                                        style="max-height: 200px;"></ul>
+                                </div>
+                            </div>
+                            <sub class="text-danger fw-bold gi-feedback"></sub>
+                        </div>
+                        <hr>
+                        <div class="card-text mb-2 mx-2">Or manually enter the project's information</div>
+                    </div>
                     <form class="mx-2" id="projectForm" method="post">
                         <@default.csrfInput/>
                         <input type="hidden" data-project-prop="id"/>
@@ -105,6 +131,7 @@
 
 <#macro script>
     <@popup/>
+    <script src="<@spring.url "/js/GithubImporter.js"/>"></script>
     <script>
         // projects data functions
         const projects = {
@@ -188,6 +215,9 @@
                     projectObj.url = form.url.value.trim();
                     projectObj.imageUri = form.image.uriElem.value;
                 };
+            let githubImporter = new GithubImporter("githubImporter", applyProjectToForm);
+            githubImporter.init();
+
             projectPopup.show = (projectObj = null, projectCard = null) => {
                 let saveBtnListener = null;
                 let deleteBtnListener = null;
@@ -195,6 +225,8 @@
                 if (projectObj && projectCard) { // we're editing an existing project
                     popup.title.textContent = "Edit project";
                     applyProjectToForm(projectObj);
+                    // hide GitHub importer
+                    _showElems([githubImporter.group], false);
                     // set delete event listener
                     deleteBtnListener = () => {
                         projectCards.remove(projectCard);
@@ -226,6 +258,8 @@
                     popup.title.textContent = "Add a new project";
                     // hide delete button
                     deleteBtn.classList.add("d-none");
+                    // show GitHub importer
+                    _showElems([githubImporter.group], true);
                     // set save event listener
                     saveBtnListener = () => {
                         if (form.element.reportValidity()) {
@@ -264,6 +298,9 @@
             };
 
             <@shared.popupHandlers/>
+            popup.element.addEventListener("hidden.bs.modal", () => {
+                githubImporter.feedbackElem.textContent = "";
+            });
 
             addBtn.addEventListener("click", () => projectPopup.show());
         })()

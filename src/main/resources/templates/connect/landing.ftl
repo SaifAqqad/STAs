@@ -7,12 +7,11 @@
 <html lang="en">
 
 <@default.head title="Account connection"/>
-<#assign isOAuthError = (toastColor!"" == "danger" && RequestParameters.error??)/>
-
+<#assign isOAuthError = ((toastColor!"") = "danger") && RequestParameters.error??/>
 <body class="min-vh-100">
 <@default.navbar/>
 <div class="d-flex justify-content-center mt-5 mx-md-5 animate__animated animate__fadeIn animate__faster">
-    <#if isOAuthError>
+    <#if isOAuthError??>
         <@infoCard title="An error has occured" border="danger" style="text-dark bg-white">
             <#if toast??>
                 <p class="card-text">${toast}</p>
