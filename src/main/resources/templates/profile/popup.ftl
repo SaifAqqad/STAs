@@ -460,76 +460,10 @@
                 </div>
             </div>
         </@formPopup>
+        <script src="/js/CourseParser.js"></script>
         <script>
             <#-- courseParser setup -->
-            (() => {
-                const formId = "${formId}";
-                const courseParser = new function () {
-                    this.group = document.getElementById("courseParser");
-                    this.input = this.group.querySelector("#courseParserInput");
-                    this.button = this.group.querySelector("#courseParserButton");
-                    this.feedback = this.group.querySelector("#courseParserFeedback");
-                    this.endpoint = "/courses";
-                    this.isRunning = false;
-                    this.setValidity = (validity, message = null) => {
-                        if (validity) {
-                            this.input.classList.remove("is-invalid");
-                            this.feedback.innerText = "";
-                        } else {
-                            this.input.classList.add("is-invalid");
-                            this.feedback.innerText = message;
-                        }
-                    };
-                    this.setLoading = (isLoading) => {
-                        if (isLoading) {
-                            this.button.querySelector(".btn-spinner").classList.remove("d-none");
-                            this.button.querySelector(".btn-text").classList.add("d-none");
-                        } else {
-                            this.button.querySelector(".btn-spinner").classList.add("d-none");
-                            this.button.querySelector(".btn-text").classList.remove("d-none");
-                        }
-                    };
-                };
-                courseParser.button.addEventListener("click", async () => {
-                    if (courseParser.isRunning)
-                        return;
-                    courseParser.isRunning = true;
-                    // check if input is valid
-                    if (courseParser.input.reportValidity()) {
-                        courseParser.setValidity(true);
-                        courseParser.setLoading(true);
-                        // fetch the course data
-                        const response = await fetch(courseParser.endpoint + "?" + new URLSearchParams({
-                            url: courseParser.input.value,
-                        }));
-                        courseParser.setLoading(false);
-                        // check if response is valid
-                        if (response.ok) {
-                            const course = await response.json();
-                            // check for a courseParser error
-                            if (course.error) {
-                                courseParser.setValidity(false, course.error);
-                            } else {
-                                // empty the url input and apply the course data
-                                courseParser.input.value = "";
-                                _applyCourseToForm(formId, {
-                                    name: course["name"],
-                                    description: course["description"],
-                                    imageUri: course["imageUrl"],
-                                    url: course["url"],
-                                    publisher: course["publisher"],
-                                });
-                            }
-                        } else {
-                            courseParser.setValidity(false, "An error has occurred");
-                        }
-                    } else {
-                        courseParser.setValidity(false, "Please enter a valid URL");
-                        await _animateCSS(courseParser.input, "headShake");
-                    }
-                    courseParser.isRunning = false;
-                });
-            })()
+            new CourseParser("courseParser", _applyCourseToForm.bind(null, "${formId}"));
         </script>
     </#if>
 </#macro>

@@ -5,6 +5,7 @@
 <#import "components/contactInfo.ftl" as contactInfo/>
 <#import "components/about.ftl" as about/>
 <#import "components/education.ftl" as education/>
+<#import "components/project.ftl" as project/>
 
 
 <!DOCTYPE html>
@@ -37,7 +38,7 @@
             <div class="tab tab-hidden animate__fast w-100" data-tab-index="0"><@contactInfo.card/></div>
             <div class="tab tab-hidden animate__fast w-100" data-tab-index="1"><@about.card/></div>
             <div class="tab tab-hidden animate__fast w-100" data-tab-index="2"><@education.card/></div>
-            <div class="tab tab-hidden animate__fast w-100" data-tab-index="3"></div>
+            <div class="tab tab-hidden animate__fast w-100" data-tab-index="3"><@project.card/></div>
         </div>
 
     </div>
@@ -48,6 +49,7 @@
 <@contactInfo.script/>
 <@about.script/>
 <@education.script/>
+<@project.script/>
 </body>
 
 </html>

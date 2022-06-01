@@ -33,6 +33,9 @@ function switchToTab(tabIndex, isFirstLoad = false) {
         });
     }
 
+    // scroll to the top of the page
+    window.scrollTo({top: 0, behavior: 'smooth'});
+
     // show then animate the next tab
     nextTab.element.classList.remove('tab-hidden');
     _animateCSS(nextTab.element, nextTab.animation).then(() => {

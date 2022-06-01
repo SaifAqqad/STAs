@@ -37,10 +37,10 @@
 </#macro>
 
 <#macro popup>
-    <div class="modal fade" id="coursePopup" tabindex="-1">
+    <div class="modal fade user-select-none" id="coursePopup" tabindex="-1">
         <div class="modal-dialog modal-dialog-centered">
             <div class="modal-content">
-                <div class="modal-header">
+                <div class="modal-header pb-1">
                     <h5 class="modal-title"></h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
@@ -129,6 +129,7 @@
 
 <#macro script>
     <@popup/>
+    <script src="/js/CourseParser.js"></script>
     <script>
         // courses data functions
         const courses = {
@@ -159,61 +160,7 @@
             };
         });
 
-        // courses cards functions
-        const courseCards = {
-            add: null,
-            remove: null,
-        };
-        (() => {
-            const cardsContainer = document.getElementById("coursesContainer");
-            const cardTemplate = <@default.jsStr><@shared.itemCard cardType="course-card"/></@default.jsStr>;
-            const emptyContainerTemplate = <@default.jsStr><@shared.emptyContainer/></@default.jsStr>;
-
-            <#noparse>
-            // creates and adds a course card to the cardsContainer
-            // returns the added card
-            courseCards.add = (courseObj) => {
-                // remove empty container
-                if (cardsContainer.querySelector(".empty-container"))
-                    cardsContainer.replaceChildren();
-
-                // create card element and apply courseObj data
-                const template = document.createElement("template");
-                template.innerHTML = cardTemplate;
-                const card = template.content.firstElementChild;
-                card.querySelector(".course-card-title").innerText = courseObj.name;
-                card.querySelector(".course-card-subtitle").innerText = courseObj.publisher;
-                card.querySelector(".course-card-text").innerText = courseObj.studentComment || courseObj.description;
-
-                if (courseObj.imageUri)
-                    card.querySelector(".course-card-image").src = courseObj.imageUri;
-                else // remove the image element if there's no image
-                    card.querySelector(".course-card-image-container").remove();
-
-                // create the card's column and add it to the cardsContainer
-                const col = document.createElement("div");
-                col.classList.add("col", "mb-3");
-                col.appendChild(card);
-                cardsContainer.appendChild(col);
-                return cardsContainer.lastElementChild.firstElementChild;
-            };
-
-            // removes a course card from the cardsContainer
-            courseCards.remove = (card) => {
-                // remove the card's column
-                const col = card.parentElement;
-                col.remove();
-                // insert empty container if there are no cards
-                if (cardsContainer.querySelectorAll(".col").length === 0) {
-                    const template = document.createElement("template");
-                    template.innerHTML = emptyContainerTemplate;
-                    const emptyContainer = template.content.firstElementChild;
-                    cardsContainer.appendChild(emptyContainer);
-                }
-            };
-            </#noparse>
-        })()
-
+        const courseCards = new itemCardFactory("coursesContainer", "course", <@default.jsStr><@shared.itemCard cardType="course"/></@default.jsStr>);
 
         // courses popup functions
         const coursePopup = {
@@ -225,32 +172,6 @@
                     this.element = document.getElementById("coursePopup");
                     this.title = this.element.querySelector(".modal-title");
                     this.object = new bootstrap.Modal(this.element);
-                },
-                courseParser = new function () {
-                    this.group = document.getElementById("courseParser");
-                    this.input = this.group.querySelector("#courseParserInput");
-                    this.button = this.group.querySelector("#courseParserButton");
-                    this.feedback = this.group.querySelector("#courseParserFeedback");
-                    this.endpoint = "/courses";
-                    this.isRunning = false;
-                    this.setValidity = (validity, message = null) => {
-                        if (validity) {
-                            this.input.classList.remove("is-invalid");
-                            this.feedback.innerText = "";
-                        } else {
-                            this.input.classList.add("is-invalid");
-                            this.feedback.innerText = message;
-                        }
-                    };
-                    this.setLoading = (isLoading) => {
-                        if (isLoading) {
-                            this.button.querySelector(".btn-spinner").classList.remove("d-none");
-                            this.button.querySelector(".btn-text").classList.add("d-none");
-                        } else {
-                            this.button.querySelector(".btn-spinner").classList.add("d-none");
-                            this.button.querySelector(".btn-text").classList.remove("d-none");
-                        }
-                    };
                 },
                 form = new function () {
                     this.element = document.getElementById("courseForm");
@@ -289,7 +210,8 @@
                     courseObj.publisher = form.publisher.value.trim();
                     courseObj.url = form.url.value.trim();
                     courseObj.imageUri = form.image.uriElem.value;
-                };
+                },
+                courseParser = new CourseParser("courseParser", applyCourseToForm);
 
             coursePopup.show = (courseObj = null, courseCard = null) => {
                 let saveBtnListener = null;
@@ -315,7 +237,12 @@
                             applyFormToCourse(courseObj);
                             courseObj = courses.update(courseObj);
                             courseCards.remove(courseCard);
-                            courseCard = courseCards.add(courseObj);
+                            courseCard = courseCards.add({
+                                title: courseObj.name,
+                                subtitle: courseObj.publisher,
+                                text: courseObj.studentComment || courseObj.description,
+                                imageUri: courseObj.imageUri,
+                            });
                             courseCard.addEventListener("click", () => {
                                 coursePopup.show(courseObj, courseCard);
                             });
@@ -334,7 +261,12 @@
                             courseObj = new Profile.Course();
                             applyFormToCourse(courseObj);
                             courseObj = courses.add(courseObj);
-                            const card = courseCards.add(courseObj);
+                            const card = courseCards.add({
+                                title: courseObj.name,
+                                subtitle: courseObj.publisher,
+                                text: courseObj.studentComment || courseObj.description,
+                                imageUri: courseObj.imageUri,
+                            });
                             card.addEventListener("click", () => {
                                 coursePopup.show(courseObj, card);
                             });
@@ -360,116 +292,15 @@
                 popup.object.hide();
             };
 
-            // when showing the popup, animate the text-area's height
-            popup.element.addEventListener("shown.bs.modal", () => {
-                form.element.querySelectorAll("textarea").forEach(async (textArea) => {
-                    textArea.classList.add("height-transition")
-                    _updateAutoTextArea(textArea)
-                    await _sleep(200)
-                    textArea.classList.remove("height-transition")
-                });
-            });
+            <@shared.popupHandlers/>
 
-            // when an image is selected, encode it and show it in the image preview
-            form.image.fileElem.addEventListener("change", (e) => {
-                const file = e.target.files[0];
-                if (file.size <= 1048576) {
-                    const reader = new FileReader();
-                    reader.onload = (e) => {
-                        form.image.previewElem.src = e.target.result;
-                        form.image.uriElem.value = e.target.result;
-                    };
-                    reader.readAsDataURL(file);
-                } else { // image size is too large
-                    form.image.fileFeedback.textContent = "Image size must be less than 1MB";
-                    form.image.fileElem.value = "";
-                    form.image.fileElem.classList.add("is-invalid");
-                    form.image.fileElem.addEventListener("change", (e) => {
-                        form.image.fileElem.classList.remove("is-invalid");
-                        form.image.fileFeedback.textContent = "";
-                    }, {once: true});
-                }
-            });
-
-            form.image.clearButton.addEventListener("click", () => {
-                form.image.previewElem.src = "";
-                form.image.uriElem.value = "";
-                form.image.fileElem.value = "";
-                form.image.fileElem.classList.remove("is-invalid");
-                form.image.fileFeedback.textContent = "";
-            });
-
-            // when hiding the popup, clear the form
-            // and reset the text-area's height
+            // when hiding the popup, reset courseParser
             popup.element.addEventListener("hidden.bs.modal", () => {
-                _clearForm(form.element);
                 courseParser.setValidity(true);
                 courseParser.setLoading(false);
-                form.image.fileElem.classList.remove("is-invalid");
-                form.image.fileFeedback.textContent = "";
-                form.element.querySelectorAll("textarea").forEach((textArea) => {
-                    textArea.style.height = 4 + "rem";
-                });
-            });
-
-            // style and animate the form's inputs when they're invalid
-            form.element.querySelectorAll("input").forEach(input => {
-                input.addEventListener("invalid", () => {
-                    input.classList.add("is-invalid");
-                    _animateCSS(input, "headShake");
-                    input.addEventListener("input", () => {
-                        input.classList.remove("is-invalid");
-                    }, {once: true});
-                });
-            });
-
-            // set up auto-expanding text-areas
-            form.element.querySelectorAll("textarea").forEach(textarea => {
-                _setupAutoTextArea(textarea);
             });
 
             addBtn.addEventListener("click", () => coursePopup.show());
-
-            // set up course parser functionality
-            courseParser.button.addEventListener("click", async () => {
-                if (courseParser.isRunning)
-                    return;
-                courseParser.isRunning = true;
-                // check if input is valid
-                if (courseParser.input.reportValidity()) {
-                    courseParser.setValidity(true);
-                    courseParser.setLoading(true);
-                    // fetch the course data
-                    const response = await fetch(courseParser.endpoint + "?" + new URLSearchParams({
-                        url: courseParser.input.value,
-                    }));
-                    courseParser.setLoading(false);
-                    // check if response is valid
-                    if (response.ok) {
-                        const course = await response.json();
-                        // check for a courseParser error
-                        if (course.error) {
-                            courseParser.setValidity(false, course.error);
-                        } else {
-                            // empty the url input and apply the course data
-                            courseParser.input.value = "";
-                            applyCourseToForm({
-                                name: course["name"],
-                                description: course["description"],
-                                imageUri: course["imageUrl"],
-                                url: course["url"],
-                                publisher: course["publisher"],
-                            });
-                        }
-                    } else {
-                        courseParser.setValidity(false, "An error has occurred");
-                    }
-                } else {
-                    courseParser.setValidity(false, "Please enter a valid URL");
-                    await _animateCSS(courseParser.input, "headShake");
-                }
-                courseParser.isRunning = false;
-            });
         })()
     </script>
 
@@ -500,7 +331,12 @@
                 // create a course card for each existing course
                 const coursesArray = Profile.getItem("courses");
                 coursesArray.forEach(course => {
-                    const courseCard = courseCards.add(course);
+                    const courseCard = courseCards.add({
+                        title: course.name,
+                        subtitle: course.publisher,
+                        text: course.studentComment || course.description,
+                        imageUri: course.imageUri,
+                    });
                     courseCard.addEventListener("click", () => coursePopup.show(course, courseCard));
                 });
             })
