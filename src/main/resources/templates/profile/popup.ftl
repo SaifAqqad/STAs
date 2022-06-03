@@ -309,7 +309,7 @@
             }
         </script>
         <@formPopup addPopup=addPopup detailsPopup=detailsPopup popupId=popupId formId=formId uriBase=uriBase isMultiPartForm=true imageInputId=["${formId}_imageUri", "${formId}_imageUriData"] applyMethod="_applyProjectToForm">
-            <div id="githubImporter">
+            <div id="githubImporter" class="add-only">
                 <div class="mx-2">
                     <div class="card-text mb-2">Import a project from a GitHub repository</div>
                     <div class="gi-pre-login d-flex justify-content-center">
