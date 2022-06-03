@@ -10,6 +10,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 
 import javax.persistence.*;
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
@@ -46,11 +47,11 @@ public class User implements UserDetails {
 
     private boolean isEnabled;
 
-    @OneToMany(mappedBy = "user", orphanRemoval = true)
-    private List<UserToken> tokens;
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
+    private final List<UserToken> tokens = new ArrayList<>();
 
-    @OneToMany(mappedBy = "user", orphanRemoval = true)
-    private List<Connection> connections;
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
+    private final List<Connection> connections = new ArrayList<>();
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
