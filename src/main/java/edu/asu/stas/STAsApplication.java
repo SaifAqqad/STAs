@@ -92,7 +92,6 @@ public class STAsApplication {
 
                     Project project = new Project();
                     project.setName("AHK_MicMute");
-                    project.setCategory("Desktop application");
                     project.setDescription("open-source program that allows you to mute your microphone with a pre-defined hotkey. It supports custom mute sounds, profiles, push-to-talk, AFK timeout, and more.");
                     project.setUrl("https://github.com/SaifAqqad/AHK_MicMute");
                     project.setImageUri("https://github.com/SaifAqqad/AHK_MicMute/raw/master/screenshots/configwindow_1.png");

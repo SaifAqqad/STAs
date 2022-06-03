@@ -211,11 +211,11 @@
                             </div>
                         <#-- Content -->
                             <#list profile.experiences>
-                                <ul class="list-unstyled timeline-sm">
+                                <ul class="list-unstyled timeline">
                                     <#items as experience>
-                                        <li class="timeline-sm-item cursor-pointer bg-hover text-hover-dark smooth"
+                                        <li class="timeline-item cursor-pointer bg-hover text-hover-dark smooth"
                                             data-id="${experience.id}">
-                                            <span class="timeline-sm-date">${experience.startDate.year?c} - ${(experience.endDate.year?c)!"Present"}</span>
+                                            <span class="timeline-date">${experience.startDate.year?c} - ${(experience.endDate.year?c)!"Present"}</span>
                                             <div class="pt-1 mb-1 card-title fs-115">${experience.jobTitle}</div>
                                             <p class="text-muted">${experience.companyName}</p>
                                             <#if experience.description??>
@@ -249,7 +249,7 @@
                             <div class="scrollable-box">
                                 <#list profile.activities as activity>
                                     <@profileCard title=activity.name subtitle=activity.getFormattedDate() text=activity.description img=activity.imageUri img_alt=activity.name id=activity.id?c
-                                    limitLines=false class="btn w-100 ${isEditing?then('bg-hover','pe-none')} rounded-0 ${activity?is_first?then('rounded-top','')} ${activity?is_last?then('rounded-bottom','border-bottom-0')}"/>
+                                    limitLines=false preserveLines=true class="btn w-100 ${isEditing?then('bg-hover','pe-none')} rounded-0 ${activity?is_first?then('rounded-top','')} ${activity?is_last?then('rounded-bottom','border-bottom-0')}"/>
                                 <#else>
                                     <div class="w-100 min-h-100 d-flex justify-content-center align-items-center">
                                         <span class="fs-6 text-muted user-select-none">You haven't added anything yet</span>
@@ -276,7 +276,7 @@
                             <div class="row row-cols-1 row-cols-lg-2">
                                 <#list profile.projects as project>
                                     <div class="col mb-3">
-                                        <@profileCard title=project.name subtitle=project.category text=project.description img=project.imageUri id=project.id?c class="btn bg-hover"/>
+                                        <@profileCard title=project.name text=project.description img=project.imageUri id=project.id?c class="btn bg-hover" preserveLines=true/>
                                     </div>
                                 <#else>
                                     <div class="w-100 min-h-100 d-flex justify-content-center align-items-center">
@@ -304,7 +304,7 @@
                             <div class="row row-cols-1 row-cols-lg-2">
                                 <#list profile.courses as course >
                                     <div class="col mb-3">
-                                        <@profileCard title=course.name text=(course.studentComment?has_content)?then(course.studentComment,course.description) img=course.imageUri id=course.id?c class="btn bg-hover"/>
+                                        <@profileCard title=course.name text=(course.studentComment?has_content)?then(course.studentComment,course.description) img=course.imageUri id=course.id?c class="btn bg-hover" preserveLines=true/>
                                     </div>
                                 <#else>
                                     <div class="w-100 min-h-100 d-flex justify-content-center align-items-center">

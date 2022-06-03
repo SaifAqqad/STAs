@@ -24,7 +24,7 @@
                        placeholder="Phone number">
                 <label class="form-label text-muted" for="contactPhone">Phone number</label>
             </div>
-            <div class="mt-4 clearfix">
+            <div class="mt-3 clearfix">
                 <@shared.nextBtn id="contactInfoNext"/>
             </div>
         </div>

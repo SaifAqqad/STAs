@@ -17,18 +17,18 @@
                        placeholder="University">
                 <label class="form-label text-muted" for="university">University</label>
             </div>
-            <div class="card card-border-grey w-100 mt-3 p-3 pt-2 ">
-                <div class="d-flex justify-content-between align-items-center">
-                    <h6 class="card-title mb-2">
-                        Have you taken any courses?
-                    </h6>
-                    <button class="btn btn-outline-primary mb-2" id="addCourseButton">Add course</button>
-                </div>
+            <div class="mt-3 d-flex justify-content-between align-items-center">
+                <h6 class="card-title mb-2">
+                    Have you taken any courses?
+                </h6>
+                <button class="btn btn-outline-primary mb-2" id="addCourseButton">Add course</button>
+            </div>
+            <div class="card border-0 shadow-none bg-white w-100 mt-1 p-3 py-0">
                 <div class="row row-cols-1" id="coursesContainer">
                     <@shared.emptyContainer/>
                 </div>
             </div>
-            <div class="mt-4 clearfix">
+            <div class="mt-3 clearfix">
                 <@shared.backBtn/>
                 <@shared.nextBtn/>
             </div>

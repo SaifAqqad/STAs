@@ -35,7 +35,7 @@
             <div class="card-body d-flex flex-column flex-grow-1 w-100">
                 <h5 class="card-title user-select-none ${cardType}-card-title"></h5>
                 <h6 class="card-subtitle mb-2 text-muted ${cardType}-card-subtitle"></h6>
-                <p class="card-text limit-lines-4 ${cardType}-card-text"></p>
+                <p class="card-text preserve-lines limit-lines-4 ${cardType}-card-text"></p>
                 <#nested/>
             </div>
         </div>
@@ -114,6 +114,23 @@
                 category = null;
                 url = null;
                 imageUri = null;
+                startDate = null;
+                endDate = null;
+
+                constructor(obj = null) {
+                    if (obj === null)
+                        return;
+                    for (const prop in this) {
+                        this[prop] = obj[prop] || this[prop];
+                    }
+                }
+            });
+
+            static Experience = (class {
+                id = null;
+                companyName = null;
+                jobTitle = null;
+                description = null;
                 startDate = null;
                 endDate = null;
 
@@ -230,7 +247,7 @@
         });
 
         // when an image is selected, encode it and show it in the image preview
-        form.image.fileElem.addEventListener("change", (e) => {
+        form.image?.fileElem.addEventListener("change", (e) => {
             const file = e.target.files[0];
             if (file.size <= 1048576) {
                 const reader = new FileReader();
@@ -250,7 +267,7 @@
             }
         });
 
-        form.image.clearButton.addEventListener("click", () => {
+        form.image?.clearButton.addEventListener("click", () => {
             form.image.previewElem.src = "";
             form.image.uriElem.value = "";
             form.image.fileElem.value = "";
@@ -262,8 +279,10 @@
         // and reset the text-area's height
         popup.element.addEventListener("hidden.bs.modal", () => {
             _clearForm(form.element);
-            form.image.fileElem.classList.remove("is-invalid");
-            form.image.fileFeedback.textContent = "";
+            if (form.image) {
+                form.image.fileElem.classList.remove("is-invalid");
+                form.image.fileFeedback.textContent = "";
+            }
             form.element.querySelectorAll("textarea").forEach((textArea) => {
                 textArea.style.height = 4 + "rem";
             });

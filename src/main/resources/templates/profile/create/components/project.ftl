@@ -5,18 +5,18 @@
 <#macro card>
     <div id="projectCard" class="card rounded-3 user-select-none w-100">
         <div class="card-body">
-            <div class="card card-border-grey w-100 mt-3 p-3 pt-2">
-                <div class="d-flex justify-content-between align-items-center">
-                    <h6 class="card-title mb-2">
-                        Have you worked on any projects?
-                    </h6>
-                    <button class="btn btn-outline-primary mb-2" id="addProjectButton">Add project</button>
-                </div>
+            <div class="d-flex justify-content-between align-items-center">
+                <h6 class="card-title mb-2">
+                    Have you worked on any projects?
+                </h6>
+                <button class="btn btn-outline-primary mb-2" id="addProjectButton">Add project</button>
+            </div>
+            <div class="card border-0 shadow-none bg-white w-100 mt-3 p-3 py-0">
                 <div class="row row-cols-1" id="projectsContainer">
                     <@shared.emptyContainer/>
                 </div>
             </div>
-            <div class="mt-4 clearfix">
+            <div class="mt-3 clearfix">
                 <@shared.backBtn/>
                 <@shared.nextBtn/>
             </div>
@@ -67,12 +67,6 @@
                                    id="projectName"
                                    placeholder="Name">
                             <label class="form-label text-muted" for="projectName">Name</label>
-                        </div>
-                        <div class="form-floating mt-3">
-                            <input class="form-control" required type="text" data-project-prop="category"
-                                   id="projectCategory"
-                                   placeholder="Category">
-                            <label class="form-label text-muted" for="projectCategory">Category</label>
                         </div>
                         <div class="form-floating mt-3 fix-floating-label">
                             <textarea class="form-control" data-project-prop="description" id="projectDescription"
@@ -186,7 +180,6 @@
                     }
                     this.name = this.element.querySelector("[data-project-prop='name']");
                     this.description = this.element.querySelector("[data-project-prop='description']");
-                    this.category = this.element.querySelector("[data-project-prop='category']");
                     this.url = this.element.querySelector("[data-project-prop='url']");
                     this.startDate = this.element.querySelector("[data-project-prop='startDate']");
                     this.endDate = this.element.querySelector("[data-project-prop='endDate']");
@@ -197,7 +190,6 @@
                 applyProjectToForm = (projectObj) => {
                     form.name.value = projectObj.name || "";
                     form.description.value = projectObj.description || "";
-                    form.category.value = projectObj.category || "";
                     form.url.value = projectObj.url || "";
                     form.startDate.value = projectObj.startDate || "";
                     form.endDate.value = projectObj.endDate || "";
@@ -209,7 +201,6 @@
                 applyFormToProject = (projectObj) => {
                     projectObj.name = form.name.value.trim();
                     projectObj.description = form.description.value.trim();
-                    projectObj.category = form.category.value.trim();
                     projectObj.startDate = form.startDate.value;
                     projectObj.endDate = form.endDate.value;
                     projectObj.url = form.url.value.trim();
@@ -244,7 +235,6 @@
                             projectCards.remove(projectCard);
                             projectCard = projectCards.add({
                                 title: projectObj.name,
-                                subtitle: projectObj.category,
                                 text: projectObj.description,
                                 imageUri: projectObj.imageUri,
                             });
@@ -268,7 +258,6 @@
                             projectObj = projects.add(projectObj);
                             const card = projectCards.add({
                                 title: projectObj.name,
-                                subtitle: projectObj.category,
                                 text: projectObj.description,
                                 imageUri: projectObj.imageUri,
                             });
@@ -318,7 +307,6 @@
                 projectArray.forEach(projectObj => {
                     const projectCard = projectCards.add({
                         title: projectObj.name,
-                        subtitle: projectObj.category,
                         text: projectObj.description,
                         imageUri: projectObj.imageUri,
                     });
