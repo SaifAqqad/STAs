@@ -6,6 +6,7 @@
 <#import "components/about.ftl" as about/>
 <#import "components/education.ftl" as education/>
 <#import "components/project.ftl" as project/>
+<#import "components/experience.ftl" as experience/>
 
 
 <!DOCTYPE html>
@@ -32,13 +33,15 @@
             <button data-tab-index="1" class="p-2 me-1 border rounded-circle"></button>
             <button data-tab-index="2" class="p-2 me-1 border rounded-circle"></button>
             <button data-tab-index="3" class="p-2 me-1 border rounded-circle"></button>
+            <button data-tab-index="4" class="p-2 me-1 border rounded-circle"></button>
         </div>
 
         <div class="tabs w-100 w-lg-75 w-xl-50">
             <div class="tab tab-hidden animate__fast w-100" data-tab-index="0"><@contactInfo.card/></div>
             <div class="tab tab-hidden animate__fast w-100" data-tab-index="1"><@about.card/></div>
             <div class="tab tab-hidden animate__fast w-100" data-tab-index="2"><@education.card/></div>
-            <div class="tab tab-hidden animate__fast w-100" data-tab-index="3"><@project.card/></div>
+            <div class="tab tab-hidden animate__fast w-100" data-tab-index="3"><@experience.card/></div>
+            <div class="tab tab-hidden animate__fast w-100" data-tab-index="4"><@project.card/></div>
         </div>
 
     </div>
@@ -50,6 +53,7 @@
 <@about.script/>
 <@education.script/>
 <@project.script/>
+<@experience.script/>
 </body>
 
 </html>
