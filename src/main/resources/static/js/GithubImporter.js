@@ -88,11 +88,24 @@ class GithubImporter {
     }
 
     repoToProject(repo) {
+        let description = "";
+        // add initial description
+        if (repo["description"])
+            description += repo["description"].trim();
+        // sort and add languages
+        const languages = Object.entries(repo["languages"])
+            .sort(([, ln1], [, ln2]) => ln2 - ln1)
+            .map(([lang,]) => lang);
+        if (languages.length > 0)
+            description += "\nLanguages: " + languages.join(", ");
+        // add stargazersCount
+        if (repo["stargazersCount"] > 0)
+            description += "\nStargazers: " + repo["stargazersCount"];
         return {
             name: repo["name"],
-            description: repo["description"],
-            category: repo["language"],
             url: repo["htmlUrl"],
+            startDate: repo["createdAt"].substring(0, 10),
+            description: description.trim(),
         };
     }
 

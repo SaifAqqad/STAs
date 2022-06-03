@@ -252,7 +252,13 @@
                 const tooltips = [];
                 _applyJsonToModal("${popupId}", json)
                 document.querySelector("#${popupId} [data-prop='formattedEndDate']").textContent = json["formattedEndDate"] || "Present"
-                document.querySelector("#${popupId} [data-prop-manual='imageUri']").src = json["imageUri"]
+                const imageGroup = document.querySelector("#${popupId} .image-group")
+                if (json["imageUri"]) {
+                    imageGroup.classList.remove("d-none");
+                    document.querySelector("#${popupId} [data-prop-manual='imageUri']").src = json["imageUri"]
+                } else {
+                    imageGroup.classList.add("d-none");
+                }
                 document.querySelector("#${popupId} [data-prop-manual='url']").href = json["url"]
                 // set startDate tooltip value
                 document.querySelector("#${popupId} [data-prop-manual='startDate']").setAttribute("title", json["startDate"])
@@ -270,8 +276,8 @@
         </script>
         <@overviewPopup popupId=popupId uriBase=uriBase overviewPopup=overviewPopupDetails applyMethod="_applyProjectToModal">
             <div class="pt-0 card-body">
-                <div class="d-flex justify-content-around align-items-center flex-column flex-lg-row">
-                    <div class="card w-100 me-0 mb-3 w-lg-50 me-lg-3 mb-lg-0">
+                <div class="d-flex align-items-center flex-column flex-lg-row">
+                    <div class="card w-100 me-0 mb-3 w-lg-50 me-lg-3 mb-lg-0 image-group">
                         <img class="card-img-top" data-prop-manual="imageUri" src="" alt="Project image">
                     </div>
                     <div class="w-100 w-lg-50">
@@ -287,7 +293,7 @@
                                   data-prop-manual="endDate"></span> ·
                             <span data-prop="duration"></span>
                         </div>
-                        <p class="mt-2" data-prop="description"></p>
+                        <p class="mt-2 preserve-lines" data-prop="description"></p>
                     </div>
                 </div>
             </div>
@@ -299,51 +305,86 @@
                 const imageElem = document.getElementById(formId + "_image")
                 const imageUri = document.getElementById(formId + "_imageUri")
                 imageElem.src = imageUri.value
+                document.querySelectorAll("#${formId} textarea").forEach(textArea => _updateAutoTextArea(textArea));
             }
         </script>
         <@formPopup addPopup=addPopup detailsPopup=detailsPopup popupId=popupId formId=formId uriBase=uriBase isMultiPartForm=true imageInputId=["${formId}_imageUri", "${formId}_imageUriData"] applyMethod="_applyProjectToForm">
-            <input type="hidden" name="id" id="${formId}_id"/>
-            <div class="form-floating">
-                <input class="form-control" required type="text" name="name" id="${formId}_name"
-                       placeholder="Name">
-                <label class="form-label text-muted" for="${formId}_name">Name</label>
+            <div id="githubImporter">
+                <div class="mx-2">
+                    <div class="card-text mb-2">Import a project from a GitHub repository</div>
+                    <div class="gi-pre-login d-flex justify-content-center">
+                        <button type="button" class="gi-login-btn btn btn-dark w-75 mt-2">
+                            <@default.icon name="github" width="24" class="align-bottom"/>
+                            <span class="align-text-bottom">Log in with GitHub</span>
+                        </button>
+                    </div>
+                    <div class="gi-post-login">
+                        <div class="dropdown w-100 d-flex justify-content-center">
+                            <button class="btn btn-dark w-75 dropdown-toggle" type="button" id="giDropDown"
+                                    data-bs-toggle="dropdown" aria-expanded="false">
+                                <@default.icon name="github" width="24" class="align-bottom"/>
+                                <span class="gi-username">GitHub</span>'s
+                                repositories
+                            </button>
+                            <ul class="dropdown-menu overflow-auto w-75 gi-repos" aria-labelledby="giDropDown"
+                                style="max-height: 200px;"></ul>
+                        </div>
+                    </div>
+                    <sub class="text-danger fw-bold gi-feedback"></sub>
+                </div>
+                <hr>
+                <div class="card-text mb-2 mx-2">Or manually enter the project's information</div>
             </div>
-            <div class="form-floating mt-3">
-                <input class="form-control" required type="text" name="category" id="${formId}_category"
-                       placeholder="Category">
-                <label class="form-label text-muted" for="${formId}_category">Category</label>
-            </div>
-            <div class="form-floating mt-3 fix-floating-label">
-            <textarea class="form-control" name="description" id="${formId}_description"
-                      placeholder="Description"></textarea>
-                <label class="form-label text-muted" for="${formId}_description">Description</label>
-            </div>
-            <div class="form-floating mt-3">
-                <input class="form-control" type="text" name="url" id="${formId}_url"
-                       placeholder="Link">
-                <label class="form-label text-muted" for="${formId}_url">Link</label>
-            </div>
-            <div class="form-floating mt-3">
-                <input class="form-control" type="date" name="startDate" id="${formId}_startDate"
-                       placeholder="Start date">
-                <label class="form-label text-muted" for="${formId}_startDate">Start date</label>
-            </div>
-            <div class="form-floating mt-3">
-                <input class="form-control" type="date" name="endDate" id="${formId}_endDate" placeholder="End date">
-                <label class="form-label text-muted" for="${formId}_endDate">End date</label>
-            </div>
-            <div class="mt-3">
-                <label class="form-label text-muted" for="${formId}_imageUriData">Project image</label>
-                <div class="card w-100 mt-3">
-                    <img id="${formId}_image" class="card-img-top" alt="" src="">
-                    <div class="card-body">
-                        <input type="hidden" name="imageUri" id="${formId}_imageUri"/>
-                        <input class="form-control" type="file" accept="image/*" name="imageUriData"
-                               id="${formId}_imageUriData"
-                               placeholder="Project image">
+            <div class="mx-2">
+                <input type="hidden" name="id" id="${formId}_id"/>
+                <div class="form-floating">
+                    <input class="form-control" required type="text" name="name" id="${formId}_name"
+                           placeholder="Name">
+                    <label class="form-label text-muted" for="${formId}_name">Name</label>
+                </div>
+                <div class="form-floating mt-3 fix-floating-label">
+                    <textarea class="form-control" name="description" id="${formId}_description"
+                              placeholder="Description"></textarea>
+                    <label class="form-label text-muted" for="${formId}_description">Description</label>
+                </div>
+                <div class="form-floating mt-3">
+                    <input class="form-control" type="text" name="url" id="${formId}_url"
+                           placeholder="Link">
+                    <label class="form-label text-muted" for="${formId}_url">Link</label>
+                </div>
+                <div class="form-floating mt-3">
+                    <input class="form-control" type="date" name="startDate" id="${formId}_startDate"
+                           placeholder="Start date">
+                    <label class="form-label text-muted" for="${formId}_startDate">Start date</label>
+                </div>
+                <div class="form-floating mt-3">
+                    <input class="form-control" type="date" name="endDate" id="${formId}_endDate"
+                           placeholder="End date">
+                    <label class="form-label text-muted" for="${formId}_endDate">End date</label>
+                </div>
+                <div class="mt-3">
+                    <label class="form-label text-muted" for="${formId}_imageUriData">Project image</label>
+                    <div class="card w-100 mt-3">
+                        <img id="${formId}_image" class="card-img-top" alt="" src="">
+                        <div class="card-body">
+                            <input type="hidden" name="imageUri" id="${formId}_imageUri"/>
+                            <input class="form-control" type="file" accept="image/*" name="imageUriData"
+                                   id="${formId}_imageUriData"
+                                   placeholder="Project image">
+                        </div>
                     </div>
                 </div>
             </div>
+            <script src="<@spring.url "/js/GithubImporter.js"/>"></script>
+            <script>
+                (async () => {
+                    let githubImporter = new GithubImporter("githubImporter", _applyProjectToForm.bind(null, "${formId}"));
+                    await githubImporter.init();
+                    document.getElementById("${popupId}").addEventListener("hidden.bs.modal", () => {
+                        githubImporter.feedbackElem.textContent = "";
+                    });
+                })();
+            </script>
         </@formPopup>
     </#if>
 </#macro>
@@ -354,16 +395,22 @@
             function _applyCourseToModal(json) {
                 _assignDefaultValue({publisher: "Link"}, json)
                 _applyJsonToModal("${popupId}", json)
-                document.querySelector("#${popupId} [data-prop-manual='imageUri']").src = json["imageUri"]
+                const imageGroup = document.querySelector("#${popupId} .image-group")
+                if (json["imageUri"]) {
+                    imageGroup.classList.remove("d-none");
+                    document.querySelector("#${popupId} [data-prop-manual='imageUri']").src = json["imageUri"]
+                } else {
+                    imageGroup.classList.add("d-none");
+                }
                 document.querySelector("#${popupId} [data-prop-manual='url']").href = json["url"]
             }
         </script>
         <@overviewPopup popupId=popupId uriBase=uriBase overviewPopup=overviewPopupDetails applyMethod="_applyCourseToModal">
             <div class="pt-0 card-body">
-                <div class="d-flex justify-content-around align-items-center flex-column flex-lg-row">
+                <div class="d-flex align-items-center flex-column flex-lg-row">
                     <#-- below lg: width(100) me(0) mb(3) -->
                     <#-- lg and above: width(50) me(3) mb(0) -->
-                    <div class="card w-100 me-0 mb-3 w-lg-50 me-lg-3 mb-lg-0">
+                    <div class="card w-100 me-0 mb-3 w-lg-50 me-lg-3 mb-lg-0 image-group">
                         <img class="card-img-top" data-prop-manual="imageUri" src="" alt="Course image">
                     </div>
                     <div class="w-100 w-lg-50">
@@ -377,11 +424,11 @@
                         </h6>
                         <div data-group="description">
                             <div class="text-black">Course description</div>
-                            <p class="mt-0 limit-lines-8" data-prop="description"></p>
+                            <p class="mt-0 preserve-lines limit-lines-8" data-prop="description"></p>
                         </div>
                         <div data-group="studentComment">
                             <div class="text-black">Course reflection</div>
-                            <p class="mt-0" data-prop="studentComment"></p>
+                            <p class="mt-0 preserve-lines" data-prop="studentComment"></p>
                         </div>
                     </div>
                 </div>

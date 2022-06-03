@@ -68,12 +68,6 @@
                                    placeholder="Name">
                             <label class="form-label text-muted" for="projectName">Name</label>
                         </div>
-                        <div class="form-floating mt-3">
-                            <input class="form-control" required type="text" data-project-prop="category"
-                                   id="projectCategory"
-                                   placeholder="Category">
-                            <label class="form-label text-muted" for="projectCategory">Category</label>
-                        </div>
                         <div class="form-floating mt-3 fix-floating-label">
                             <textarea class="form-control" data-project-prop="description" id="projectDescription"
                                       placeholder="Description"></textarea>
@@ -186,7 +180,6 @@
                     }
                     this.name = this.element.querySelector("[data-project-prop='name']");
                     this.description = this.element.querySelector("[data-project-prop='description']");
-                    this.category = this.element.querySelector("[data-project-prop='category']");
                     this.url = this.element.querySelector("[data-project-prop='url']");
                     this.startDate = this.element.querySelector("[data-project-prop='startDate']");
                     this.endDate = this.element.querySelector("[data-project-prop='endDate']");
@@ -197,7 +190,6 @@
                 applyProjectToForm = (projectObj) => {
                     form.name.value = projectObj.name || "";
                     form.description.value = projectObj.description || "";
-                    form.category.value = projectObj.category || "";
                     form.url.value = projectObj.url || "";
                     form.startDate.value = projectObj.startDate || "";
                     form.endDate.value = projectObj.endDate || "";
@@ -209,7 +201,6 @@
                 applyFormToProject = (projectObj) => {
                     projectObj.name = form.name.value.trim();
                     projectObj.description = form.description.value.trim();
-                    projectObj.category = form.category.value.trim();
                     projectObj.startDate = form.startDate.value;
                     projectObj.endDate = form.endDate.value;
                     projectObj.url = form.url.value.trim();
@@ -244,7 +235,6 @@
                             projectCards.remove(projectCard);
                             projectCard = projectCards.add({
                                 title: projectObj.name,
-                                subtitle: projectObj.category,
                                 text: projectObj.description,
                                 imageUri: projectObj.imageUri,
                             });
@@ -268,7 +258,6 @@
                             projectObj = projects.add(projectObj);
                             const card = projectCards.add({
                                 title: projectObj.name,
-                                subtitle: projectObj.category,
                                 text: projectObj.description,
                                 imageUri: projectObj.imageUri,
                             });
@@ -318,7 +307,6 @@
                 projectArray.forEach(projectObj => {
                     const projectCard = projectCards.add({
                         title: projectObj.name,
-                        subtitle: projectObj.category,
                         text: projectObj.description,
                         imageUri: projectObj.imageUri,
                     });
