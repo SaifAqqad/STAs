@@ -276,7 +276,7 @@
                             <div class="row row-cols-1 row-cols-lg-2">
                                 <#list profile.projects as project>
                                     <div class="col mb-3">
-                                        <@profileCard title=project.name subtitle=project.category text=project.description img=project.imageUri id=project.id?c class="btn bg-hover"/>
+                                        <@profileCard title=project.name text=project.description img=project.imageUri id=project.id?c class="btn bg-hover"/>
                                     </div>
                                 <#else>
                                     <div class="w-100 min-h-100 d-flex justify-content-center align-items-center">

@@ -98,7 +98,6 @@ CREATE TABLE project
 (
     id            BIGINT AUTO_INCREMENT NOT NULL,
     name          VARCHAR(255)          NULL,
-    category      VARCHAR(255)          NULL,
     `description` VARCHAR(5000)         NULL,
     url           VARCHAR(255)          NULL,
     image_uri     VARCHAR(255)          NULL,

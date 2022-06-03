@@ -30,8 +30,6 @@ public class Project {
     @NonNull
     private String name;
 
-    private String category;
-
     @Column(length = 5000)
     private String description;
 

@@ -280,7 +280,6 @@
                                 <span data-prop="name"></span><@default.externalLinkIcon/>
                             </a>
                         </h5>
-                        <h6 class="text-muted" data-prop="category"></h6>
                         <div class="text-muted">
                             <span data-prop="formattedStartDate" data-bs-toggle="tooltip" data-bs-placement="top"
                                   title="" data-prop-manual="startDate"></span> -
