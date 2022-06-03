@@ -13,13 +13,13 @@ import static java.util.Objects.requireNonNull;
 import static java.util.Objects.requireNonNullElse;
 
 @JsonTypeInfo(
-        use = JsonTypeInfo.Id.NAME,
-        property = "profileType"
+    use = JsonTypeInfo.Id.NAME,
+    property = "profileType"
 )
 @JsonSubTypes({
-        @Type(value = GithubProfile.class, name = "github"),
-        @Type(value = GoogleProfile.class, name = "google"),
-        @Type(value = LinkedInProfile.class, name = "linkedin")
+    @Type(value = GithubProfile.class, name = "github"),
+    @Type(value = GoogleProfile.class, name = "google"),
+    @Type(value = LinkedInProfile.class, name = "linkedin")
 })
 public interface OAuthProfile extends Serializable {
     static OAuthProfile getOAuthProfile(OAuth2UserRequest request, OAuth2User user) {
@@ -38,6 +38,8 @@ public interface OAuthProfile extends Serializable {
                 GithubProfile profile = new GithubProfile();
                 String[] fullName = requireNonNull((String) user.getAttribute("name")).split("\\s", 2);
                 var repos = GithubProfile.fetchUserRepositories(request.getAccessToken());
+                // fetch languages for each repo
+                repos.forEach(repo -> repo.setLanguages(GithubProfile.fetchLanguages(repo, request.getAccessToken())));
                 profile.setUniqueId(user.getName());
                 profile.setFirstName(fullName[0]);
                 profile.setLastName(fullName.length > 1 ? fullName[1] : "");

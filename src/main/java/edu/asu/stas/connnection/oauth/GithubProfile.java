@@ -38,9 +38,7 @@ public class GithubProfile implements OAuthProfile {
     public static List<Repository> fetchUserRepositories(OAuth2AccessToken accessToken) {
         String response = http.get(
             API_BASE_URL + "/user/repos?per_page=100",
-            Map.of(
-                AUTHORIZATION, "bearer " + accessToken.getTokenValue()
-            )
+            Map.of(AUTHORIZATION, "bearer " + accessToken.getTokenValue())
         );
         try {
             return objectMapper().readValue(response, new TypeReference<>() {
@@ -48,6 +46,20 @@ public class GithubProfile implements OAuthProfile {
         } catch (JsonProcessingException e) {
             e.printStackTrace();
             return Collections.emptyList();
+        }
+    }
+
+    public static Map<String, Long> fetchLanguages(Repository repository, OAuth2AccessToken accessToken) {
+        String response = http.get(
+            repository.getLanguagesUrl(),
+            Map.of(AUTHORIZATION, "bearer " + accessToken.getTokenValue())
+        );
+        try {
+            return objectMapper().readValue(response, new TypeReference<>() {
+            });
+        } catch (JsonProcessingException e) {
+            e.printStackTrace();
+            return Collections.emptyMap();
         }
     }
 
@@ -65,10 +77,11 @@ public class GithubProfile implements OAuthProfile {
     public static class Repository {
         private String name;
         private String description;
-        private String language;
+        private String languagesUrl;
         private Long stargazersCount;
         private String htmlUrl;
         private Date createdAt;
         private Date updatedAt;
+        private Map<String, Long> languages;
     }
 }
