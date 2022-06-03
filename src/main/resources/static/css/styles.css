@@ -231,18 +231,18 @@ pre {
 }
 
 /* Timeline css */
-.timeline-sm {
+.timeline {
     padding-left: 130px;
 }
 
-.timeline-sm .timeline-sm-item {
+.timeline .timeline-item {
     position: relative;
     padding-bottom: 20px;
     padding-left: 40px;
     border-left: 2px solid #dee2e6;
 }
 
-.timeline-sm .timeline-sm-item:after {
+.timeline .timeline-item:after {
     content: "";
     display: block;
     position: absolute;
@@ -255,17 +255,17 @@ pre {
     border: 2px solid #7D8893;
 }
 
-.timeline-sm .timeline-sm-item .timeline-sm-date {
+.timeline .timeline-item .timeline-date {
     position: absolute;
     left: -130px;
 }
 
 @media (max-width: 420px) {
-    .timeline-sm {
+    .timeline {
         padding-left: 0;
     }
 
-    .timeline-sm .timeline-sm-date {
+    .timeline .timeline-date {
         position: relative !important;
         display: block;
         left: 0 !important;

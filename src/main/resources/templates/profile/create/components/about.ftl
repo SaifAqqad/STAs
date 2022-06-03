@@ -25,7 +25,7 @@
                 </div>
             </div>
             <div class="card card-border-grey p-3 pb-1 mt-3 d-none md-content" style="min-height: 4rem"></div>
-            <div class="mt-4 clearfix">
+            <div class="mt-3 clearfix">
                 <@shared.backBtn/>
                 <@shared.nextBtn/>
             </div>
@@ -70,6 +70,7 @@
                 } else {
                     mdEdit.classList.remove("d-none");
                     mdContent.classList.add("d-none");
+                    _updateAutoTextArea(aboutElem);
                 }
             });
 

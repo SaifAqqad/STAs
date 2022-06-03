@@ -5,18 +5,18 @@
 <#macro card>
     <div id="projectCard" class="card rounded-3 user-select-none w-100">
         <div class="card-body">
-            <div class="card card-border-grey w-100 mt-3 p-3 pt-2">
-                <div class="d-flex justify-content-between align-items-center">
-                    <h6 class="card-title mb-2">
-                        Have you worked on any projects?
-                    </h6>
-                    <button class="btn btn-outline-primary mb-2" id="addProjectButton">Add project</button>
-                </div>
+            <div class="d-flex justify-content-between align-items-center">
+                <h6 class="card-title mb-2">
+                    Have you worked on any projects?
+                </h6>
+                <button class="btn btn-outline-primary mb-2" id="addProjectButton">Add project</button>
+            </div>
+            <div class="card border-0 shadow-none bg-white w-100 mt-3 p-3 py-0">
                 <div class="row row-cols-1" id="projectsContainer">
                     <@shared.emptyContainer/>
                 </div>
             </div>
-            <div class="mt-4 clearfix">
+            <div class="mt-3 clearfix">
                 <@shared.backBtn/>
                 <@shared.nextBtn/>
             </div>

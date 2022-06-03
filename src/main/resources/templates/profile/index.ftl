@@ -211,11 +211,11 @@
                             </div>
                         <#-- Content -->
                             <#list profile.experiences>
-                                <ul class="list-unstyled timeline-sm">
+                                <ul class="list-unstyled timeline">
                                     <#items as experience>
-                                        <li class="timeline-sm-item cursor-pointer bg-hover text-hover-dark smooth"
+                                        <li class="timeline-item cursor-pointer bg-hover text-hover-dark smooth"
                                             data-id="${experience.id}">
-                                            <span class="timeline-sm-date">${experience.startDate.year?c} - ${(experience.endDate.year?c)!"Present"}</span>
+                                            <span class="timeline-date">${experience.startDate.year?c} - ${(experience.endDate.year?c)!"Present"}</span>
                                             <div class="pt-1 mb-1 card-title fs-115">${experience.jobTitle}</div>
                                             <p class="text-muted">${experience.companyName}</p>
                                             <#if experience.description??>
