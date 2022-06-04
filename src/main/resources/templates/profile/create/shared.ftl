@@ -89,6 +89,7 @@
                 projects: [],
                 experiences: [],
             }
+
             static Course = (class {
                 id = null;
                 name = null;
@@ -133,6 +134,22 @@
                 description = null;
                 startDate = null;
                 endDate = null;
+
+                constructor(obj = null) {
+                    if (obj === null)
+                        return;
+                    for (const prop in this) {
+                        this[prop] = obj[prop] || this[prop];
+                    }
+                }
+            });
+
+            static Activity = (class {
+                id = null;
+                name = null;
+                description = null;
+                imageUri = null;
+                date = null;
 
                 constructor(obj = null) {
                     if (obj === null)
@@ -212,6 +229,7 @@
                 col.classList.add("col", "mb-3");
                 col.appendChild(card);
                 this.#container.appendChild(col);
+                updateTabsHeight();
                 return this.#container.lastElementChild.firstElementChild;
             }
 
@@ -227,6 +245,7 @@
                     const emptyContainer = template.content.firstElementChild;
                     this.#container.appendChild(emptyContainer);
                 }
+                updateTabsHeight();
             }
         }
     </script>

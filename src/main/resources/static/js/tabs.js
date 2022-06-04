@@ -59,6 +59,7 @@ function updateTabIndicators(tabIndex) {
 function updateTabsHeight() {
     const tabsContainer = document.querySelector('.tabs');
     const activeTab = document.querySelector('.tab-active');
+    if (!activeTab) return;
     tabsContainer.style.minHeight = `${activeTab.offsetHeight}px`;
 }
 
