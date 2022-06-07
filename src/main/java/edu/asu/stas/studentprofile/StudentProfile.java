@@ -1,5 +1,6 @@
 package edu.asu.stas.studentprofile;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import edu.asu.stas.studentprofile.activity.Activity;
 import edu.asu.stas.studentprofile.course.Course;
@@ -74,6 +75,7 @@ public class StudentProfile implements Serializable {
     private final LinkedCaseInsensitiveMap<String> links = new LinkedCaseInsensitiveMap<>();
 
     @OneToOne(targetEntity = User.class, fetch = FetchType.LAZY, optional = false)
+    @JsonIgnore
     private User user;
 
     @JsonProperty("publicUri")
