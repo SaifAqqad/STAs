@@ -187,8 +187,6 @@
                 window.localStorage.removeItem("profile");
             }
         }
-
-        // TODO: add profile submit functionality
         </#noparse>
 
         class itemCardFactory {

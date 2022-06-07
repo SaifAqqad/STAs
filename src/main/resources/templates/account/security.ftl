@@ -212,7 +212,7 @@
         const accountDeleteModal = document.getElementById("accountDeleteModal");
         accountDeleteBtn.addEventListener("click", () => {
             let modal = new bootstrap.Modal(accountDeleteModal);
-            accountDeleteModal.addEventListener("shown.bs.modal", () => document.getElementById("accountDeleteCode2FA").focus());
+            accountDeleteModal.addEventListener("shown.bs.modal", () => document.getElementById("accountDeleteCode2FA")?.focus());
             modal.show(null);
         })
     })()
