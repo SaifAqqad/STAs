@@ -145,11 +145,13 @@ public class StudentProfileService {
         savedProfile.getProjects().addAll(profile.getProjects());
         savedProfile.getProjects().forEach(project -> this.processProject(project, savedProfile));
         savedProfile.getExperiences().addAll(profile.getExperiences());
+        savedProfile.getExperiences().forEach(experience -> this.processExperience(experience, savedProfile));
         initialProfile = studentProfileRepository.save(savedProfile);
         return initialProfile;
     }
 
     private void processCourse(Course course, StudentProfile profile) {
+        course.setId(null);
         course.setProfile(profile);
         if (course.getImageUri() != null) {
             var courseImage = course.getImageUri();
@@ -169,6 +171,7 @@ public class StudentProfileService {
     }
 
     private void processActivity(Activity activity, StudentProfile profile) {
+        activity.setId(null);
         activity.setProfile(profile);
         if (activity.getImageUri() != null) {
             var activityImage = activity.getImageUri();
@@ -188,6 +191,7 @@ public class StudentProfileService {
     }
 
     private void processProject(Project project, StudentProfile profile) {
+        project.setId(null);
         project.setProfile(profile);
         if (project.getImageUri() != null) {
             var projectImage = project.getImageUri();
@@ -204,5 +208,11 @@ public class StudentProfileService {
             }
         }
         projectRepository.save(project);
+    }
+
+    private void processExperience(Experience experience, StudentProfile savedProfile) {
+        experience.setId(null);
+        experience.setProfile(savedProfile);
+        experienceRepository.save(experience);
     }
 }
