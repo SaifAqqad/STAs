@@ -21,6 +21,6 @@ public class DataURIResource {
         if(dataInfoParts.length > 1) {
             encoding = dataInfoParts[1];
         }
-        data = Base64Utils.decodeFromUrlSafeString(dataUri.substring(comma + 1));
+        data = Base64Utils.decodeFromString(dataUri.substring(comma + 1));
     }
 }
