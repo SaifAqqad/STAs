@@ -19,9 +19,9 @@ public class ActivityController {
     private final ContentService contentService;
 
     public ActivityController(
-            StudentProfileService studentProfileService,
-            ActivityRepository activityRepository,
-            ContentService contentService
+        StudentProfileService studentProfileService,
+        ActivityRepository activityRepository,
+        ContentService contentService
     ) {
         this.studentProfileService = studentProfileService;
         this.activityRepository = activityRepository;
@@ -72,19 +72,25 @@ public class ActivityController {
     @PostMapping("/profile/activities/{id}")
     @Transactional
     public RedirectView updateById(
-            @PathVariable Long id,
-            Activity activity,
-            @RequestParam MultipartFile imageUriData,
-            RedirectAttributes redirectAttributes
+        @PathVariable Long id,
+        Activity activity,
+        @RequestParam MultipartFile imageUriData,
+        RedirectAttributes redirectAttributes
     ) throws IOException {
         var profile = studentProfileService.getAuthenticatedUserProfile();
         if (id.equals(activity.getId()) && activityRepository.existsByProfileAndId(profile, activity.getId())) {
             activity.setProfile(profile);
             if (!imageUriData.isEmpty()) {
                 activity.setImageUri(contentService.storeResource(
-                        imageUriData.getResource(),
-                        "activity",
-                        activity.getId().toString()
+                    imageUriData.getResource(),
+                    "activity",
+                    activity.getId().toString()
+                ));
+            } else if (activity.getImageUri() != null) {
+                activity.setImageUri(contentService.storeResource(
+                    activity.getImageUri(),
+                    "activity",
+                    activity.getId().toString()
                 ));
             }
             activityRepository.save(activity);
@@ -100,20 +106,26 @@ public class ActivityController {
     @PostMapping("/profile/activities")
     @Transactional
     public RedirectView addNew(
-            Activity activity,
-            @RequestParam MultipartFile imageUriData,
-            RedirectAttributes redirectAttributes
+        Activity activity,
+        @RequestParam MultipartFile imageUriData,
+        RedirectAttributes redirectAttributes
     ) throws IOException {
         var profile = studentProfileService.getAuthenticatedUserProfile();
         activity.setProfile(profile);
         activity = activityRepository.save(activity);
         if (!imageUriData.isEmpty()) {
             activity.setImageUri(contentService.storeResource(
-                    imageUriData.getResource(),
-                    "activity",
-                    activity.getId().toString()
+                imageUriData.getResource(),
+                "activity",
+                activity.getId().toString()
             ));
             activityRepository.save(activity);
+        } else if (activity.getImageUri() != null) {
+            activity.setImageUri(contentService.storeResource(
+                activity.getImageUri(),
+                "activity",
+                activity.getId().toString()
+            ));
         }
         redirectAttributes.addFlashAttribute("toast", "Activity added successfully");
         return new RedirectView("/profile");

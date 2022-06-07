@@ -19,9 +19,9 @@ public class ProjectController {
     private final ContentService contentService;
 
     public ProjectController(
-            StudentProfileService studentProfileService,
-            ProjectRepository projectRepository,
-            ContentService contentService
+        StudentProfileService studentProfileService,
+        ProjectRepository projectRepository,
+        ContentService contentService
     ) {
         this.studentProfileService = studentProfileService;
         this.projectRepository = projectRepository;
@@ -72,19 +72,25 @@ public class ProjectController {
     @PostMapping("/profile/projects/{id}")
     @Transactional
     public RedirectView updateById(
-            @PathVariable Long id,
-            Project project,
-            @RequestParam MultipartFile imageUriData,
-            RedirectAttributes redirectAttributes
+        @PathVariable Long id,
+        Project project,
+        @RequestParam MultipartFile imageUriData,
+        RedirectAttributes redirectAttributes
     ) throws IOException {
         var profile = studentProfileService.getAuthenticatedUserProfile();
         if (id.equals(project.getId()) && projectRepository.existsByProfileAndId(profile, project.getId())) {
             project.setProfile(profile);
             if (!imageUriData.isEmpty()) {
                 project.setImageUri(contentService.storeResource(
-                        imageUriData.getResource(),
-                        "project",
-                        project.getId().toString()
+                    imageUriData.getResource(),
+                    "project",
+                    project.getId().toString()
+                ));
+            } else if (project.getImageUri() != null) {
+                project.setImageUri(contentService.storeResource(
+                    project.getImageUri(),
+                    "project",
+                    project.getId().toString()
                 ));
             }
             projectRepository.save(project);
@@ -100,20 +106,26 @@ public class ProjectController {
     @PostMapping("/profile/projects")
     @Transactional
     public RedirectView addNew(
-            Project project,
-            @RequestParam MultipartFile imageUriData,
-            RedirectAttributes redirectAttributes
+        Project project,
+        @RequestParam MultipartFile imageUriData,
+        RedirectAttributes redirectAttributes
     ) throws IOException {
         var profile = studentProfileService.getAuthenticatedUserProfile();
         project.setProfile(profile);
         project = projectRepository.save(project);
         if (!imageUriData.isEmpty()) {
             project.setImageUri(contentService.storeResource(
-                    imageUriData.getResource(),
-                    "project",
-                    project.getId().toString()
+                imageUriData.getResource(),
+                "project",
+                project.getId().toString()
             ));
             projectRepository.save(project);
+        } else if (project.getImageUri() != null) {
+            project.setImageUri(contentService.storeResource(
+                project.getImageUri(),
+                "project",
+                project.getId().toString()
+            ));
         }
         redirectAttributes.addFlashAttribute("toast", "Project added successfully");
         return new RedirectView("/profile");

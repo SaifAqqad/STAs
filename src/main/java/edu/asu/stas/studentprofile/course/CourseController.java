@@ -20,9 +20,9 @@ public class CourseController {
 
 
     public CourseController(
-            StudentProfileService studentProfileService,
-            CourseRepository courseRepository,
-            ContentService contentService
+        StudentProfileService studentProfileService,
+        CourseRepository courseRepository,
+        ContentService contentService
     ) {
         this.studentProfileService = studentProfileService;
         this.courseRepository = courseRepository;
@@ -73,19 +73,25 @@ public class CourseController {
     @PostMapping("/profile/courses/{id}")
     @Transactional
     public RedirectView updateById(
-            @PathVariable Long id,
-            Course course,
-            @RequestParam MultipartFile imageUriData,
-            RedirectAttributes redirectAttributes
+        @PathVariable Long id,
+        Course course,
+        @RequestParam MultipartFile imageUriData,
+        RedirectAttributes redirectAttributes
     ) throws IOException {
         var profile = studentProfileService.getAuthenticatedUserProfile();
         if (id.equals(course.getId()) && courseRepository.existsByProfileAndId(profile, course.getId())) {
             course.setProfile(profile);
             if (!imageUriData.isEmpty()) {
                 course.setImageUri(contentService.storeResource(
-                        imageUriData.getResource(),
-                        "course",
-                        course.getId().toString()
+                    imageUriData.getResource(),
+                    "course",
+                    course.getId().toString()
+                ));
+            } else if (course.getImageUri() != null) {
+                course.setImageUri(contentService.storeResource(
+                    course.getImageUri(),
+                    "course",
+                    course.getId().toString()
                 ));
             }
             courseRepository.save(course);
@@ -101,20 +107,26 @@ public class CourseController {
     @PostMapping("/profile/courses")
     @Transactional
     public RedirectView addNew(
-            Course course,
-            @RequestParam MultipartFile imageUriData,
-            RedirectAttributes redirectAttributes
+        Course course,
+        @RequestParam MultipartFile imageUriData,
+        RedirectAttributes redirectAttributes
     ) throws IOException {
         var profile = studentProfileService.getAuthenticatedUserProfile();
         course.setProfile(profile);
         course = courseRepository.save(course);
         if (!imageUriData.isEmpty()) {
             course.setImageUri(contentService.storeResource(
-                    imageUriData.getResource(),
-                    "course",
-                    course.getId().toString()
+                imageUriData.getResource(),
+                "course",
+                course.getId().toString()
             ));
             courseRepository.save(course);
+        } else if (course.getImageUri() != null) {
+            course.setImageUri(contentService.storeResource(
+                course.getImageUri(),
+                "course",
+                course.getId().toString()
+            ));
         }
         redirectAttributes.addFlashAttribute("toast", "Course added successfully");
         return new RedirectView("/profile");

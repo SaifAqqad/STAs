@@ -8,6 +8,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.validation.BindingResult;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.bind.support.SessionStatus;
 import org.springframework.web.multipart.MultipartFile;
@@ -40,9 +42,9 @@ public class StudentProfileController {
 
     @GetMapping("/profile")
     public String getProfilePage(
-            @RequestParam(required = false) Boolean edit,
-            Model model,
-            SessionStatus sessionStatus
+        @RequestParam(required = false) Boolean edit,
+        Model model,
+        SessionStatus sessionStatus
     ) {
         StudentProfile profile = getStudentProfile();
         if (Objects.isNull(profile)) return "redirect:/profile/create";
@@ -78,6 +80,19 @@ public class StudentProfileController {
         return "profile/create/index";
     }
 
+    @PostMapping("/profile/create")
+    @ResponseBody
+    public ResponseEntity<StudentProfile> createProfile(
+        @Validated @RequestBody StudentProfile profile,
+        BindingResult bindingResult
+    ) {
+        if (bindingResult.hasErrors()) {
+            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+        }
+        profile = studentProfileService.createProfile(profile);
+        return ResponseEntity.ok(profile);
+    }
+
     @PostMapping("/profile/about")
     public String updateProfileAbout(String about, RedirectAttributes redirectAttributes) {
         StudentProfile profile = getStudentProfile();
@@ -91,29 +106,33 @@ public class StudentProfileController {
 
     @PostMapping("/profile/info")
     public String updateProfileInfo(
-            ProfileInfo profileInfo,
-            @RequestParam Map<String, String> links,
-            RedirectAttributes redirectAttributes
+        ProfileInfo profileInfo,
+        @RequestParam Map<String, String> links,
+        RedirectAttributes redirectAttributes
     ) {
         StudentProfile profile = Objects.requireNonNull(getStudentProfile());
-        studentProfileService.updateProfileInfo(profile,
-                                                profileInfo,
-                                                links.entrySet()
-                                                     .stream()
-                                                     .filter(entry -> entry.getKey().startsWith("link_") &&
-                                                             !entry.getValue().isBlank())
-                                                     .collect(Collectors.toMap(entry -> entry.getKey()
-                                                                                             .replaceFirst("link_", ""),
-                                                                               Map.Entry::getValue)));
+        studentProfileService.updateProfileInfo(
+            profile,
+            profileInfo,
+            links.entrySet()
+                 .stream()
+                 .filter(entry -> entry.getKey().startsWith("link_") &&
+                     !entry.getValue().isBlank())
+                 .collect(Collectors.toMap(
+                     entry -> entry.getKey()
+                                   .replaceFirst("link_", ""),
+                     Map.Entry::getValue
+                 ))
+        );
         redirectAttributes.addFlashAttribute("toast", "Profile updated successfully");
         return "redirect:/profile";
     }
 
     @PostMapping("/profile/info/links")
     public String addNewLink(
-            @RequestParam String linkName,
-            @RequestParam String linkUrl,
-            RedirectAttributes redirectAttributes
+        @RequestParam String linkName,
+        @RequestParam String linkUrl,
+        RedirectAttributes redirectAttributes
     ) {
         StudentProfile profile = Objects.requireNonNull(getStudentProfile());
         var links = profile.getLinks();
@@ -130,15 +149,17 @@ public class StudentProfileController {
 
     @PostMapping("/profile/picture")
     public String updateProfilePicture(
-            @RequestParam MultipartFile imageUriData,
-            RedirectAttributes redirectAttributes
+        @RequestParam MultipartFile imageUriData,
+        RedirectAttributes redirectAttributes
     ) throws IOException {
         deleteProfilePicture(redirectAttributes);
         StudentProfile profile = Objects.requireNonNull(getStudentProfile());
         if (!imageUriData.isEmpty()) {
-            profile.setImageUri(contentService.storeResource(imageUriData.getResource(),
-                                                             "profile",
-                                                             profile.getId().toString()));
+            profile.setImageUri(contentService.storeResource(
+                imageUriData.getResource(),
+                "profile",
+                profile.getId().toString()
+            ));
             studentProfileService.saveProfile(profile);
         }
         redirectAttributes.addFlashAttribute("toast", "Profile picture updated successfully");
@@ -170,8 +191,10 @@ public class StudentProfileController {
     @ResponseBody
     public ResponseEntity<ProfilePrivacy> getProfilePrivacy() {
         StudentProfile profile = Objects.requireNonNull(getStudentProfile());
-        return ResponseEntity.ok(new ProfilePrivacy(profile.isPublic(),
-                                                    profile.getUuid(),
-                                                    profile.isIncludeInSearch()));
+        return ResponseEntity.ok(new ProfilePrivacy(
+            profile.isPublic(),
+            profile.getUuid(),
+            profile.isIncludeInSearch()
+        ));
     }
 }

@@ -1,5 +1,6 @@
 package edu.asu.stas.studentprofile;
 
+import edu.asu.stas.content.ContentService;
 import edu.asu.stas.lib.TokenGenerator;
 import edu.asu.stas.studentprofile.activity.Activity;
 import edu.asu.stas.studentprofile.activity.ActivityRepository;
@@ -15,11 +16,12 @@ import lombok.NonNull;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import javax.transaction.Transactional;
+import java.io.IOException;
 import java.util.Comparator;
 import java.util.Map;
 import java.util.Objects;
 
-@SuppressWarnings("ClassCanBeRecord")
 @Service
 public class StudentProfileService {
 
@@ -29,15 +31,17 @@ public class StudentProfileService {
     private final ExperienceRepository experienceRepository;
     private final ProjectRepository projectRepository;
     private final TokenGenerator tokenGenerator;
+    private final ContentService contentService;
 
     @Autowired
     public StudentProfileService(
-            StudentProfileRepository studentProfileRepository,
-            ActivityRepository activityRepository,
-            CourseRepository courseRepository,
-            ExperienceRepository experienceRepository,
-            ProjectRepository projectRepository,
-            TokenGenerator tokenGenerator
+        StudentProfileRepository studentProfileRepository,
+        ActivityRepository activityRepository,
+        CourseRepository courseRepository,
+        ExperienceRepository experienceRepository,
+        ProjectRepository projectRepository,
+        TokenGenerator tokenGenerator,
+        ContentService contentService
     ) {
         this.studentProfileRepository = studentProfileRepository;
         this.activityRepository = activityRepository;
@@ -45,6 +49,7 @@ public class StudentProfileService {
         this.experienceRepository = experienceRepository;
         this.projectRepository = projectRepository;
         this.tokenGenerator = tokenGenerator;
+        this.contentService = contentService;
     }
 
     public StudentProfile getProfileByUser(@NonNull User user) {
@@ -119,5 +124,45 @@ public class StudentProfileService {
 
     public void deleteProfile(@NonNull StudentProfile studentProfile) {
         studentProfileRepository.delete(studentProfile);
+    }
+
+    @Transactional
+    public StudentProfile createProfile(StudentProfile profile) {
+        profile.getCourses().forEach(this::processCourse);
+        profile.getActivities().forEach(this::processActivity);
+        profile.getProjects().forEach(this::processProject);
+        profile.setUser(UserService.getAuthenticatedUser());
+        profile = studentProfileRepository.save(profile);
+        return profile;
+    }
+
+    private void processCourse(Course course) {
+        if (course.getImageUri() != null) {
+            try {
+                course.setImageUri(contentService.storeResource(course.getImageUri(), "course", course.getId().toString()));
+            } catch (IOException e) {
+                course.setImageUri(null);
+            }
+        }
+    }
+
+    private void processActivity(Activity activity) {
+        if (activity.getImageUri() != null) {
+            try {
+                activity.setImageUri(contentService.storeResource(activity.getImageUri(), "activity", activity.getId().toString()));
+            } catch (IOException e) {
+                activity.setImageUri(null);
+            }
+        }
+    }
+
+    private void processProject(Project project) {
+        if (project.getImageUri() != null) {
+            try {
+                project.setImageUri(contentService.storeResource(project.getImageUri(), "project", project.getId().toString()));
+            } catch (IOException e) {
+                project.setImageUri(null);
+            }
+        }
     }
 }
