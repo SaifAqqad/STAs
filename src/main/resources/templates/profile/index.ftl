@@ -72,7 +72,8 @@
                             <#-- name and major -->
                             <div class="profile-view-items">
                                 <div class="fs-4 profile-view-item" data-prop="name">${profile.name}</div>
-                                <div class="fs-6 text-muted profile-view-item" data-prop="major">${profile.major}</div>
+                                <div class="fs-6 text-muted profile-view-item"
+                                     data-prop="major">${profile.major!""}</div>
                             </div>
                             <@editOnly>
                                 <div class="profile-edit-items text-start d-none">
@@ -84,7 +85,7 @@
                                     <div class="mt-2">
                                         <label class="form-label text-muted mb-0" for="edit_major">Major</label>
                                         <input class="form-control form-control-sm profile-edit-item" type="text"
-                                               data-prop="major" id="edit_major" value="${profile.major}">
+                                               data-prop="major" id="edit_major" value="${profile.major!""}">
                                     </div>
                                 </div>
                             </@editOnly>
@@ -92,10 +93,10 @@
                         <hr class="mx-4"/>
                         <#-- profile info -->
                         <div class="px-3 profile-view-items">
-                            <@profileViewItem text=profile.location name="location" icon="location"/>
-                            <@profileViewItem text=profile.university name="university" icon="university"/>
-                            <@profileViewItem text=profile.contactEmail name="contactEmail" icon="email" link="mailto:${profile.contactEmail}"/>
-                            <@profileViewItem text=profile.contactPhone name="contactPhone" icon="phone" link="tel:${profile.contactPhone}"/>
+                            <@profileViewItem text=profile.location!"" name="location" icon="location"/>
+                            <@profileViewItem text=profile.university!"" name="university" icon="university"/>
+                            <@profileViewItem text=profile.contactEmail!"" name="contactEmail" icon="email" link="mailto:${profile.contactEmail}"/>
+                            <@profileViewItem text=profile.contactPhone!"" name="contactPhone" icon="phone" link="tel:${profile.contactPhone}"/>
                             <div class="profile-view-links">
                                 <#list profile.links as linkName, linkUrl>
                                     <@profileViewItem text=linkName name="link_${linkName}" icon=linkName?lower_case link=linkUrl showLinkIcon=true includeUrl=true/>
@@ -113,13 +114,13 @@
                                       enctype="multipart/form-data">
                                     <@default.csrfInput/>
                                     <input class="hidden-profile-edit-item" type="hidden" name="name"
-                                           value="${profile.name}">
+                                           value="${profile.name!""}">
                                     <input class="hidden-profile-edit-item" type="hidden" name="major"
-                                           value="${profile.major}">
-                                    <@profileEditItem icon="location" name="location" label="Location" value=profile.location/>
-                                    <@profileEditItem icon="university" name="university" label="University" value=profile.university/>
-                                    <@profileEditItem icon="email" name="contactEmail" label="Contact email" value=profile.contactEmail/>
-                                    <@profileEditItem icon="phone" name="contactPhone" label="Contact phone" value=profile.contactPhone/>
+                                           value="${profile.major!""}">
+                                    <@profileEditItem icon="location" name="location" label="Location" value=profile.location!""/>
+                                    <@profileEditItem icon="university" name="university" label="University" value=profile.university!""/>
+                                    <@profileEditItem icon="email" name="contactEmail" label="Contact email" value=profile.contactEmail!""/>
+                                    <@profileEditItem icon="phone" name="contactPhone" label="Contact phone" value=profile.contactPhone!""/>
                                     <#list profile.links >
                                         <div class="d-flex justify-content-evenly align-items-center user-select-none mt-1">
                                             <div class="text-muted fs-6 me-1">Links</div>
@@ -560,7 +561,7 @@ overviewPopupDetails={
     </div>
 </#macro>
 
-<#macro profileViewItem text name icon="" link="" showLinkIcon=false includeUrl=false>
+<#macro profileViewItem text="" name="" icon="" link="" showLinkIcon=false includeUrl=false>
     <#if text?has_content>
         <div class="text-muted fs-6 text-truncate">
             <#if link?has_content>

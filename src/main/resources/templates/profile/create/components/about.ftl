@@ -48,8 +48,8 @@
             // setup auto-expanding textarea
             _setupAutoTextArea(aboutElem);
             aboutElem.addEventListener("input", () => {
-                _updateAutoTextArea(aboutElem);
                 aboutCharCount.textContent = `${aboutElem.value.length}/5000`;
+                updateTabsHeight();
             });
 
             // save about content on blur
