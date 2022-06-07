@@ -56,21 +56,21 @@
 
 <#macro profileCard name="_" imageUri="_" publicUri="_" major="_" location="_" university="_">
     <div class="p-0 card card-border-grey h-100 user-select-none btn bg-hover animate__animated animate__fadeIn animate__faster profile-card">
-        <img src="${imageUri}" data-prop="imageUri" class="card-img-top" onerror="_setPlaceholder(this)"
-             data-placeholder="/images/generic_profile.jpeg" alt="Profile Picture">
+        <img src="${imageUri}" data-prop="imageUri" data-default="/images/generic_profile.jpeg" data-attribute="src"
+             class="card-img-top" alt="Profile Picture">
         <div class="card-body d-flex flex-column flex-grow-1 w-100 align-content-start text-start">
-            <h5 class="card-title" data-prop="name">${name}</h5>
+            <h5 class="card-title" data-prop="name" data-attribute="innerText">${name}</h5>
             <h6 class="card-subtitle mb-2 text-muted overflow-hidden text-truncate"
-                data-prop="major">${major}</h6>
-            <div class="text-muted fs-6 overflow-hidden text-truncate">
+                data-prop="major" data-attribute="innerText">${major}</h6>
+            <div class="text-muted fs-6 overflow-hidden text-truncate" data-group="location">
                 <@default.icon name="location" fallback="web" class="mx-1"/>
-                <span data-prop="location" class="profile-view-item">${location}</span>
+                <span data-prop="location" data-attribute="innerText" class="profile-view-item">${location}</span>
             </div>
-            <div class="text-muted fs-6 overflow-hidden text-truncate">
+            <div class="text-muted fs-6 overflow-hidden text-truncate" data-group="university">
                 <@default.icon name="university" fallback="web" class="mx-1"/>
-                <span data-prop="university" class="profile-view-item">${university}</span>
+                <span data-prop="university" data-attribute="innerText" class="profile-view-item">${university}</span>
             </div>
-            <a data-prop="publicUri" href="${publicUri}" class="stretched-link"></a>
+            <a data-prop="publicUri" data-attribute="href" href="${publicUri}" class="stretched-link"></a>
         </div>
     </div>
 </#macro>
@@ -118,12 +118,15 @@
             const templateElem = document.createElement('template');
             templateElem.innerHTML = profileCardTemplate;
             const profileCard = templateElem.content.firstElementChild;
-            profileCard.querySelector('[data-prop="name"]').innerText = profile["name"];
-            profileCard.querySelector('[data-prop="major"]').innerText = profile["major"];
-            profileCard.querySelector('[data-prop="location"]').innerText = profile["location"];
-            profileCard.querySelector('[data-prop="university"]').innerText = profile["university"];
-            profileCard.querySelector('[data-prop="publicUri"]').href = profile["publicUri"];
-            profileCard.querySelector('[data-prop="imageUri"]').src = profile["imageUri"] || "";
+            profileCard.querySelectorAll('[data-prop][data-attribute]').forEach(elem => {
+                // If the property is not set and there is no default value
+                if (!profile[elem.dataset.prop] && !elem.dataset.default) {
+                    elem.classList.add('d-none'); // hide it
+                    profileCard.querySelector('[data-group="' + elem.dataset.prop + '"]')?.classList.add('d-none'); // hide the group
+                }
+                elem[elem.dataset.attribute] = profile[elem.dataset.prop] || elem.dataset.default || "";
+
+            });
             const column = document.createElement('div');
             column.classList.add('col', 'mb-3', 'd-flex', 'justify-content-center', 'justify-content-md-start');
             column.appendChild(profileCard);
