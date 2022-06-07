@@ -141,7 +141,7 @@ public class AccountController {
             redirectAttributes.addFlashAttribute("toast", "Authentication code invalid");
             return "redirect:/account/security";
         }
-        boolean isDeleted = userService.deleteUser(user);
+        boolean isDeleted = userService.deleteUserById(user.getId());
         if(!isDeleted){
             redirectAttributes.addFlashAttribute("toastColor", "danger");
             redirectAttributes.addFlashAttribute("toast", "Account deletion failed");

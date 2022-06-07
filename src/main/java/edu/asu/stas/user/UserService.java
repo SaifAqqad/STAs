@@ -358,7 +358,8 @@ public class UserService implements UserDetailsService, OAuth2UserService<OAuth2
     }
 
     @Transactional
-    public boolean deleteUser(User user) {
+    public boolean deleteUserById(Long userId) {
+        User user = userRepository.findById(userId).orElseThrow();
         StudentProfile profile = studentProfileService.getProfileByUser(user);
         try {
             if (Objects.nonNull(profile)) {

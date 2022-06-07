@@ -58,16 +58,16 @@ public class StudentProfile implements Serializable {
 
     private boolean includeInSearch = false;
 
-    @OneToMany(mappedBy = "profile", orphanRemoval = true)
+    @OneToMany(mappedBy = "profile", cascade = CascadeType.ALL, orphanRemoval = true)
     private final List<Course> courses = new ArrayList<>();
 
-    @OneToMany(mappedBy = "profile", orphanRemoval = true)
+    @OneToMany(mappedBy = "profile", cascade = CascadeType.ALL, orphanRemoval = true)
     private final List<Activity> activities = new ArrayList<>();
 
-    @OneToMany(mappedBy = "profile", orphanRemoval = true)
+    @OneToMany(mappedBy = "profile", cascade = CascadeType.ALL, orphanRemoval = true)
     private final List<Project> projects = new ArrayList<>();
 
-    @OneToMany(mappedBy = "profile", orphanRemoval = true)
+    @OneToMany(mappedBy = "profile", cascade = CascadeType.ALL, orphanRemoval = true)
     private final List<Experience> experiences = new ArrayList<>();
 
     @Type(type = "json")
