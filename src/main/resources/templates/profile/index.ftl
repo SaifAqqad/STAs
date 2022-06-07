@@ -151,50 +151,52 @@
 
             <#-- Right column -->
             <div id="profileContent" class="col-md-8 col-lg-9">
-
-                <div id="profileAbout" class="mb-3">
-                    <@profileCard class="view-card">
-                    <#-- Title -->
-                        <div class="d-flex justify-content-between align-items-center <@viewOnly>mb-2</@viewOnly>">
-                            <h5 class="card-title mb-2"><@default.icon name="personInfo" class="me-2"/>
-                                About me
-                            </h5>
-                            <@editOnly>
-                                <button class="btn btn-outline-primary mb-2" id="editAboutButton">Edit</button>
-                            </@editOnly>
-                        </div>
-                    <#-- Content -->
-                        <div class="md-content card-text" id="aboutContent"></div>
-                    </@profileCard>
-                    <@editOnly>
-                        <@profileCard class="edit-card d-none">
+                <@editOnly or=profile.about?has_content>
+                    <div id="profileAbout" class="mb-3">
+                        <@profileCard class="view-card">
                         <#-- Title -->
                             <div class="d-flex justify-content-between align-items-center <@viewOnly>mb-2</@viewOnly>">
-                                <h5 class="card-title user-select-none mb-2"><@default.icon name="personInfo" class="me-2"/>
+                                <h5 class="card-title mb-2"><@default.icon name="personInfo" class="me-2"/>
                                     About me
                                 </h5>
-                                <div class="mb-2">
-                                    <button class="btn btn-primary save-btn">Save</button>
-                                    <button class="btn btn-outline-primary cancel-btn">Cancel</button>
-                                </div>
+                                <@editOnly>
+                                    <button class="btn btn-outline-primary mb-2" id="editAboutButton">Edit</button>
+                                </@editOnly>
                             </div>
                         <#-- Content -->
-                            <form action="<@spring.url "/profile/about"/>" method="post" enctype="multipart/form-data">
-                                <@default.csrfInput/>
-                                <div class="mt-2">
+                            <div class="md-content card-text" id="aboutContent"></div>
+                        </@profileCard>
+                        <@editOnly>
+                            <@profileCard class="edit-card d-none">
+                            <#-- Title -->
+                                <div class="d-flex justify-content-between align-items-center <@viewOnly>mb-2</@viewOnly>">
+                                    <h5 class="card-title user-select-none mb-2"><@default.icon name="personInfo" class="me-2"/>
+                                        About me
+                                    </h5>
+                                    <div class="mb-2">
+                                        <button class="btn btn-primary save-btn">Save</button>
+                                        <button class="btn btn-outline-primary cancel-btn">Cancel</button>
+                                    </div>
+                                </div>
+                            <#-- Content -->
+                                <form action="<@spring.url "/profile/about"/>" method="post"
+                                      enctype="multipart/form-data">
+                                    <@default.csrfInput/>
+                                    <div class="mt-2">
                                 <textarea aria-label="About me" class="form-control" name="about"
                                           maxlength="5000"></textarea>
+                                    </div>
+                                </form>
+                                <div class="clearfix">
+                                    <div class="float-start">
+                                        <@default.mdDisclaimer/>
+                                    </div>
+                                    <div class="float-end text-muted user-select-none" id="aboutCharCount">0/5000</div>
                                 </div>
-                            </form>
-                            <div class="clearfix">
-                                <div class="float-start">
-                                    <@default.mdDisclaimer/>
-                                </div>
-                                <div class="float-end text-muted user-select-none" id="aboutCharCount">0/5000</div>
-                            </div>
-                        </@profileCard>
-                    </@editOnly>
-                </div>
+                            </@profileCard>
+                        </@editOnly>
+                    </div>
+                </@editOnly>
 
                 <@editOnly or=profile.experiences?has_content>
 
@@ -339,62 +341,64 @@
         })()
     </script>
 </@ownOnly>
-<script>
-    <#-- About card script -->
-    (() => {
-        const view = {card: document.querySelector("#profileAbout div.card.view-card")}
-        view.textElement = view.card.querySelector("#aboutContent")
-        view.content = "${profile.about?js_string?no_esc}";
-        // set initial content
-        view.textElement.innerHTML = DOMPurify.sanitize(marked.parse(view.content));
+<@editOnly or=profile.about?has_content>
+    <script>
+        <#-- About card script -->
+        (() => {
+            const view = {card: document.querySelector("#profileAbout div.card.view-card")}
+            view.textElement = view.card.querySelector("#aboutContent")
+            view.content = "${(profile.about!"")?js_string?no_esc}";
+            // set initial content
+            view.textElement.innerHTML = DOMPurify.sanitize(marked.parse(view.content));
 
-        <@editOnly>
-        const edit = {card: document.querySelector("#profileAbout div.card.edit-card")}
-        edit.textArea = edit.card.querySelector("textarea[name='about']")
-        edit.form = edit.card.querySelector("form")
-        edit.charCount = edit.card.querySelector("#aboutCharCount")
-        edit.charLimit = 5000
+            <@editOnly>
+            const edit = {card: document.querySelector("#profileAbout div.card.edit-card")}
+            edit.textArea = edit.card.querySelector("textarea[name='about']")
+            edit.form = edit.card.querySelector("form")
+            edit.charCount = edit.card.querySelector("#aboutCharCount")
+            edit.charLimit = 5000
 
-        // set initial textarea height
-        edit.textArea.setAttribute("style", "height:" + (edit.textArea.scrollHeight) + "px;overflow-y:hidden;")
+            // set initial textarea height
+            edit.textArea.setAttribute("style", "height:" + (edit.textArea.scrollHeight) + "px;overflow-y:hidden;")
 
-        // view card edit button
-        view.card.querySelector("#editAboutButton").addEventListener("click", () => {
-            // hide view card
-            _showElems([view.card], false)
-            // show edit card
-            _showElems([edit.card], true)
-            // set text area content
-            edit.textArea.value = view.content.trim()
-            // set text area char count
-            edit.charCount.textContent = edit.textArea.value.length + "/" + edit.charLimit
-            // set text area initial height
-            edit.textArea.style.height = 'auto';
-            edit.textArea.style.height = edit.textArea.scrollHeight + 'px';
-        })
+            // view card edit button
+            view.card.querySelector("#editAboutButton").addEventListener("click", () => {
+                // hide view card
+                _showElems([view.card], false)
+                // show edit card
+                _showElems([edit.card], true)
+                // set text area content
+                edit.textArea.value = view.content.trim()
+                // set text area char count
+                edit.charCount.textContent = edit.textArea.value.length + "/" + edit.charLimit
+                // set text area initial height
+                edit.textArea.style.height = 'auto';
+                edit.textArea.style.height = edit.textArea.scrollHeight + 'px';
+            })
 
-        // edit card cancel button
-        edit.card.querySelector("button.cancel-btn").addEventListener("click", () => {
-            // hide edit card
-            _showElems([edit.card], false)
-            // show view card
-            _showElems([view.card], true)
-        })
+            // edit card cancel button
+            edit.card.querySelector("button.cancel-btn").addEventListener("click", () => {
+                // hide edit card
+                _showElems([edit.card], false)
+                // show view card
+                _showElems([view.card], true)
+            })
 
-        // edit card save button
-        edit.card.querySelector("button.save-btn").addEventListener("click", () => {
-            edit.form.submit()
-        })
+            // edit card save button
+            edit.card.querySelector("button.save-btn").addEventListener("click", () => {
+                edit.form.submit()
+            })
 
-        // textarea onChange
-        edit.textArea.addEventListener("input", () => {
-            edit.textArea.style.height = 'auto';
-            edit.textArea.style.height = edit.textArea.scrollHeight + 'px';
-            edit.charCount.textContent = edit.textArea.value.length + "/" + edit.charLimit
-        })
-        </@editOnly>
-    })()
-</script>
+            // textarea onChange
+            edit.textArea.addEventListener("input", () => {
+                edit.textArea.style.height = 'auto';
+                edit.textArea.style.height = edit.textArea.scrollHeight + 'px';
+                edit.charCount.textContent = edit.textArea.value.length + "/" + edit.charLimit
+            })
+            </@editOnly>
+        })()
+    </script>
+</@editOnly>
 
 <@editOnly>
 <#-- Profile info script -->
@@ -536,7 +540,8 @@ overviewPopupDetails={
         <div class="d-flex flex-column flex-sm-row align-content-between align-items-center w-100">
             <#if img?has_content>
                 <div class="h-100 w-50 p-2 d-flex align-items-center">
-                    <img src="${img}" class="w-100 rounded-3 shadow-lg aspect-ratio-1 object-fit-cover" alt="${img_alt}">
+                    <img src="${img}" class="w-100 rounded-3 shadow-lg aspect-ratio-1 object-fit-cover"
+                         alt="${img_alt}">
                 </div>
             </#if>
             <div class="card-body d-flex flex-column flex-grow-1 w-100">
@@ -556,18 +561,20 @@ overviewPopupDetails={
 </#macro>
 
 <#macro profileViewItem text name icon="" link="" showLinkIcon=false includeUrl=false>
-    <div class="text-muted fs-6 text-truncate">
-        <#if link?has_content>
-            <a href="${link?no_esc}" target="_blank" class="text-decoration-none text-muted text-hover-dark">
-                <@default.icon name=icon fallback="web" class="mx-1"/>
-                <span data-prop="${name}" <#if includeUrl>data-url="${link}"</#if>
+    <#if text?has_content>
+        <div class="text-muted fs-6 text-truncate">
+            <#if link?has_content>
+                <a href="${link?no_esc}" target="_blank" class="text-decoration-none text-muted text-hover-dark">
+                    <@default.icon name=icon fallback="web" class="mx-1"/>
+                    <span data-prop="${name}" <#if includeUrl>data-url="${link}"</#if>
                       class="profile-view-item">${text}<#if showLinkIcon><@default.externalLinkIcon/></#if></span>
-            </a>
-        <#else>
-            <@default.icon name=icon fallback="web" class="mx-1"/>
-            <span data-prop="${name}" class="profile-view-item">${text}</span>
-        </#if>
-    </div>
+                </a>
+            <#else>
+                <@default.icon name=icon fallback="web" class="mx-1"/>
+                <span data-prop="${name}" class="profile-view-item">${text}</span>
+            </#if>
+        </div>
+    </#if>
 </#macro>
 
 <#macro profileEditItem icon name label value showLabel=false>
