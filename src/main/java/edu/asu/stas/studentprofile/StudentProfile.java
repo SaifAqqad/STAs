@@ -6,6 +6,7 @@ import edu.asu.stas.studentprofile.activity.Activity;
 import edu.asu.stas.studentprofile.course.Course;
 import edu.asu.stas.studentprofile.experience.Experience;
 import edu.asu.stas.studentprofile.project.Project;
+import edu.asu.stas.studentprofile.skill.Skill;
 import edu.asu.stas.user.User;
 import lombok.*;
 import org.hibernate.Hibernate;
@@ -69,6 +70,9 @@ public class StudentProfile implements Serializable {
 
     @OneToMany(mappedBy = "profile", cascade = CascadeType.ALL, orphanRemoval = true)
     private final List<Experience> experiences = new ArrayList<>();
+
+    @OneToMany(mappedBy = "profile", cascade = CascadeType.ALL, orphanRemoval = true)
+    private final List<Skill> skills = new ArrayList<>();
 
     @Type(type = "json")
     @Column(columnDefinition = "json")
