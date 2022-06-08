@@ -147,7 +147,47 @@
                     </div>
                 </div>
 
-                <#-- TODO: Add skills card -->
+                <#-- Skills card -->
+                <@editOnly or=profile.skills?has_content>
+                    <div id="skillsCard" class="mb-3">
+                        <@profileCard>
+                        <#-- Title -->
+                            <div class="d-flex justify-content-between align-items-center <@viewOnly>mb-2</@viewOnly>">
+                                <h5 class="card-title mb-2"><@default.icon name="mdi:tools" class="me-2"/>
+                                    Skills
+                                </h5>
+                                <@editOnly>
+                                    <button class="btn btn-outline-primary mb-2" id="">Add</button>
+                                </@editOnly>
+                            </div>
+                        <#-- Content -->
+                            <div id="skills">
+                                <#list profile.skills as skill>
+                                    <div class="skill rounded-2 mb-2 p-2 w-100 <@editOnly>cursor-pointer bg-hover</@editOnly>"
+                                         data-id="${skill.id}">
+                                        <div class="w-100 mb-1 d-flex justify-content-between text-muted">
+                                            <div>${skill.name}</div>
+                                            <div>${skill.level}%</div>
+                                        </div>
+                                        <div class="w-100">
+                                            <div class="progress" style="height: 10px;">
+                                                <div class="progress-bar" role="progressbar"
+                                                     style="width: ${skill.level}%;"
+                                                     aria-valuenow="${skill.level}"
+                                                     aria-valuemin="0" aria-valuemax="100">
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                <#else>
+                                    <div class="w-100 min-h-100 d-flex justify-content-center align-items-center">
+                                        <span class="fs-6 text-muted user-select-none">You haven't added anything yet</span>
+                                    </div>
+                                </#list>
+                            </div>
+                        </@profileCard>
+                    </div>
+                </@editOnly>
             </div>
 
             <#-- Right column -->
