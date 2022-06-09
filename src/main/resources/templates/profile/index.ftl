@@ -152,32 +152,47 @@
                     <div id="skillsCard" class="mb-3">
                         <@profileCard>
                         <#-- Title -->
-                            <div class="d-flex justify-content-between align-items-center <@viewOnly>mb-2</@viewOnly>">
+                            <div class="d-flex justify-content-between align-items-center">
                                 <h5 class="card-title mb-2"><@default.icon name="mdi:tools" class="me-2"/>
                                     Skills
                                 </h5>
-                                <@editOnly>
+                                <@editOnly> <#-- TODO: Implement add skill popup -->
                                     <button class="btn btn-outline-primary mb-2" id="">Add</button>
                                 </@editOnly>
                             </div>
                         <#-- Content -->
                             <div id="skills">
                                 <#list profile.skills as skill>
-                                    <div class="skill rounded-2 mb-2 p-2 w-100 <@editOnly>cursor-pointer bg-hover</@editOnly>"
-                                         data-id="${skill.id}">
-                                        <div class="w-100 mb-1 d-flex justify-content-between text-muted">
-                                            <div>${skill.name}</div>
-                                            <div>${skill.level}%</div>
+                                    <div class="skill rounded-2 p-2 w-100 <@editOnly>cursor-pointer bg-hover</@editOnly>"
+                                         data-id="${skill.id}"> <#-- TODO: Implement edit skill popup -->
+                                        <div class="mb-1 d-flex justify-content-between text-muted">
+                                            <span>${skill.name}</span>
+                                            <span>${skill.level}%</span>
                                         </div>
-                                        <div class="w-100">
-                                            <div class="progress" style="height: 10px;">
-                                                <div class="progress-bar" role="progressbar"
-                                                     style="width: ${skill.level}%;"
-                                                     aria-valuenow="${skill.level}"
-                                                     aria-valuemin="0" aria-valuemax="100">
-                                                </div>
+                                        <div class="progress" style="height: 10px;">
+                                            <div class="progress-bar" role="progressbar"
+                                                 style="width: ${skill.level}%;"
+                                                 aria-valuenow="${skill.level}"
+                                                 aria-valuemin="0" aria-valuemax="100">
                                             </div>
                                         </div>
+                                        <@viewOnly>
+                                            <#if skill.endorsements?has_content>
+                                                <#assign count = skill.endorsements.size()/>
+                                                <div class="mt-2 d-flex justify-content-between align-items-center">
+                                                    <a class="cursor-pointer text-decoration-none text-muted text-hover-dark view-endorsement-button"
+                                                       data-id="${skill.id}"> <#-- TODO: Add endorsements popover -->
+                                                        <@default.icon name="mdi:account-multiple" class="me-1"/>
+                                                        <span>${count} endorsement<#if (count > 1)>s</#if></span>
+                                                    </a>
+                                                    <@publicViewOnly>
+                                                        <button class="btn btn-sm btn-outline-primary endorse-button"
+                                                                data-id="${skill.id}">Endorse  <#-- TODO: Implement endorse functionality -->
+                                                        </button>
+                                                    </@publicViewOnly>
+                                                </div>
+                                            </#if>
+                                        </@viewOnly>
                                     </div>
                                 <#else>
                                     <div class="w-100 min-h-100 d-flex justify-content-center align-items-center">
@@ -644,6 +659,12 @@ overviewPopupDetails={
 
 <#macro ownOnly>
     <#if !(isPublicView!false)>
+        <#nested/>
+    </#if>
+</#macro>
+
+<#macro publicViewOnly>
+    <#if isPublicView!false>
         <#nested/>
     </#if>
 </#macro>
