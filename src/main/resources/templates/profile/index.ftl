@@ -177,21 +177,22 @@
                                             </div>
                                         </div>
                                         <@viewOnly>
-                                            <#if skill.endorsements?has_content>
-                                                <#assign count = skill.endorsements.size()/>
-                                                <div class="mt-2 d-flex justify-content-between align-items-center">
-                                                    <a class="cursor-pointer text-decoration-none text-muted text-hover-dark view-endorsement-button"
-                                                       data-id="${skill.id}"> <#-- TODO: Add endorsements popover -->
+                                            <div class="mt-2 d-flex justify-content-between align-items-center">
+                                                <#if skill.endorsements?has_content>
+                                                    <#assign count = skill.endorsements.size()/>
+                                                    <a data-id="${skill.id}" <#-- TODO: Add endorsements popover -->
+                                                       class="cursor-pointer text-decoration-none text-muted text-hover-dark view-endorsement-button">
                                                         <@default.icon name="mdi:account-multiple" class="me-1"/>
                                                         <span>${count} endorsement<#if (count > 1)>s</#if></span>
                                                     </a>
-                                                    <@publicViewOnly>
-                                                        <button class="btn btn-sm btn-outline-primary endorse-button"
-                                                                data-id="${skill.id}">Endorse  <#-- TODO: Implement endorse functionality -->
-                                                        </button>
-                                                    </@publicViewOnly>
-                                                </div>
-                                            </#if>
+                                                </#if>
+                                                <@publicViewOnly>
+                                                    <button class="btn btn-sm btn-outline-primary endorse-button"
+                                                            data-id="${skill.id}">
+                                                        Endorse <#-- TODO: Implement endorse functionality -->
+                                                    </button>
+                                                </@publicViewOnly>
+                                            </div>
                                         </@viewOnly>
                                     </div>
                                 <#else>
