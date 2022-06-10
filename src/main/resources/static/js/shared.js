@@ -15,6 +15,7 @@ function _applyJsonToForm(formId, json) {
             elem.value = json[prop]
         }
     }
+    document.querySelectorAll(`#${formId} textarea`).forEach(elem => _updateAutoTextArea(elem));
 }
 
 function _showElems(elems, show) {
