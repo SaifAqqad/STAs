@@ -5,6 +5,7 @@ import edu.asu.stas.studentprofile.endorsement.Endorsement;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import net.minidev.json.annotate.JsonIgnore;
 import org.hibernate.validator.constraints.Range;
 
 import javax.persistence.*;
@@ -25,9 +26,11 @@ public class Skill {
     @Range(min = 0, max = 100)
     private int level;
 
-    @ManyToOne(fetch = FetchType.EAGER, optional = false)
+    @ManyToOne(optional = false)
+    @JsonIgnore
     private StudentProfile profile;
 
     @OneToMany(mappedBy = "skill", cascade = CascadeType.ALL, orphanRemoval = true)
+    @JsonIgnore
     private final List<Endorsement> endorsements = new ArrayList<>();
 }
