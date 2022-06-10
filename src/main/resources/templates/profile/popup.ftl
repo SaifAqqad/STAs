@@ -138,6 +138,22 @@
     </@formPopup>
 </#macro>
 
+<#macro skillPopup addPopup detailsPopup popupId formId uriBase >
+    <@formPopup addPopup=addPopup detailsPopup=detailsPopup popupId=popupId formId=formId uriBase=uriBase>
+        <input type="hidden" name="id" id="${formId}_id"/>
+        <div class="form-floating">
+            <input class="form-control" required type="text" name="name" id="${formId}_name"
+                   placeholder="Skill">
+            <label class="form-label text-muted" for="${formId}_name">Skill</label>
+        </div>
+        <div class="form-floating mt-3">
+            <input class="form-control" required type="number" min="0" max="100" name="level" id="${formId}_level"
+                   placeholder="Level">
+            <label class="form-label text-muted" for="${formId}_level">Level</label>
+        </div>
+    </@formPopup>
+</#macro>
+
 <#macro experiencePopup addPopup detailsPopup popupId formId uriBase overviewPopupDetails>
     <#if overviewPopupDetails.enabled>
         <script>
