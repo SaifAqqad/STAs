@@ -156,19 +156,23 @@
                                 <h5 class="card-title mb-2"><@default.icon name="mdi:tools" class="me-2"/>
                                     Skills
                                 </h5>
-                                <@editOnly> <#-- TODO: Implement add skill popup -->
-                                    <button class="btn btn-outline-primary mb-2" id="">Add</button>
+                                <@editOnly>
+                                    <button class="btn btn-outline-primary mb-2" id="addSkillButton">Add</button>
                                 </@editOnly>
                             </div>
                         <#-- Content -->
-                            <div id="skills">
+                            <div id="profileSkills">
                                 <#list profile.skills as skill>
                                     <div class="skill rounded-2 p-2 w-100 <@editOnly>cursor-pointer bg-hover</@editOnly>"
-                                         data-id="${skill.id}"> <#-- TODO: Implement edit skill popup -->
+                                         data-id="${skill.id}">
+
+                                        <#-- Skill text -->
                                         <div class="mb-1 d-flex justify-content-between text-muted">
                                             <span>${skill.name}</span>
                                             <span>${skill.level}%</span>
                                         </div>
+
+                                        <#-- Skill level -->
                                         <div class="progress" style="height: 10px;">
                                             <div class="progress-bar" role="progressbar"
                                                  style="width: ${skill.level}%;"
@@ -176,24 +180,47 @@
                                                  aria-valuemin="0" aria-valuemax="100">
                                             </div>
                                         </div>
+
                                         <@viewOnly>
-                                            <div class="mt-2 d-flex justify-content-between align-items-center">
+                                            <div class="mt-2 clearfix">
+
+                                                <#-- Endorsements count -->
                                                 <#if skill.endorsements?has_content>
-                                                    <#assign count = skill.endorsements.size()/>
-                                                    <a data-id="${skill.id}" <#-- TODO: Add endorsements popover -->
-                                                       class="cursor-pointer text-decoration-none text-muted text-hover-dark view-endorsement-button">
+                                                    <#assign count = skill.endorsements?size/>
+                                                    <a class="float-start cursor-pointer text-decoration-none text-muted text-hover-dark view-endorsement-button"
+                                                       data-id="${skill.id}">
                                                         <@default.icon name="mdi:account-multiple" class="me-1"/>
-                                                        <span>${count} endorsement<#if (count > 1)>s</#if></span>
+                                                        <span>${count} endorsement${(count > 1)?then("s","")}</span>
                                                     </a>
                                                 </#if>
+
+                                                <#-- Endorse Button -->
                                                 <@publicViewOnly>
-                                                    <button class="btn btn-sm btn-outline-primary endorse-button"
-                                                            data-id="${skill.id}">
-                                                        Endorse <#-- TODO: Implement endorse functionality -->
-                                                    </button>
+
+                                                    <#assign isEndorsed = false/>
+                                                    <#if authenticatedUser??>
+                                                    <#-- check if the authed user has already endorsed this skill -->
+                                                        <#list skill.endorsements as endorsement>
+                                                            <#if (endorsement.user.id == authenticatedUser.id)>
+                                                                <#assign isEndorsed = true/>
+                                                            </#if>
+                                                        </#list>
+                                                    </#if>
+
+                                                    <#if !isEndorsed>
+                                                        <form class="float-end" method="post"
+                                                              action="<@spring.url springMacroRequestContext.requestUri + "/skills/${skill.id}/endorsements"/>">
+                                                            <@default.csrfInput/>
+                                                            <button class="btn btn-sm btn-outline-primary">Endorse
+                                                            </button>
+                                                        </form>
+                                                    </#if>
+
                                                 </@publicViewOnly>
+
                                             </div>
                                         </@viewOnly>
+
                                     </div>
                                 <#else>
                                     <div class="w-100 min-h-100 d-flex justify-content-center align-items-center">
@@ -201,6 +228,7 @@
                                     </div>
                                 </#list>
                             </div>
+
                         </@profileCard>
                     </div>
                 </@editOnly>
@@ -509,6 +537,63 @@
         })()
     </script>
 </@editOnly>
+<#-- Skills popover script -->
+<@viewOnly>
+    <script>
+        (() => {
+            const baseUri = "${springMacroRequestContext.requestUri}";
+            const skillButtons = document.querySelectorAll(".view-endorsement-button");
+            const getEndorsementsList = async (skillId) => {
+                const response = await fetch(baseUri + "/skills/" + skillId + "/endorsements");
+                if (!response.ok)
+                    return null;
+                const {endorsements} = (await response.json());
+                if (!endorsements || endorsements.length === 0)
+                    return null;
+                const list = document.createElement("ul");
+                list.classList.add("list-group", "list-group-flush", "shadow-none");
+                for (let i = 0; i < endorsements.length; i++) {
+                    const endorsement = endorsements[i];
+
+                    const listItem = document.createElement("li");
+                    listItem.classList.add("list-group-item", "p-0", "border-0");
+
+                    const name = document.createElement("div");
+                    name.classList.add("fw-bold");
+                    name.textContent = endorsement["endorserName"];
+                    listItem.appendChild(name);
+
+                    const email = document.createElement("div");
+                    email.classList.add("text-muted");
+                    email.textContent = endorsement["endorserEmail"];
+                    listItem.appendChild(email);
+
+                    list.appendChild(listItem);
+
+                    // add divider if not last item
+                    if (i !== endorsements.length - 1) {
+                        const divider = document.createElement("hr")
+                        divider.classList.add("my-1");
+                        list.appendChild(divider);
+                    }
+                }
+                return list;
+            };
+
+            skillButtons.forEach(async skillButton => {
+                let endorsementList = await getEndorsementsList(skillButton.getAttribute("data-id"));
+                let options = {
+                    html: true,
+                    placement: 'right',
+                    trigger: 'hover',
+                    content: endorsementList,
+                }
+                if (endorsementList)
+                    new bootstrap.Popover(skillButton, options)
+            });
+        })()
+    </script>
+</@viewOnly>
 <#-- edit/overview popups -->
 <@popups.script/>
 <@popups.experiencePopup popupId="experiencePopup" formId="experienceForm" uriBase=springMacroRequestContext.requestUri+"/experiences"
@@ -579,6 +664,17 @@ overviewPopupDetails={
     "popupTitle" : "Profile picture",
     "deleteButtonId" : "profilePictureDeleteButton",
     "elementSelector" : "#profilePictureEditButton"
+    }
+    />
+    <@popups.skillPopup popupId="skillPopup" formId="skillForm" uriBase=springMacroRequestContext.requestUri+"/skills"
+    detailsPopup={
+    "popupTitle" : "Skill details",
+    "deleteButtonId" : "skillDelete",
+    "elementSelector" : "#profileSkills > .skill"
+    }
+    addPopup={
+    "popupTitle" : "Add a new skill",
+    "buttonId" : "addSkillButton"
     }
     />
 </@editOnly>
