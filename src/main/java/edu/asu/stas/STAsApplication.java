@@ -10,6 +10,8 @@ import edu.asu.stas.studentprofile.experience.Experience;
 import edu.asu.stas.studentprofile.experience.ExperienceRepository;
 import edu.asu.stas.studentprofile.project.Project;
 import edu.asu.stas.studentprofile.project.ProjectRepository;
+import edu.asu.stas.studentprofile.skill.Skill;
+import edu.asu.stas.studentprofile.skill.SkillRepository;
 import edu.asu.stas.user.User;
 import edu.asu.stas.user.UserRepository;
 import org.springframework.boot.ApplicationRunner;
@@ -36,6 +38,7 @@ public class STAsApplication {
             CourseRepository courseRepository,
             ActivityRepository activityRepository,
             ProjectRepository projectRepository,
+            SkillRepository skillRepository,
             ExperienceRepository experienceRepository
     ) {
         return args -> {
@@ -71,6 +74,17 @@ public class STAsApplication {
                     profile.getLinks().put("GitHub", "https://github.com/SaifAqqad/");
                     profile.setUser(user1);
                     profile = studentProfileRepository.save(profile);
+
+                    Skill skill1 = new Skill();
+                    skill1.setName("Java");
+                    skill1.setLevel(80);
+                    skill1.setProfile(profile);
+                    skillRepository.save(skill1);
+                    Skill skill2 = new Skill();
+                    skill2.setName("Spring");
+                    skill2.setLevel(65);
+                    skill2.setProfile(profile);
+                    skillRepository.save(skill2);
 
                     Course course = new Course();
                     course.setName("The Java workshop");
