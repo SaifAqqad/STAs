@@ -68,12 +68,11 @@
             const tab = Number(window.localStorage.getItem("currentTab") || 0)
             onTabSwitchBtn(tab, true)
         });
-        <#noparse>
 
         class Profile {
             static #defaultProfile = {
-                name: null,
-                contactEmail: null,
+                name: "${authenticatedUser.firstName} ${authenticatedUser.lastName}",
+                contactEmail: "${authenticatedUser.email}",
                 contactPhone: null,
                 location: null,
                 about: null,
@@ -187,7 +186,6 @@
                 window.localStorage.removeItem("profile");
             }
         }
-        </#noparse>
 
         class itemCardFactory {
             #emptyContainerTemplate = <@default.jsStr><@emptyContainer/></@default.jsStr>;
