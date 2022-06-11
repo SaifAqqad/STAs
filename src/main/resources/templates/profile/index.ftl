@@ -201,7 +201,7 @@
                                                     <#if authenticatedUser??>
                                                     <#-- check if the authed user has already endorsed this skill -->
                                                         <#list skill.endorsements as endorsement>
-                                                            <#if (endorsement.user.id == authenticatedUser.id)>
+                                                            <#if (endorsement.user.userId == authenticatedUser.userId)>
                                                                 <#assign isEndorsed = true/>
                                                             </#if>
                                                         </#list>
