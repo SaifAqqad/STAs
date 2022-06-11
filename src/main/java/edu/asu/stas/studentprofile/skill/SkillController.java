@@ -3,14 +3,11 @@ package edu.asu.stas.studentprofile.skill;
 import edu.asu.stas.studentprofile.StudentProfileService;
 import edu.asu.stas.studentprofile.endorsement.Endorsement;
 import edu.asu.stas.studentprofile.endorsement.EndorsementRepository;
-import edu.asu.stas.user.UserService;
+import edu.asu.stas.user.User;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import org.springframework.web.servlet.view.RedirectView;
@@ -65,8 +62,11 @@ public class SkillController {
 
     // GET /profile/skills/{id}
     @GetMapping("/profile/skills/{id}")
-    public ResponseEntity<SkillInfo> getById(@PathVariable Long id) {
-        var profile = studentProfileService.getAuthenticatedUserProfile();
+    public ResponseEntity<SkillInfo> getById(
+        @PathVariable Long id,
+        @ModelAttribute("authenticatedUser") User user
+    ) {
+        var profile = Objects.isNull(user) ? null : studentProfileService.getProfileByUser(user);
         var skill = skillRepository.getByProfileAndId(profile, id);
         if (Objects.isNull(skill)) {
             return ResponseEntity.notFound().build();
@@ -88,8 +88,11 @@ public class SkillController {
 
     // GET /profile/skills/{id}/endorsements
     @GetMapping("/profile/skills/{id}/endorsements")
-    public ResponseEntity<SkillEndorsements> getSkillEndorsements(@PathVariable Long id) {
-        var profile = studentProfileService.getAuthenticatedUserProfile();
+    public ResponseEntity<SkillEndorsements> getSkillEndorsements(
+        @PathVariable Long id,
+        @ModelAttribute("authenticatedUser") User user
+    ) {
+        var profile = Objects.isNull(user) ? null : studentProfileService.getProfileByUser(user);
         var skill = skillRepository.getByProfileAndId(profile, id);
         if (Objects.isNull(skill)) {
             return ResponseEntity.notFound().build();
@@ -117,11 +120,11 @@ public class SkillController {
     public RedirectView addNewEndorsement(
         @PathVariable String uuid,
         @PathVariable Long id,
-        RedirectAttributes redirectAttributes
+        RedirectAttributes redirectAttributes,
+        @ModelAttribute("authenticatedUser") User user
     ) {
         var profile = Objects.requireNonNull(studentProfileService.getProfileByUuid(uuid));
         var skill = Objects.requireNonNull(skillRepository.getByProfileAndId(profile, id));
-        var user = UserService.getAuthenticatedUser();
         if (profile.isPublic()) {
             if (endorsementRepository.existsByUserAndSkill(user, skill)) {
                 redirectAttributes.addFlashAttribute("toastColor", "danger");
@@ -141,8 +144,11 @@ public class SkillController {
     // POST /profile/skills/delete
     @PostMapping("/profile/skills/delete")
     @Transactional
-    public RedirectView deleteById(SkillInfo skill, RedirectAttributes redirectAttributes) {
-        var profile = studentProfileService.getAuthenticatedUserProfile();
+    public RedirectView deleteById(
+        SkillInfo skill, RedirectAttributes redirectAttributes,
+        @ModelAttribute("authenticatedUser") User user
+    ) {
+        var profile = Objects.isNull(user) ? null : studentProfileService.getProfileByUser(user);
         if (skillRepository.existsByProfileAndId(profile, skill.id)) {
             skillRepository.deleteByProfileAndId(profile, skill.id);
             redirectAttributes.addFlashAttribute("toast", "Skill deleted successfully");
@@ -159,9 +165,10 @@ public class SkillController {
     public RedirectView updateById(
         @PathVariable Long id,
         SkillInfo skillInfo,
-        RedirectAttributes redirectAttributes
+        RedirectAttributes redirectAttributes,
+        @ModelAttribute("authenticatedUser") User user
     ) {
-        var profile = studentProfileService.getAuthenticatedUserProfile();
+        var profile = Objects.isNull(user) ? null : studentProfileService.getProfileByUser(user);
         var skill = skillRepository.getByProfileAndId(profile, id);
         if (Objects.nonNull(skill)) {
             skill.setName(skillInfo.name);
@@ -180,9 +187,10 @@ public class SkillController {
     @Transactional
     public RedirectView addNew(
         SkillInfo skillInfo,
-        RedirectAttributes redirectAttributes
+        RedirectAttributes redirectAttributes,
+        @ModelAttribute("authenticatedUser") User user
     ) {
-        var profile = studentProfileService.getAuthenticatedUserProfile();
+        var profile = Objects.isNull(user) ? null : studentProfileService.getProfileByUser(user);
         Skill skill = new Skill();
         skill.setName(skillInfo.name);
         skill.setLevel(skillInfo.level);

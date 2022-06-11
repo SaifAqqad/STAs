@@ -23,6 +23,7 @@ import edu.asu.stas.user.token.UserToken;
 import edu.asu.stas.user.token.UserTokenRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataAccessException;
+import org.springframework.security.authentication.AnonymousAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -48,13 +49,13 @@ import java.util.Objects;
 
 @Service
 public class UserService implements UserDetailsService, OAuth2UserService<OAuth2UserRequest, OAuth2User> {
-    private final UserRepository userRepository;
+    private static UserRepository userRepository;
+    private static ConnectionRepository connectionRepository;
     private final UserTokenRepository userTokenRepository;
     private final StudentProfileService studentProfileService;
     private final PasswordEncoder passwordEncoder;
     private final TokenGenerator tokenGenerator;
     private final MailService mailService;
-    private final ConnectionRepository connectionRepository;
     private final CodeVerifier totpVerifier;
     private final SecretGenerator secretGenerator;
     private final QrDataFactory qrDataFactory;
@@ -75,13 +76,13 @@ public class UserService implements UserDetailsService, OAuth2UserService<OAuth2
             QrDataFactory qrDataFactory,
             QrGenerator qrGenerator
     ) {
-        this.userRepository = userRepository;
+        UserService.userRepository = userRepository;
+        UserService.connectionRepository = connectionRepository;
         this.userTokenRepository = userTokenRepository;
         this.studentProfileService = studentProfileService;
         this.passwordEncoder = passwordEncoder;
         this.tokenGenerator = tokenGenerator;
         this.mailService = mailService;
-        this.connectionRepository = connectionRepository;
         this.totpVerifier = totpVerifier;
         this.secretGenerator = secretGenerator;
         this.qrDataFactory = qrDataFactory;
@@ -90,12 +91,12 @@ public class UserService implements UserDetailsService, OAuth2UserService<OAuth2
 
     public static User getAuthenticatedUser() {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        if (Objects.nonNull(authentication) && authentication.isAuthenticated()) {
+        if (Objects.nonNull(authentication) && !(authentication instanceof AnonymousAuthenticationToken)) {
             Object principle = authentication.getPrincipal();
             if (principle instanceof User user) {
-                return user;
+                return userRepository.findById(user.getId()).orElse(null);
             } else if (principle instanceof Connection connection) {
-                return connection.getUser();
+                return userRepository.findById(connection.getUser().getId()).orElse(null);
             }
         }
         return null;

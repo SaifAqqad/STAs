@@ -2,6 +2,7 @@ package edu.asu.stas.studentprofile.project;
 
 import edu.asu.stas.content.ContentService;
 import edu.asu.stas.studentprofile.StudentProfileService;
+import edu.asu.stas.user.User;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -30,8 +31,11 @@ public class ProjectController {
 
     // GET /profile/projects/{id}
     @GetMapping("/profile/projects/{id}")
-    public ResponseEntity<Project> getById(@PathVariable Long id) {
-        var profile = studentProfileService.getAuthenticatedUserProfile();
+    public ResponseEntity<Project> getById(
+        @PathVariable Long id,
+        @ModelAttribute("authenticatedUser") User user
+    ) {
+        var profile = Objects.isNull(user) ? null : studentProfileService.getProfileByUser(user);
         var project = projectRepository.getByProfileAndId(profile, id);
         if (Objects.isNull(project)) {
             return ResponseEntity.notFound().build();
@@ -54,8 +58,11 @@ public class ProjectController {
     // POST /profile/projects/delete
     @PostMapping("/profile/projects/delete")
     @Transactional
-    public RedirectView deleteById(Project project, RedirectAttributes redirectAttributes) {
-        var profile = studentProfileService.getAuthenticatedUserProfile();
+    public RedirectView deleteById(
+        Project project, RedirectAttributes redirectAttributes,
+        @ModelAttribute("authenticatedUser") User user
+    ) {
+        var profile = Objects.isNull(user) ? null : studentProfileService.getProfileByUser(user);
         if (projectRepository.existsByProfileAndId(profile, project.getId())) {
             projectRepository.deleteByProfileAndId(profile, project.getId());
             String imageName = project.getImageUri().substring(project.getImageUri().lastIndexOf('/') + 1);
@@ -75,9 +82,10 @@ public class ProjectController {
         @PathVariable Long id,
         Project project,
         @RequestParam MultipartFile imageUriData,
-        RedirectAttributes redirectAttributes
+        RedirectAttributes redirectAttributes,
+        @ModelAttribute("authenticatedUser") User user
     ) throws IOException {
-        var profile = studentProfileService.getAuthenticatedUserProfile();
+        var profile = Objects.isNull(user) ? null : studentProfileService.getProfileByUser(user);
         if (id.equals(project.getId()) && projectRepository.existsByProfileAndId(profile, project.getId())) {
             project.setProfile(profile);
             if (!imageUriData.isEmpty()) {
@@ -108,9 +116,10 @@ public class ProjectController {
     public RedirectView addNew(
         Project project,
         @RequestParam MultipartFile imageUriData,
-        RedirectAttributes redirectAttributes
+        RedirectAttributes redirectAttributes,
+        @ModelAttribute("authenticatedUser") User user
     ) throws IOException {
-        var profile = studentProfileService.getAuthenticatedUserProfile();
+        var profile = Objects.isNull(user) ? null : studentProfileService.getProfileByUser(user);
         project.setProfile(profile);
         project = projectRepository.save(project);
         if (!imageUriData.isEmpty()) {

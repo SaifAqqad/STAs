@@ -35,18 +35,14 @@ public class StudentProfileController {
         this.contentService = contentService;
     }
 
-    public StudentProfile getStudentProfile() {
-        User user = Objects.requireNonNull(UserService.getAuthenticatedUser());
-        return studentProfileService.getProfileByUser(user);
-    }
-
     @GetMapping("/profile")
     public String getProfilePage(
         @RequestParam(required = false) Boolean edit,
         Model model,
-        SessionStatus sessionStatus
+        SessionStatus sessionStatus,
+        @ModelAttribute("authenticatedUser") User authedUser
     ) {
-        StudentProfile profile = getStudentProfile();
+        StudentProfile profile = studentProfileService.getProfileByUser(authedUser);
         if (Objects.isNull(profile)) return "redirect:/profile/create";
         model.addAttribute("profile", profile);
         if (Objects.nonNull(edit)) {
@@ -63,7 +59,7 @@ public class StudentProfileController {
     public String getProfileByUuid(@PathVariable String uuid, Model model) {
         StudentProfile profile = studentProfileService.getProfileByUuid(uuid);
         if (Objects.nonNull(profile) && profile.isPublic()) {
-            User authedUser = UserService.getAuthenticatedUser();
+            User authedUser = (User) model.getAttribute("authenticatedUser");
             if (Objects.nonNull(authedUser) && profile.equals(studentProfileService.getProfileByUser(authedUser))) {
                 return "redirect:/profile";
             }
@@ -84,18 +80,22 @@ public class StudentProfileController {
     @ResponseBody
     public ResponseEntity<StudentProfile> createProfile(
         @Validated @RequestBody StudentProfile profile,
-        BindingResult bindingResult
+        BindingResult bindingResult,
+        @ModelAttribute("authenticatedUser") User authedUser
     ) {
         if (bindingResult.hasErrors()) {
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         }
-        profile = studentProfileService.createProfile(profile);
+        profile = studentProfileService.createProfile(profile, authedUser);
         return ResponseEntity.ok(profile);
     }
 
     @PostMapping("/profile/about")
-    public String updateProfileAbout(String about, RedirectAttributes redirectAttributes) {
-        StudentProfile profile = getStudentProfile();
+    public String updateProfileAbout(
+        String about, RedirectAttributes redirectAttributes,
+        @ModelAttribute("authenticatedUser") User authedUser
+    ) {
+        StudentProfile profile = studentProfileService.getProfileByUser(authedUser);
         if (Objects.nonNull(profile)) {
             profile.setAbout(about.trim());
             studentProfileService.saveProfile(profile);
@@ -108,9 +108,10 @@ public class StudentProfileController {
     public String updateProfileInfo(
         ProfileInfo profileInfo,
         @RequestParam Map<String, String> links,
-        RedirectAttributes redirectAttributes
+        RedirectAttributes redirectAttributes,
+        @ModelAttribute("authenticatedUser") User authedUser
     ) {
-        StudentProfile profile = Objects.requireNonNull(getStudentProfile());
+        StudentProfile profile = studentProfileService.getProfileByUser(authedUser);
         studentProfileService.updateProfileInfo(
             profile,
             profileInfo,
@@ -132,9 +133,10 @@ public class StudentProfileController {
     public String addNewLink(
         @RequestParam String linkName,
         @RequestParam String linkUrl,
-        RedirectAttributes redirectAttributes
+        RedirectAttributes redirectAttributes,
+        @ModelAttribute("authenticatedUser") User authedUser
     ) {
-        StudentProfile profile = Objects.requireNonNull(getStudentProfile());
+        StudentProfile profile = studentProfileService.getProfileByUser(authedUser);
         var links = profile.getLinks();
         if (links.containsKey(linkName)) {
             redirectAttributes.addFlashAttribute("toastColor", "danger");
@@ -150,10 +152,11 @@ public class StudentProfileController {
     @PostMapping("/profile/picture")
     public String updateProfilePicture(
         @RequestParam MultipartFile imageUriData,
-        RedirectAttributes redirectAttributes
+        RedirectAttributes redirectAttributes,
+        @ModelAttribute("authenticatedUser") User authedUser
     ) throws IOException {
-        deleteProfilePicture(redirectAttributes);
-        StudentProfile profile = Objects.requireNonNull(getStudentProfile());
+        deleteProfilePicture(redirectAttributes, authedUser);
+        StudentProfile profile = studentProfileService.getProfileByUser(authedUser);
         if (!imageUriData.isEmpty()) {
             profile.setImageUri(contentService.storeResource(
                 imageUriData.getResource(),
@@ -167,8 +170,11 @@ public class StudentProfileController {
     }
 
     @PostMapping("/profile/picture/delete")
-    public String deleteProfilePicture(RedirectAttributes redirectAttributes) {
-        StudentProfile profile = Objects.requireNonNull(getStudentProfile());
+    public String deleteProfilePicture(
+        RedirectAttributes redirectAttributes,
+        @ModelAttribute("authenticatedUser") User authedUser
+    ) {
+        StudentProfile profile = studentProfileService.getProfileByUser(authedUser);
         if (Objects.nonNull(profile.getImageUri())) {
             String imageName = profile.getImageUri().substring(profile.getImageUri().lastIndexOf('/') + 1);
             contentService.removeResource("profile", profile.getId().toString() + "_" + imageName);
@@ -181,16 +187,19 @@ public class StudentProfileController {
 
     @PostMapping("/profile/privacy")
     @ResponseBody
-    public ResponseEntity<ProfilePrivacy> updateProfilePrivacy(ProfilePrivacy profilePrivacy) {
-        StudentProfile profile = Objects.requireNonNull(getStudentProfile());
+    public ResponseEntity<ProfilePrivacy> updateProfilePrivacy(
+        ProfilePrivacy profilePrivacy,
+        @ModelAttribute("authenticatedUser") User authedUser
+    ) {
+        StudentProfile profile = studentProfileService.getProfileByUser(authedUser);
         profilePrivacy = studentProfileService.updateProfilePrivacy(profile, profilePrivacy);
         return ResponseEntity.ok(profilePrivacy);
     }
 
     @GetMapping("/profile/privacy")
     @ResponseBody
-    public ResponseEntity<ProfilePrivacy> getProfilePrivacy() {
-        StudentProfile profile = Objects.requireNonNull(getStudentProfile());
+    public ResponseEntity<ProfilePrivacy> getProfilePrivacy(@ModelAttribute("authenticatedUser") User authedUser) {
+        StudentProfile profile = studentProfileService.getProfileByUser(authedUser);
         return ResponseEntity.ok(new ProfilePrivacy(
             profile.isPublic(),
             profile.getUuid(),

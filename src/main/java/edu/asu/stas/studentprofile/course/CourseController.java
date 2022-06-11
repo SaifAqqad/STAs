@@ -2,6 +2,7 @@ package edu.asu.stas.studentprofile.course;
 
 import edu.asu.stas.content.ContentService;
 import edu.asu.stas.studentprofile.StudentProfileService;
+import edu.asu.stas.user.User;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -31,8 +32,11 @@ public class CourseController {
 
     // GET /profile/courses/{id}
     @GetMapping("/profile/courses/{id}")
-    public ResponseEntity<Course> getById(@PathVariable Long id) {
-        var profile = studentProfileService.getAuthenticatedUserProfile();
+    public ResponseEntity<Course> getById(
+        @PathVariable Long id,
+        @ModelAttribute("authenticatedUser") User user
+    ) {
+        var profile = Objects.isNull(user) ? null : studentProfileService.getProfileByUser(user);
         var course = courseRepository.getByProfileAndId(profile, id);
         if (Objects.isNull(course)) {
             return ResponseEntity.notFound().build();
@@ -55,8 +59,11 @@ public class CourseController {
     // POST /profile/courses/delete
     @PostMapping("/profile/courses/delete")
     @Transactional
-    public RedirectView deleteById(Course course, RedirectAttributes redirectAttributes) {
-        var profile = studentProfileService.getAuthenticatedUserProfile();
+    public RedirectView deleteById(
+        Course course, RedirectAttributes redirectAttributes,
+        @ModelAttribute("authenticatedUser") User user
+    ) {
+        var profile = Objects.isNull(user) ? null : studentProfileService.getProfileByUser(user);
         if (courseRepository.existsByProfileAndId(profile, course.getId())) {
             courseRepository.deleteByProfileAndId(profile, course.getId());
             String imageName = course.getImageUri().substring(course.getImageUri().lastIndexOf('/') + 1);
@@ -76,9 +83,10 @@ public class CourseController {
         @PathVariable Long id,
         Course course,
         @RequestParam MultipartFile imageUriData,
-        RedirectAttributes redirectAttributes
+        RedirectAttributes redirectAttributes,
+        @ModelAttribute("authenticatedUser") User user
     ) throws IOException {
-        var profile = studentProfileService.getAuthenticatedUserProfile();
+        var profile = Objects.isNull(user) ? null : studentProfileService.getProfileByUser(user);
         if (id.equals(course.getId()) && courseRepository.existsByProfileAndId(profile, course.getId())) {
             course.setProfile(profile);
             if (!imageUriData.isEmpty()) {
@@ -109,9 +117,10 @@ public class CourseController {
     public RedirectView addNew(
         Course course,
         @RequestParam MultipartFile imageUriData,
-        RedirectAttributes redirectAttributes
+        RedirectAttributes redirectAttributes,
+        @ModelAttribute("authenticatedUser") User user
     ) throws IOException {
-        var profile = studentProfileService.getAuthenticatedUserProfile();
+        var profile = Objects.isNull(user) ? null : studentProfileService.getProfileByUser(user);
         course.setProfile(profile);
         course = courseRepository.save(course);
         if (!imageUriData.isEmpty()) {
