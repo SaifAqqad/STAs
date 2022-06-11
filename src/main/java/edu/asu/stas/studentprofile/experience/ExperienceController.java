@@ -1,6 +1,7 @@
 package edu.asu.stas.studentprofile.experience;
 
 import edu.asu.stas.studentprofile.StudentProfileService;
+import edu.asu.stas.user.User;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
@@ -15,8 +16,8 @@ public class ExperienceController {
     private final ExperienceRepository experienceRepository;
 
     public ExperienceController(
-            StudentProfileService studentProfileService,
-            ExperienceRepository experienceRepository
+        StudentProfileService studentProfileService,
+        ExperienceRepository experienceRepository
     ) {
         this.studentProfileService = studentProfileService;
         this.experienceRepository = experienceRepository;
@@ -24,8 +25,11 @@ public class ExperienceController {
 
     // GET /profile/experiences/{id}
     @GetMapping("/profile/experiences/{id}")
-    public ResponseEntity<Experience> getById(@PathVariable Long id) {
-        var profile = studentProfileService.getAuthenticatedUserProfile();
+    public ResponseEntity<Experience> getById(
+        @PathVariable Long id,
+        @ModelAttribute("authenticatedUser") User user
+    ) {
+        var profile = Objects.isNull(user) ? null : studentProfileService.getProfileByUser(user);
         var experience = experienceRepository.getByProfileAndId(profile, id);
         if (Objects.isNull(experience)) {
             return ResponseEntity.notFound().build();
@@ -49,8 +53,11 @@ public class ExperienceController {
     // POST /profile/experiences/delete
     @PostMapping("/profile/experiences/delete")
     @Transactional
-    public RedirectView deleteById(Experience experience, RedirectAttributes redirectAttributes) {
-        var profile = studentProfileService.getAuthenticatedUserProfile();
+    public RedirectView deleteById(
+        Experience experience, RedirectAttributes redirectAttributes,
+        @ModelAttribute("authenticatedUser") User user
+    ) {
+        var profile = Objects.isNull(user) ? null : studentProfileService.getProfileByUser(user);
         if (experienceRepository.existsByProfileAndId(profile, experience.getId())) {
             experienceRepository.deleteByProfileAndId(profile, experience.getId());
             redirectAttributes.addFlashAttribute("toast", "Experience deleted successfully");
@@ -64,11 +71,12 @@ public class ExperienceController {
     // POST /profile/experiences/{id}
     @PostMapping("/profile/experiences/{id}")
     public RedirectView updateById(
-            @PathVariable Long id,
-            Experience experience,
-            RedirectAttributes redirectAttributes
+        @PathVariable Long id,
+        Experience experience,
+        RedirectAttributes redirectAttributes,
+        @ModelAttribute("authenticatedUser") User user
     ) {
-        var profile = studentProfileService.getAuthenticatedUserProfile();
+        var profile = Objects.isNull(user) ? null : studentProfileService.getProfileByUser(user);
         if (id.equals(experience.getId()) && experienceRepository.existsByProfileAndId(profile, experience.getId())) {
             experience.setProfile(profile);
             experienceRepository.save(experience);
@@ -82,8 +90,11 @@ public class ExperienceController {
 
     // POST /profile/experiences
     @PostMapping("/profile/experiences")
-    public RedirectView addNew(Experience experience, RedirectAttributes redirectAttributes) {
-        var profile = studentProfileService.getAuthenticatedUserProfile();
+    public RedirectView addNew(
+        Experience experience, RedirectAttributes redirectAttributes,
+        @ModelAttribute("authenticatedUser") User user
+    ) {
+        var profile = Objects.isNull(user) ? null : studentProfileService.getProfileByUser(user);
         experience.setProfile(profile);
         experienceRepository.save(experience);
         redirectAttributes.addFlashAttribute("toast", "Experience added successfully");

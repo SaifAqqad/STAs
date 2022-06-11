@@ -1,5 +1,7 @@
 package edu.asu.stas.studentprofile;
 
+import edu.asu.stas.connnection.Connection;
+import edu.asu.stas.connnection.oauth.GithubProfile;
 import edu.asu.stas.content.ContentService;
 import edu.asu.stas.lib.TokenGenerator;
 import edu.asu.stas.studentprofile.activity.Activity;
@@ -11,7 +13,6 @@ import edu.asu.stas.studentprofile.experience.ExperienceRepository;
 import edu.asu.stas.studentprofile.project.Project;
 import edu.asu.stas.studentprofile.project.ProjectRepository;
 import edu.asu.stas.user.User;
-import edu.asu.stas.user.UserService;
 import lombok.NonNull;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -67,14 +68,6 @@ public class StudentProfileService {
         return studentProfileRepository.getByUuid(uuid);
     }
 
-    public StudentProfile getAuthenticatedUserProfile() {
-        User user = UserService.getAuthenticatedUser();
-        if (Objects.isNull(user)) {
-            return null;
-        }
-        return getProfileByUser(user);
-    }
-
     public void saveProfile(StudentProfile profile) {
         studentProfileRepository.save(profile);
     }
@@ -127,9 +120,9 @@ public class StudentProfileService {
     }
 
     @Transactional
-    public StudentProfile createProfile(StudentProfile profile) {
+    public StudentProfile createProfile(StudentProfile profile, User user) {
         StudentProfile initialProfile = new StudentProfile();
-        initialProfile.setUser(UserService.getAuthenticatedUser());
+        initialProfile.setUser(user);
         initialProfile.setName(profile.getName());
         initialProfile.setAbout(profile.getAbout());
         initialProfile.setMajor(profile.getMajor());
@@ -146,6 +139,14 @@ public class StudentProfileService {
         savedProfile.getProjects().forEach(project -> this.processProject(project, savedProfile));
         savedProfile.getExperiences().addAll(profile.getExperiences());
         savedProfile.getExperiences().forEach(experience -> this.processExperience(experience, savedProfile));
+        // add GitHub profile link if GitHub account is linked
+        user.getConnections()
+            .stream()
+            .filter(conn -> conn.getServiceName().equals(Connection.SupportedTypes.GITHUB))
+            .map(conn -> (GithubProfile) conn.getServiceUserProfile())
+            .findFirst()
+            .ifPresent(gProfile -> savedProfile.getLinks()
+                                               .put("GitHub", "https://github.com/" + gProfile.getUserName()));
         initialProfile = studentProfileRepository.save(savedProfile);
         return initialProfile;
     }

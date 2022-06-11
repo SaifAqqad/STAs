@@ -35,9 +35,9 @@ public class AccountController {
 
     // adds the authenticated user's accountDetails to the model (when needed)
     @ModelAttribute
-    public AccountDetails accountDetails() {
-        User user = UserService.getAuthenticatedUser();
-        return Objects.nonNull(user) ? new AccountDetails(user) : null;
+    public void accountDetails(Model model) {
+        User user = (User) model.getAttribute("authenticatedUser");
+        model.addAttribute("accountDetails", Objects.nonNull(user) ? new AccountDetails(user) : null);
     }
 
     @GetMapping("/account")
@@ -47,20 +47,25 @@ public class AccountController {
 
     @PostMapping("/account/update")
     public String updateAccountDetails(
-            @Validated @ModelAttribute AccountDetails accountDetails,
-            BindingResult bindingResult,
-            RedirectAttributes redirectAttributes
+        @Validated @ModelAttribute AccountDetails accountDetails,
+        BindingResult bindingResult,
+        RedirectAttributes redirectAttributes,
+        @ModelAttribute("authenticatedUser") User user
     ) {
         if (bindingResult.hasErrors()) {
             // flash attributes are saved and then passed to the next request as model attributes
             // So we can use it to pass the bindingResults to the redirect request
-            redirectAttributes.addFlashAttribute("org.springframework.validation.BindingResult.accountDetails",
-                                                 bindingResult);
+            redirectAttributes.addFlashAttribute(
+                "org.springframework.validation.BindingResult.accountDetails",
+                bindingResult
+            );
             redirectAttributes.addFlashAttribute("accountDetails", accountDetails);
             return "redirect:/account?error";
         }
-        userService.updateUserByAccountDetails(Objects.requireNonNull(UserService.getAuthenticatedUser()),
-                                               accountDetails);
+        userService.updateUserByAccountDetails(
+            Objects.requireNonNull(user),
+            accountDetails
+        );
         redirectAttributes.addFlashAttribute("toast", "Changes saved successfully");
         return "redirect:/account";
     }
@@ -73,7 +78,7 @@ public class AccountController {
             model.addAttribute("changePasswordForm", new ChangePasswordForm());
         }
 
-        User user = Objects.requireNonNull(UserService.getAuthenticatedUser());
+        User user = (User) Objects.requireNonNull(model.getAttribute("authenticatedUser"));
         // check if the user has a current password
         if (Objects.isNull(user.getPassword())) {
             model.addAttribute("isCurrentPasswordDisabled", true);
@@ -90,28 +95,31 @@ public class AccountController {
 
     @PostMapping("/account/security/update-password")
     public String postPasswordForm(
-            @Validated @ModelAttribute ChangePasswordForm changePasswordForm,
-            BindingResult bindingResult,
-            RedirectAttributes redirectAttributes
+        @Validated @ModelAttribute ChangePasswordForm changePasswordForm,
+        BindingResult bindingResult,
+        RedirectAttributes redirectAttributes,
+        @ModelAttribute("authenticatedUser") User user
     ) {
         if (bindingResult.hasErrors()) {
-            redirectAttributes.addFlashAttribute("org.springframework.validation.BindingResult.changePasswordForm",
-                                                 bindingResult);
+            redirectAttributes.addFlashAttribute(
+                "org.springframework.validation.BindingResult.changePasswordForm",
+                bindingResult
+            );
             redirectAttributes.addFlashAttribute("changePasswordForm", changePasswordForm);
             return "redirect:/account/security?error";
         }
-        userService.updateUserPassword(Objects.requireNonNull(UserService.getAuthenticatedUser()), changePasswordForm);
+        userService.updateUserPassword(Objects.requireNonNull(user), changePasswordForm);
         redirectAttributes.addFlashAttribute("toast", "Password changed successfully");
         return "redirect:/account/security";
     }
 
     @PostMapping("/account/security/update-2fa")
     public String post2FAState(
-            boolean state,
-            String code,
-            RedirectAttributes redirectAttributes
+        boolean state,
+        String code,
+        RedirectAttributes redirectAttributes,
+        @ModelAttribute("authenticatedUser") User user
     ) {
-        User user = Objects.requireNonNull(UserService.getAuthenticatedUser());
         if (state) { // turned on 2FA
             MfaSecret secret = userService.enable2FA(user);
             redirectAttributes.addFlashAttribute("twoFactorSecret", secret.getSecret());
@@ -131,18 +139,18 @@ public class AccountController {
 
     @PostMapping("/account/security/delete")
     public String deleteAccount(
-            @RequestParam(required = false) String code2FA,
-            HttpServletRequest request,
-            RedirectAttributes redirectAttributes
+        @RequestParam(required = false) String code2FA,
+        HttpServletRequest request,
+        RedirectAttributes redirectAttributes,
+        @ModelAttribute("authenticatedUser") User user
     ) throws ServletException {
-        User user = Objects.requireNonNull(UserService.getAuthenticatedUser());
         if (user.isUsing2FA() && !userService.is2FACodeValid(user, code2FA)) {
             redirectAttributes.addFlashAttribute("toastColor", "danger");
             redirectAttributes.addFlashAttribute("toast", "Authentication code invalid");
             return "redirect:/account/security";
         }
         boolean isDeleted = userService.deleteUserById(user.getId());
-        if(!isDeleted){
+        if (!isDeleted) {
             redirectAttributes.addFlashAttribute("toastColor", "danger");
             redirectAttributes.addFlashAttribute("toast", "Account deletion failed");
             return "redirect:/account/security";
@@ -155,19 +163,26 @@ public class AccountController {
     //---  Connections page
 
     @GetMapping("/account/connections")
-    public String getConnectionsPage(Model model) {
-        User user = Objects.requireNonNull(UserService.getAuthenticatedUser());
+    public String getConnectionsPage(
+        Model model,
+        @ModelAttribute("authenticatedUser") User user
+    ) {
         model.addAllAttributes(connectionRepository
-                                       .findAllByUser(user)
-                                       .stream()
-                                       .collect(Collectors.toMap(conn -> "service_" + conn.getServiceName(),
-                                                                 conn -> conn)));
+            .findAllByUser(user)
+            .stream()
+            .collect(Collectors.toMap(
+                conn -> "service_" + conn.getServiceName(),
+                conn -> conn
+            )));
         return "account/connections";
     }
 
     @GetMapping("/account/connections/disconnect/{serviceName}")
-    public String disconnectService(@PathVariable String serviceName, RedirectAttributes redirectAttributes) {
-        User user = Objects.requireNonNull(UserService.getAuthenticatedUser());
+    public String disconnectService(
+        @PathVariable String serviceName,
+        RedirectAttributes redirectAttributes,
+        @ModelAttribute("authenticatedUser") User user
+    ) {
         Connection connection = connectionRepository.findByUserAndServiceName(user, serviceName);
         if (Objects.isNull(connection)) {
             redirectAttributes.addFlashAttribute("toastColor", "danger");
@@ -175,9 +190,11 @@ public class AccountController {
             return "redirect:/account/connections?error";
         }
         connectionRepository.delete(connection);
-        redirectAttributes.addFlashAttribute("toast",
-                                             StringUtils.capitalize(serviceName) +
-                                                     " account disconnected successfully");
+        redirectAttributes.addFlashAttribute(
+            "toast",
+            StringUtils.capitalize(serviceName) +
+                " account disconnected successfully"
+        );
         return "redirect:/account/connections";
     }
 
@@ -185,8 +202,8 @@ public class AccountController {
 
     @GetMapping("/reset-password")
     public String getResetPasswordPage(
-            @RequestParam(required = false) String token,
-            Model model
+        @RequestParam(required = false) String token,
+        Model model
     ) {
         if (Objects.nonNull(token) && userService.isResetTokenValid(token)) {
             if (!model.containsAttribute("resetPasswordForm")) {
@@ -199,13 +216,15 @@ public class AccountController {
 
     @PostMapping("/reset-password/do")
     public String postResetPassword(
-            @Validated @ModelAttribute ResetPasswordForm resetPasswordForm,
-            BindingResult bindingResult,
-            RedirectAttributes redirectAttributes
+        @Validated @ModelAttribute ResetPasswordForm resetPasswordForm,
+        BindingResult bindingResult,
+        RedirectAttributes redirectAttributes
     ) {
         if (bindingResult.hasErrors()) {
-            redirectAttributes.addFlashAttribute("org.springframework.validation.BindingResult.resetPasswordForm",
-                                                 bindingResult);
+            redirectAttributes.addFlashAttribute(
+                "org.springframework.validation.BindingResult.resetPasswordForm",
+                bindingResult
+            );
             redirectAttributes.addFlashAttribute("resetPasswordForm", resetPasswordForm);
             redirectAttributes.addAttribute("token", resetPasswordForm.getResetToken());
         } else {
@@ -217,8 +236,8 @@ public class AccountController {
 
     @PostMapping("/reset-password/request-email")
     public String postResetPasswordRequest(
-            @RequestParam String email,
-            RedirectAttributes redirectAttributes
+        @RequestParam String email,
+        RedirectAttributes redirectAttributes
     ) {
         userService.sendResetPasswordEmail(email);
         redirectAttributes.addFlashAttribute("requestSuccess", true);

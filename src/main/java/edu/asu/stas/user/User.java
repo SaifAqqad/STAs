@@ -1,6 +1,7 @@
 package edu.asu.stas.user;
 
 import edu.asu.stas.connnection.Connection;
+import edu.asu.stas.studentprofile.endorsement.Endorsement;
 import edu.asu.stas.user.token.UserToken;
 import lombok.*;
 import org.springframework.format.annotation.DateTimeFormat;
@@ -52,6 +53,9 @@ public class User implements UserDetails {
 
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
     private final List<Connection> connections = new ArrayList<>();
+
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+    private final List<Endorsement> endorsements = new ArrayList<>();
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
