@@ -2,7 +2,6 @@ package edu.asu.stas.studentprofile;
 
 import edu.asu.stas.content.ContentService;
 import edu.asu.stas.user.User;
-import edu.asu.stas.user.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
