@@ -57,7 +57,7 @@
 <#macro profileCard name="_" imageUri="_" publicUri="_" major="_" location="_" university="_">
     <div class="p-0 card card-border-grey h-100 user-select-none btn bg-hover animate__animated animate__fadeIn animate__faster profile-card">
         <img src="${imageUri}" data-prop="imageUri" data-default="/images/generic_profile.jpeg" data-attribute="src"
-             class="card-img-top" alt="Profile Picture">
+             class="card-img-top object-fit-cover aspect-ratio-1" alt="Profile Picture">
         <div class="card-body d-flex flex-column flex-grow-1 w-100 align-content-start text-start">
             <h5 class="card-title" data-prop="name" data-attribute="innerText">${name}</h5>
             <h6 class="card-subtitle mb-2 text-muted overflow-hidden text-truncate"
