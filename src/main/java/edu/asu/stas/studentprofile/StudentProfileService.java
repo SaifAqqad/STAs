@@ -12,6 +12,8 @@ import edu.asu.stas.studentprofile.experience.Experience;
 import edu.asu.stas.studentprofile.experience.ExperienceRepository;
 import edu.asu.stas.studentprofile.project.Project;
 import edu.asu.stas.studentprofile.project.ProjectRepository;
+import edu.asu.stas.studentprofile.skill.Skill;
+import edu.asu.stas.studentprofile.skill.SkillRepository;
 import edu.asu.stas.user.User;
 import lombok.NonNull;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -33,6 +35,7 @@ public class StudentProfileService {
     private final ProjectRepository projectRepository;
     private final TokenGenerator tokenGenerator;
     private final ContentService contentService;
+    private final SkillRepository skillRepository;
 
     @Autowired
     public StudentProfileService(
@@ -42,7 +45,8 @@ public class StudentProfileService {
         ExperienceRepository experienceRepository,
         ProjectRepository projectRepository,
         TokenGenerator tokenGenerator,
-        ContentService contentService
+        ContentService contentService,
+        SkillRepository skillRepository
     ) {
         this.studentProfileRepository = studentProfileRepository;
         this.activityRepository = activityRepository;
@@ -51,6 +55,7 @@ public class StudentProfileService {
         this.projectRepository = projectRepository;
         this.tokenGenerator = tokenGenerator;
         this.contentService = contentService;
+        this.skillRepository = skillRepository;
     }
 
     public StudentProfile getProfileByUser(@NonNull User user) {
@@ -139,6 +144,8 @@ public class StudentProfileService {
         savedProfile.getProjects().forEach(project -> this.processProject(project, savedProfile));
         savedProfile.getExperiences().addAll(profile.getExperiences());
         savedProfile.getExperiences().forEach(experience -> this.processExperience(experience, savedProfile));
+        savedProfile.getSkills().addAll(profile.getSkills());
+        savedProfile.getSkills().forEach(skill -> this.processSkill(skill, savedProfile));
         // add GitHub profile link if GitHub account is linked
         user.getConnections()
             .stream()
@@ -149,6 +156,12 @@ public class StudentProfileService {
                                                .put("GitHub", "https://github.com/" + gProfile.getUserName()));
         initialProfile = studentProfileRepository.save(savedProfile);
         return initialProfile;
+    }
+
+    private void processSkill(Skill skill, StudentProfile savedProfile) {
+        skill.setId(null);
+        skill.setProfile(savedProfile);
+        skillRepository.save(skill);
     }
 
     private void processCourse(Course course, StudentProfile profile) {
