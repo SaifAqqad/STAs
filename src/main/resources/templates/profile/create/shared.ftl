@@ -85,6 +85,7 @@
                 links: {},
                 courses: [],
                 activities: [],
+                skills: [],
                 projects: [],
                 experiences: [],
             }
@@ -149,6 +150,20 @@
                 description = null;
                 imageUri = null;
                 date = null;
+
+                constructor(obj = null) {
+                    if (obj === null)
+                        return;
+                    for (const prop in this) {
+                        this[prop] = obj[prop] || this[prop];
+                    }
+                }
+            });
+
+            static Skill = (class {
+                id = null;
+                name = null;
+                level = null;
 
                 constructor(obj = null) {
                     if (obj === null)
