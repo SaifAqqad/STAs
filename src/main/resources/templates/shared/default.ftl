@@ -72,13 +72,20 @@
             </button>
             <div class="collapse navbar-collapse" id="navbarSupportedContent">
                 <ul class="navbar-nav me-auto">
+                    <li class="nav-item">
+                        <a class="nav-link ps-2 ps-sm-p75 d-inline-flex align-items-center w-100 ${search}"
+                           href="<@spring.url relativeUrl="/search"/>">
+                            <@icon name="mdi:magnify" class="me-1" height="20"/>
+                            Search
+                        </a>
+                    </li>
                     <#-- STUDENT-only links -->
                     <@requiredRole roles.student>
                         <li class="nav-item">
                             <a class="nav-link ps-2 ps-sm-p75 d-inline-flex align-content-center w-100 ${profile}"
                                href="<@spring.url relativeUrl="/profile"/>">
                                 <@icon name="mdi:card-account-details-outline" class="me-1" height="20"/>
-                                My profile
+                                My portfolio
                             </a>
                         </li>
                     </@requiredRole>
@@ -86,13 +93,6 @@
                 <#-- Login/Logout links -->
                 <div class="d-flex">
                     <ul class="navbar-nav me-2 mb-2 mb-md-0 w-100">
-                        <li class="nav-item">
-                            <a class="nav-link ps-2 ps-sm-p75 d-inline-flex align-items-center w-100 ${search}"
-                               href="<@spring.url relativeUrl="/search"/>">
-                                <@icon name="mdi:magnify" class="me-1" height="20"/>
-                                Search
-                            </a>
-                        </li>
                         <#-- if the user is authenticated -->
                         <#if authenticatedUser??>
                             <li class="nav-item"> <#-- user's fName lName -->

@@ -20,7 +20,7 @@
                                 <input class="form-check-input form-submitter" type="checkbox" role="switch"
                                        name="public" id="privacyForm_isPublic">
                                 <label class="form-check-label text-muted w-mxc" for="privacyForm_isPublic">Public
-                                    profile</label>
+                                    portfolio</label>
                             </div>
                             <div class="w-auto input-group">
                                 <input class="form-control form-control-sm" readonly
