@@ -125,8 +125,12 @@
                     profileCard.querySelector('[data-group="' + elem.dataset.prop + '"]')?.classList.add('d-none'); // hide the group
                 }
                 elem[elem.dataset.attribute] = profile[elem.dataset.prop] || elem.dataset.default || "";
-
             });
+            profileCard.querySelectorAll("img").forEach(img => {
+                img.addEventListener('error', () => {
+                    img.src = img.dataset.default;
+                }, {once: true});
+            })
             const column = document.createElement('div');
             column.classList.add('col', 'mb-3', 'd-flex', 'justify-content-center', 'justify-content-md-start');
             column.appendChild(profileCard);
