@@ -44,7 +44,10 @@ public interface OAuthProfile extends Serializable {
                 profile.setFirstName(fullName[0]);
                 profile.setLastName(fullName.length > 1 ? fullName[1] : "");
                 profile.setUserName(requireNonNull(user.getAttribute("login")));
-                profile.setEmail(requireNonNull(user.getAttribute("email")));
+                profile.setEmail(requireNonNullElse(
+                    user.getAttribute("email"),
+                    profile.getUserName() + "@github.stas.oauth"
+                ));
                 profile.getRepositories().addAll(repos);
                 yield profile;
             }
@@ -52,7 +55,10 @@ public interface OAuthProfile extends Serializable {
             case Connection.SupportedTypes.LINKEDIN -> {
                 String firstName = requireNonNull(user.getAttribute("localizedFirstName"));
                 String lastName = requireNonNullElse(user.getAttribute("localizedLastName"), "");
-                String email = requireNonNull(LinkedInProfile.fetchEmail(request.getAccessToken()));
+                String email = requireNonNullElse(
+                    LinkedInProfile.fetchEmail(request.getAccessToken()),
+                    user.getName() + "@linkedin.stas.oauth"
+                );
                 yield new LinkedInProfile(user.getName(), firstName, lastName, email);
             }
             default -> null;
