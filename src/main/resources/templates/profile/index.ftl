@@ -139,7 +139,7 @@
                                 </form>
                             </div>
 
-                            <div class="mx-3 mt-3 d-flex justify-content-end profile-edit-items d-none">
+                            <div class="mx-3 mt-2 d-flex justify-content-end profile-edit-items d-none">
                                 <button class="btn btn-sm btn-primary me-1" id="saveInfoBtn">Save</button>
                                 <button class="btn btn-sm btn-outline-primary" id="cancelInfoBtn">Cancel</button>
                             </div>
