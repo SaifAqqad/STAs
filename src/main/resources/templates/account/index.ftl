@@ -32,7 +32,7 @@
                         </#if>
                         <form class="" action="<@spring.url "/account/update"/>" method="post">
                             <@default.csrfInput/>
-                            <div class="row">
+                            <div class="row row-cols-1 row-cols-sm-2">
                                 <div class="col">
                                     <div class="form-floating mt-3">
                                         <@account.formElement path="accountDetails.firstName" label="First Name" attrb="required " placeholder="First Name" />
