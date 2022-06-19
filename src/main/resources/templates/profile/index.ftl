@@ -104,7 +104,7 @@
                             </div>
                         </div>
                         <@editOnly>
-                            <div class="mx-3 mt-3 profile-view-items ">
+                            <div class="mx-3 mt-2 profile-view-items ">
                                 <button class="btn btn-sm btn-outline-primary w-100" id="editInfoBtn">Edit information
                                 </button>
                             </div>
@@ -132,14 +132,13 @@
                                     </#list>
                                     <div class="mx-1 mt-2 d-flex justify-content-end">
                                         <button type="button" class="btn btn-sm btn-outline-primary" id="addLinkButton">
-                                            Add
-                                            link
+                                            Add link
                                         </button>
                                     </div>
                                 </form>
                             </div>
 
-                            <div class="mx-3 mt-2 d-flex justify-content-end profile-edit-items d-none">
+                            <div class="mx-3 mt-3 d-flex justify-content-end profile-edit-items d-none">
                                 <button class="btn btn-sm btn-primary me-1" id="saveInfoBtn">Save</button>
                                 <button class="btn btn-sm btn-outline-primary" id="cancelInfoBtn">Cancel</button>
                             </div>
