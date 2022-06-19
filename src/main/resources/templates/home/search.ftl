@@ -5,7 +5,7 @@
 <!DOCTYPE html>
 <html lang="en">
 
-<@default.head title="Portfolio search - STAs">
+<@default.head title="Search for a portfolio - STAs">
     <link rel="stylesheet" href="<@spring.url "/webjars/animate.css/animate.min.css"/>"/>
     <style>
         @media (min-width: 768px) {

@@ -13,7 +13,7 @@
 <!DOCTYPE html>
 <html lang="en">
 
-<@default.head title="Create profile">
+<@default.head title="Create your portfolio - STAs">
     <link rel="stylesheet" href="<@spring.url "/css/tabs.css"/>"/>
 </@default.head>
 

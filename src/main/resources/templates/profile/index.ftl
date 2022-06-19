@@ -49,10 +49,10 @@
 
                 <#-- Profile info -->
                 <div id="profileInfo">
-                    <div class="card card-border-grey rounded-2 p-2 mb-3">
+                    <div class="card card-border-grey rounded-2 p-2 py-3 mb-3">
                         <div class="text-center mx-3">
                             <#-- profile picture -->
-                            <div class="d-flex justify-content-center p-3 user-select-none">
+                            <div class="d-flex justify-content-center pt-1 p-3 user-select-none">
                                 <div class="position-relative">
                                     <div class="img-w-100 rounded-circle object-fit-cover">
                                         <img class="img-w-100 rounded-circle object-fit-cover" id="profilePicture"
@@ -104,7 +104,7 @@
                             </div>
                         </div>
                         <@editOnly>
-                            <div class="mx-3 mt-3 profile-view-items ">
+                            <div class="mx-3 mt-2 profile-view-items ">
                                 <button class="btn btn-sm btn-outline-primary w-100" id="editInfoBtn">Edit information
                                 </button>
                             </div>
@@ -132,8 +132,7 @@
                                     </#list>
                                     <div class="mx-1 mt-2 d-flex justify-content-end">
                                         <button type="button" class="btn btn-sm btn-outline-primary" id="addLinkButton">
-                                            Add
-                                            link
+                                            Add link
                                         </button>
                                     </div>
                                 </form>
