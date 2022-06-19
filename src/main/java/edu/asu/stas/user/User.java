@@ -65,7 +65,11 @@ public class User implements UserDetails {
 
     @Override
     public String getUsername() {
-        return getEmail();
+        return email;
+    }
+
+    public String getEmail() {
+        return email.contains("stas.oauth") ? "" : email;
     }
 
     @Override
