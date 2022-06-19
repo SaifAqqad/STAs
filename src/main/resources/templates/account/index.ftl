@@ -25,6 +25,11 @@
                 </div>
                 <div class="card mt-3">
                     <div class="card-body">
+                        <#if !(accountDetails.email?has_content)>
+                            <div class="text-danger fw-bold fs-6">
+                                To avoid losing access to your account, please add an email below.
+                            </div>
+                        </#if>
                         <form class="" action="<@spring.url "/account/update"/>" method="post">
                             <@default.csrfInput/>
                             <div class="row">
