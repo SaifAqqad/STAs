@@ -49,10 +49,10 @@
 
                 <#-- Profile info -->
                 <div id="profileInfo">
-                    <div class="card card-border-grey rounded-2 p-2 mb-3">
+                    <div class="card card-border-grey rounded-2 p-2 py-3 mb-3">
                         <div class="text-center mx-3">
                             <#-- profile picture -->
-                            <div class="d-flex justify-content-center p-3 user-select-none">
+                            <div class="d-flex justify-content-center pt-1 p-3 user-select-none">
                                 <div class="position-relative">
                                     <div class="img-w-100 rounded-circle object-fit-cover">
                                         <img class="img-w-100 rounded-circle object-fit-cover" id="profilePicture"
