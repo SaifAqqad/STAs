@@ -72,7 +72,7 @@
         class Profile {
             static #defaultProfile = {
                 name: "${authenticatedUser.firstName} ${authenticatedUser.lastName}",
-                contactEmail: "${(authenticatedUser.email?contains('stas.oauth')?then('',authenticatedUser.email))}",
+                contactEmail: "${authenticatedUser.email}",
                 contactPhone: null,
                 location: null,
                 about: null,

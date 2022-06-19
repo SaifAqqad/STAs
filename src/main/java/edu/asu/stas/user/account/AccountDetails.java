@@ -35,7 +35,7 @@ public class AccountDetails {
     public AccountDetails(@NonNull User user) {
         this.firstName = user.getFirstName();
         this.lastName = user.getLastName();
-        this.email = user.getEmail().contains("stas.oauth") ? "" : user.getEmail();
+        this.email = user.getEmail();
         this.dateOfBirth = user.getDateOfBirth();
     }
 
