@@ -6,7 +6,7 @@
 <!DOCTYPE html>
 <html lang="en">
 
-<@default.head title="Account connection"/>
+<@default.head title="Account connection - STAs"/>
 <#assign isOAuthError = ((toastColor!"") = "danger") && RequestParameters.error??/>
 <body class="min-vh-100">
 <@default.navbar/>
