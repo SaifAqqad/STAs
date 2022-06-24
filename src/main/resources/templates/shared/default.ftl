@@ -221,3 +221,11 @@
     </#if>
 </#macro>
 
+<#function firstNonEmptyOrDefault default values...>
+    <#list values as value>
+        <#if value?has_content>
+            <#return value>
+        </#if>
+    </#list>
+    <#return default>
+</#function>

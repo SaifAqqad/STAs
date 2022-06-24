@@ -390,7 +390,8 @@
                             <div class="row row-cols-1 row-cols-lg-2">
                                 <#list profile.courses as course >
                                     <div class="col mb-3">
-                                        <@profileCard title=course.name text=(course.studentComment?has_content)?then(course.studentComment,course.description) img=course.imageUri id=course.id?c class="btn bg-hover" preserveLines=true/>
+                                        <#assign courseDescription = default.firstNonEmptyOrDefault("",course.studentComment,course.description) />
+                                        <@profileCard title=course.name text=courseDescription img=course.imageUri id=course.id?c class="btn bg-hover" preserveLines=true/>
                                     </div>
                                 <#else>
                                     <div class="w-100 min-h-100 d-flex justify-content-center align-items-center">
