@@ -58,7 +58,7 @@
     </svg>
 </#macro>
 
-<#macro navbar home="" login="" profile="" search="" account="" marginBreak="lg">
+<#macro navbar home="" login="" profile="" search="" account="" admin="" marginBreak="lg">
     <nav class="navbar navbar-expand-md py-2 navbar-dark bg-dark user-select-none">
         <div class="container-fluid container-${marginBreak}">
             <a class="navbar-brand d-flex align-items-center" href="<@spring.url relativeUrl="/"/>">
@@ -86,6 +86,15 @@
                                href="<@spring.url relativeUrl="/profile"/>">
                                 <@icon name="mdi:card-account-details-outline" class="me-1" height="20"/>
                                 My portfolio
+                            </a>
+                        </li>
+                    </@requiredRole>
+                    <@requiredRole roles.admin>
+                        <li class="nav-item">
+                            <a class="nav-link ps-2 ps-sm-p75 d-inline-flex align-content-center w-100 ${admin}"
+                               href="<@spring.url relativeUrl="/admin/panel"/>">
+                                <@icon name="eos-icons:admin-outlined" class="me-1" height="20"/>
+                                Admin panel
                             </a>
                         </li>
                     </@requiredRole>

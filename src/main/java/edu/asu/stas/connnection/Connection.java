@@ -1,5 +1,6 @@
 package edu.asu.stas.connnection;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import edu.asu.stas.connnection.oauth.OAuthProfile;
 import edu.asu.stas.user.User;
 import lombok.*;
@@ -42,6 +43,7 @@ public class Connection implements OAuth2User {
     private OAuthProfile serviceUserProfile;
 
     @ManyToOne(optional = false, fetch = FetchType.EAGER)
+    @JsonIgnore
     private User user;
 
     @Override
