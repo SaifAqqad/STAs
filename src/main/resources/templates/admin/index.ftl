@@ -4,7 +4,7 @@
 
 <!DOCTYPE html>
 <html lang="en">
-<@default.head title="Dashboard - STAs">
+<@default.head title="Admin panel - STAs">
     <style>
         .table > :not(:first-child) {
             border-top: 0;
@@ -15,9 +15,10 @@
 <body>
 <@default.navbar admin="active"/>
 
-<div class="container-fluid container-lg my-3 animate__animated animate__fadeIn animate__faster">
+<div class="container-fluid container-lg my-3">
     <div class="table-responsive p-2">
-        <table class="table table-light table-hover shadow shadow-lg user-select-none users-table">
+        <table class="table table-light table-hover caption-top shadow shadow-lg user-select-none users-table animate__animated animate__fadeIn animate__faster">
+            <caption class="card-title fs-6 mb-0">User accounts</caption>
             <thead class="users-header">
             <tr>
                 <th>ID</th>
@@ -40,26 +41,79 @@
             </tr>
             </tfoot>
         </table>
+        <div class="card w-100 d-none shadow shadow-lg" id="loadingSpinner">
+            <div class="w-100 min-h-100 d-flex justify-content-center align-items-center animate__animated animate__fadeIn animate__faster">
+                <div class="spinner-border text-primary" role="status">
+                    <span class="visually-hidden">Loading...</span>
+                </div>
+            </div>
+        </div>
     </div>
 
 </div>
 
 <@default.scripts/>
 
+<script src="<@spring.url "/webjars/bootstrap-modbox/dist/bootstrap-modbox.min.js"/>"></script>
 <script>
     (() => {
-        let currentPage = 0, totalPages = 0, pageSize = 10;
-        const usersBaseEndpoint = "/users";
         const connectionIcons = {
             "google": <@default.jsStr><@default.icon name='flat-color-icons:google'/></@default.jsStr>,
             "github": <@default.jsStr><@default.icon name='mdi:github'/></@default.jsStr>,
             "linkedin": <@default.jsStr><@default.icon name='mdi:linkedin'/></@default.jsStr>,
         }
-        const loadingSpinner = <@default.jsStr><@loadingSpinner/></@default.jsStr>;
+        const dropdownIcon =<@default.jsStr><@default.icon name='bxs:down-arrow'/></@default.jsStr>;
 
-        const usersHeader = document.querySelector(".users-header");
+        const loadingSpinner = document.getElementById('loadingSpinner')
+        const usersTable = document.querySelector('.users-table')
         const usersBody = document.querySelector('.users-body');
         const usersFooter = document.querySelector('.users-footer');
+
+        const User = (class {
+            static baseEndpoint = "/users";
+            static ROLES = {
+                "ROLE_STUDENT": "Student",
+                "ROLE_ADMIN": "Admin",
+            };
+            static csrfHeader = document.querySelector("meta[name='_csrf_header']").content;
+            static csrfToken = document.querySelector("meta[name='_csrf']").content;
+
+            static async getAll(page, size) {
+                const response = await fetch(User.baseEndpoint + "?" + new URLSearchParams({page, size}))
+                if (!response.ok)
+                    return null;
+                return await response.json();
+            }
+
+            static async delete(id) {
+                const response = await fetch(User.baseEndpoint + "/" + id, {
+                    headers: {[User.csrfHeader]: User.csrfToken},
+                    method: "DELETE",
+                });
+                return response.ok;
+            }
+
+            static async disable2FA(id) {
+                const response = await fetch(User.baseEndpoint + "/" + id + "/disable-2FA", {
+                    headers: {[User.csrfHeader]: User.csrfToken},
+                    method: "POST",
+                });
+                return response.ok;
+            }
+
+            static async setRole(id, role) {
+                const response = await fetch(User.baseEndpoint + "/" + id + "/role", {
+                    headers: {
+                        'Content-Type': 'application/x-www-form-urlencoded',
+                        [User.csrfHeader]: User.csrfToken,
+                    },
+                    method: "POST",
+                    body: new URLSearchParams({role}),
+                });
+                return response.ok;
+            }
+        });
+        let currentPage = 0, totalPages = 0, pageSize = 10;
 
         const userToRow = (user) => {
             const row = document.createElement('tr');
@@ -74,11 +128,45 @@
             email.textContent = user["email"] || "NA";
 
             const role = row.insertCell()
-            const roleTag = document.createElement('span');
+            const roleDropdownContainer = document.createElement('div');
+            roleDropdownContainer.classList.add('dropdown');
+
+            // Role tag button
+            const roleTag = document.createElement('div');
             const isAdmin = user["role"] === "ROLE_ADMIN";
-            roleTag.classList.add('badge', 'fw-normal', 'rounded-pill', isAdmin ? 'bg-info' : 'bg-primary');
-            roleTag.textContent = isAdmin ? "Admin" : "Student";
-            role.appendChild(roleTag);
+            roleTag.classList.add('badge', 'clickable', 'fw-normal', 'rounded-pill', isAdmin ? 'bg-info' : 'bg-primary');
+            roleTag.textContent = isAdmin ? "Admin " : "Student ";
+            roleTag.setAttribute("data-bs-toggle", "dropdown");
+            roleTag.insertAdjacentHTML('beforeend', dropdownIcon);
+            roleTag.id = "role-tag-" + user["userId"];
+            roleDropdownContainer.appendChild(roleTag);
+
+            const roleDropdownMenu = document.createElement('ul');
+            roleDropdownMenu.classList.add('dropdown-menu');
+            roleDropdownMenu.setAttribute("aria-labelledby", "role-tag-" + user["userId"]);
+
+            // add each role to the dropdown menu
+            Object.entries(User.ROLES).forEach(([role, roleName]) => {
+                const roleDropdownItem = document.createElement('li');
+                const roleDropdownItemButton = document.createElement('button');
+
+                roleDropdownItemButton.classList.add('dropdown-item');
+                roleDropdownItemButton.textContent = roleName;
+                roleDropdownItemButton.addEventListener('click', async () => {
+                    setLoading(true);
+                    if (await User.setRole(user["userId"], role))
+                        await fetchCurrentPage();
+                    setLoading(false);
+                });
+
+                roleDropdownItem.appendChild(roleDropdownItemButton);
+                roleDropdownMenu.appendChild(roleDropdownItem);
+            });
+
+            // add the dropdown menu to the dropdown container
+            roleDropdownContainer.appendChild(roleDropdownMenu);
+            // add the dropdown container to the role cell
+            role.appendChild(roleDropdownContainer);
 
             const state = row.insertCell()
             const stateTag = document.createElement('span');
@@ -87,14 +175,38 @@
             state.appendChild(stateTag);
 
             const twoFA = row.insertCell()
-            const twoFATag = document.createElement('span');
-            twoFATag.classList.add('badge', 'fw-normal', 'rounded-pill', user["using2FA"] ? 'bg-success' : 'bg-danger');
-            twoFATag.textContent = user["using2FA"] ? "Enabled" : "Disabled";
-            twoFA.appendChild(twoFATag);
+            const tag2FA = document.createElement('span');
+            twoFA.appendChild(tag2FA);
+            tag2FA.classList.add('badge', 'fw-normal', 'rounded-pill', user["using2FA"] ? 'bg-success' : 'bg-danger');
+            tag2FA.textContent = user["using2FA"] ? "Enabled" : "Disabled";
+            if (user["using2FA"]) {
+                tag2FA.classList.add('clickable');
+                tag2FA.addEventListener('click', async () => modbox.confirm({
+                    title: "Disable 2FA?",
+                    body: "Are you sure you want to disable 2FA for this user?",
+                    center: true,
+                    okButton: {
+                        label: 'Yes'
+                    },
+                    closeButton: {
+                        label: 'No'
+                    },
+                    relatedTarget: deleteButton,
+                }).then(async () => {
+                    setLoading(true);
+                    if (await User.disable2FA(user["userId"]))
+                        await fetchCurrentPage();
+                    setLoading(false);
+                }).catch(() => {
+                }));
+
+                new bootstrap.Tooltip(tag2FA, {title: "Disable 2FA"});
+            }
 
             const connections = row.insertCell()
             const connectionsRow = document.createElement('div');
             connectionsRow.classList.add('d-flex', 'justify-content-between');
+            connections.appendChild(connectionsRow);
             user["connections"].forEach(connection => {
                 const connElem = document.createElement('span');
                 connElem.classList.add('fs-5');
@@ -104,12 +216,47 @@
             if (user["connections"].length === 0) {
                 connectionsRow.textContent = "NA";
             }
-            connections.appendChild(connectionsRow);
 
             const actions = row.insertCell()
-            // TODO: Add actions
+            const actionsRow = document.createElement('div');
+            actionsRow.classList.add('d-flex', 'justify-content-between');
+            actions.appendChild(actionsRow);
+
+            // add delete button
+            const deleteButton = document.createElement('button');
+            actionsRow.appendChild(deleteButton);
+            deleteButton.classList.add('btn', 'btn-outline-danger', 'btn-sm');
+            deleteButton.textContent = "Delete user";
+            deleteButton.addEventListener('click', () => modbox.confirm({
+                title: "Delete user",
+                body: "Are you sure you want to delete this user?",
+                center: true,
+                okButton: {
+                    label: 'Yes'
+                },
+                closeButton: {
+                    label: 'No'
+                },
+                relatedTarget: deleteButton,
+            }).then(async () => {
+                setLoading(true);
+                if (await User.delete(user["userId"]))
+                    await fetchCurrentPage();
+                setLoading(false);
+            }).catch(() => {
+            }));
 
             return row;
+        };
+
+        const setLoading = (state) => {
+            if (state) {
+                usersTable.classList.add('d-none');
+                loadingSpinner.classList.remove('d-none');
+            } else {
+                usersTable.classList.remove('d-none');
+                loadingSpinner.classList.add('d-none');
+            }
         };
 
         const updatePagination = async () => {
@@ -167,29 +314,26 @@
             usersFooter.appendChild(container);
         };
 
-        const fetchCurrentPage = () => {
-            // empty the table
-            usersBody.replaceChildren();
-            // show the loading spinner
-            usersFooter.innerHTML = loadingSpinner;
-            // hide the table header
-            usersHeader.classList.add('d-none');
+        const fetchCurrentPage = async () => {
+            // show loading spinner
+            setLoading(true);
             // fetch the current page
-            fetch(usersBaseEndpoint + "?" + new URLSearchParams({
-                "page": currentPage.toString(),
-                "size": pageSize.toString()
-            })).then(response => response.json())
-                .then(data => {
-                    // for each user, create a row and append it to the table
-                    data.content.forEach(user => usersBody.appendChild(userToRow(user)));
-                    // show the table header
-                    usersHeader.classList.remove('d-none');
-                    // update current and total page count
-                    currentPage = data["pageable"]["pageNumber"];
-                    totalPages = data["totalPages"];
-                    // update the pagination footer
-                    updatePagination();
-                })
+            const data = await User.getAll(currentPage, pageSize);
+            // empty the table body
+            usersBody.replaceChildren();
+            // for each user, create a row and append it to the table
+            data.content.forEach(user => usersBody.appendChild(userToRow(user)))
+            // if there are no users
+            if (data.content.length === 0) {
+                usersBody.innerHTML = "<tr><td colspan='8' class='text-center'>There are no users yet</td></tr>";
+            }
+            // update current and total page count
+            currentPage = data["pageable"]["pageNumber"];
+            totalPages = data["totalPages"];
+            // hide loading spinner
+            setLoading(false);
+            // update the pagination footer
+            await updatePagination();
         };
 
         // on page load -> fetch the first page
@@ -200,11 +344,3 @@
 </body>
 
 </html>
-
-<#macro loadingSpinner>
-    <div class="w-100 min-h-100 d-flex justify-content-center align-items-center animate__animated animate__fadeIn animate__faster">
-        <div class="spinner-border text-dark" role="status">
-            <span class="visually-hidden">Loading...</span>
-        </div>
-    </div>
-</#macro>
