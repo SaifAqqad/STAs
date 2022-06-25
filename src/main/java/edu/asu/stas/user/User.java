@@ -1,5 +1,6 @@
 package edu.asu.stas.user;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import edu.asu.stas.connnection.Connection;
 import edu.asu.stas.studentprofile.endorsement.Endorsement;
 import edu.asu.stas.user.token.UserToken;
@@ -56,11 +57,18 @@ public class User implements UserDetails {
     private final List<Connection> connections = new ArrayList<>();
 
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+    @JsonIgnore
     private final List<Endorsement> endorsements = new ArrayList<>();
 
     @Override
+    @JsonIgnore
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        return List.of(new SimpleGrantedAuthority(role));
+        var authorities = new ArrayList<GrantedAuthority>();
+        authorities.add(new SimpleGrantedAuthority(role));
+        if (role.equals(Roles.ADMIN)) {
+            authorities.add(new SimpleGrantedAuthority(Roles.STUDENT));
+        }
+        return authorities;
     }
 
     @Override
@@ -73,16 +81,19 @@ public class User implements UserDetails {
     }
 
     @Override
+    @JsonIgnore
     public boolean isAccountNonLocked() {
         return true;
     }
 
     @Override
+    @JsonIgnore
     public boolean isAccountNonExpired() {
         return true;
     }
 
     @Override
+    @JsonIgnore
     public boolean isCredentialsNonExpired() {
         return true;
     }

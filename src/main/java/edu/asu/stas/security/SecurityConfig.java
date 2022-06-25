@@ -60,6 +60,8 @@ public class SecurityConfig {
                         "/profile/experiences/**",
                         "/profile/projects/**",
                         "/profile",
+                        "/users/**",
+                        "/admin/**",
                         "/connections/**",
                         "/course-parser/**").authenticated()
                     .mvcMatchers(

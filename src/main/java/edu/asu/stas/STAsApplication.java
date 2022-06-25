@@ -14,6 +14,8 @@ import edu.asu.stas.studentprofile.skill.Skill;
 import edu.asu.stas.studentprofile.skill.SkillRepository;
 import edu.asu.stas.user.User;
 import edu.asu.stas.user.UserRepository;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.ApplicationRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
@@ -31,6 +33,7 @@ public class STAsApplication {
     }
 
     @Bean
+    @Autowired
     public ApplicationRunner seedDataLoader(
             UserRepository userRepository,
             PasswordEncoder passwordEncoder,
@@ -39,7 +42,8 @@ public class STAsApplication {
             ActivityRepository activityRepository,
             ProjectRepository projectRepository,
             SkillRepository skillRepository,
-            ExperienceRepository experienceRepository
+            ExperienceRepository experienceRepository,
+            @Value("${spring.security.user.admin.password}") String adminPassword
     ) {
         return args -> {
             if (args.containsOption("addSeedData")) {
@@ -49,9 +53,9 @@ public class STAsApplication {
                     user1.setFirstName("Saif");
                     user1.setLastName("Aqqad");
                     user1.setEmail("saif@gmail.com");
-                    user1.setPassword(passwordEncoder.encode("s1a2i3f4"));
+                    user1.setPassword(passwordEncoder.encode(adminPassword));
                     user1.setDateOfBirth(LocalDate.of(1999, 10, 14));
-                    user1.setRole(User.Roles.STUDENT);
+                    user1.setRole(User.Roles.ADMIN);
                     user1.setEnabled(true);
                     user1 = userRepository.save(user1);
 

@@ -23,6 +23,8 @@ import edu.asu.stas.user.token.UserToken;
 import edu.asu.stas.user.token.UserTokenRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataAccessException;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.security.authentication.AnonymousAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -247,9 +249,8 @@ public class UserService implements UserDetailsService, OAuth2UserService<OAuth2
             } else {
                 throw new OAuth2AuthenticationException(new OAuth2Error(
                     OAuth2ErrorCodes.ACCESS_DENIED,
-                    "This %s account is already connected to another user.".formatted(
-                        userRequest.getClientRegistration()
-                                   .getClientName()),
+                    "This %s account is already connected to another user."
+                        .formatted(userRequest.getClientRegistration().getClientName()),
                     ""
                 ));
             }
@@ -261,9 +262,8 @@ public class UserService implements UserDetailsService, OAuth2UserService<OAuth2
             if (Objects.nonNull(connectionRepository.findByUserAndServiceName(authedUser, serviceName))) {
                 throw new OAuth2AuthenticationException(new OAuth2Error(
                     OAuth2ErrorCodes.ACCESS_DENIED,
-                    "You can only connect a single %s account.".formatted(
-                        userRequest.getClientRegistration()
-                                   .getClientName()),
+                    "You can only connect a single %s account."
+                        .formatted(userRequest.getClientRegistration().getClientName()),
                     ""
                 ));
             } else {
@@ -375,5 +375,21 @@ public class UserService implements UserDetailsService, OAuth2UserService<OAuth2
             return false;
         }
         return true;
+    }
+
+    public boolean existsById(Long userId) {
+        return userRepository.existsById(userId);
+    }
+
+    public User findById(Long userId) {
+        return userRepository.findById(userId).orElse(null);
+    }
+
+    public void save(User user) {
+        userRepository.save(user);
+    }
+
+    public Page<User> findAllExcept(Long userId, PageRequest pageable) {
+        return userRepository.findAllByUserIdIsNot(userId, pageable);
     }
 }
