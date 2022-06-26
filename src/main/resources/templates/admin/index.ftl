@@ -60,7 +60,7 @@
         const connectionIcons = {
             "google": <@default.jsStr><@default.icon name='flat-color-icons:google'/></@default.jsStr>,
             "github": <@default.jsStr><@default.icon name='mdi:github'/></@default.jsStr>,
-            "linkedin": <@default.jsStr><@default.icon name='mdi:linkedin'/></@default.jsStr>,
+            "linkedin": <@default.jsStr><@default.icon name='logos:linkedin-icon'/></@default.jsStr>,
         }
         const dropdownIcon =<@default.jsStr><@default.icon name='bxs:down-arrow'/></@default.jsStr>;
 
@@ -205,11 +205,11 @@
 
             const connections = row.insertCell()
             const connectionsRow = document.createElement('div');
-            connectionsRow.classList.add('d-flex', 'justify-content-between');
+            connectionsRow.classList.add('d-flex', 'justify-content-start');
             connections.appendChild(connectionsRow);
             user["connections"].forEach(connection => {
                 const connElem = document.createElement('span');
-                connElem.classList.add('fs-5');
+                connElem.classList.add('fs-5', 'me-1');
                 connElem.innerHTML = connectionIcons[connection["serviceName"]];
                 connectionsRow.appendChild(connElem);
             });
@@ -330,10 +330,10 @@
             // update current and total page count
             currentPage = data["pageable"]["pageNumber"];
             totalPages = data["totalPages"];
-            // hide loading spinner
-            setLoading(false);
             // update the pagination footer
             await updatePagination();
+            // hide loading spinner
+            setLoading(false);
         };
 
         // on page load -> fetch the first page
