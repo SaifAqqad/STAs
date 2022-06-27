@@ -17,7 +17,7 @@
 
 <div class="container-fluid container-lg my-3">
     <div class="table-responsive p-2">
-        <table class="table table-light table-hover caption-top shadow shadow-lg user-select-none users-table animate__animated animate__fadeIn animate__faster">
+        <table class="table table-light table-hover caption-top card-border-grey user-select-none users-table animate__animated animate__fadeIn animate__faster">
             <caption class="card-title fs-6 mb-0">User accounts</caption>
             <thead class="users-header">
             <tr>
@@ -41,11 +41,10 @@
             </tr>
             </tfoot>
         </table>
-        <div class="card w-100 d-none shadow shadow-lg" id="loadingSpinner">
-            <div class="w-100 min-h-100 d-flex justify-content-center align-items-center animate__animated animate__fadeIn animate__faster">
-                <div class="spinner-border text-primary" role="status">
-                    <span class="visually-hidden">Loading...</span>
-                </div>
+        <div id="loadingSpinner"
+             class="w-100 min-h-100 d-flex justify-content-center align-items-center animate__animated animate__fadeIn animate__faster">
+            <div class="spinner-border text-primary" role="status">
+                <span class="visually-hidden">Loading...</span>
             </div>
         </div>
     </div>

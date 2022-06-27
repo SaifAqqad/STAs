@@ -37,6 +37,7 @@ public class StudentProfileController {
     @GetMapping("/profile")
     public String getProfilePage(
         @RequestParam(required = false) Boolean edit,
+        @RequestParam(required = false) Boolean print,
         Model model,
         SessionStatus sessionStatus,
         @ModelAttribute("authenticatedUser") User authedUser
@@ -44,6 +45,9 @@ public class StudentProfileController {
         StudentProfile profile = studentProfileService.getProfileByUser(authedUser);
         if (Objects.isNull(profile)) return "redirect:/profile/create";
         model.addAttribute("profile", profile);
+        if (Boolean.TRUE.equals(print)) {
+            return "profile/print";
+        }
         if (Objects.nonNull(edit)) {
             model.addAttribute("isEditing", edit);
         }
@@ -55,7 +59,11 @@ public class StudentProfileController {
     }
 
     @GetMapping("/profile/{uuid}")
-    public String getProfileByUuid(@PathVariable String uuid, Model model) {
+    public String getProfileByUuid(
+        @PathVariable String uuid,
+        @RequestParam(required = false) Boolean print,
+        Model model
+    ) {
         StudentProfile profile = studentProfileService.getProfileByUuid(uuid);
         if (Objects.nonNull(profile) && profile.isPublic()) {
             User authedUser = (User) model.getAttribute("authenticatedUser");
@@ -65,6 +73,9 @@ public class StudentProfileController {
             model.addAttribute("profile", profile);
             model.addAttribute("isEditing", false);
             model.addAttribute("isPublicView", true);
+            if (Boolean.TRUE.equals(print)) {
+                return "profile/print";
+            }
             return "profile/index";
         }
         throw new ResponseStatusException(HttpStatus.NOT_FOUND);
