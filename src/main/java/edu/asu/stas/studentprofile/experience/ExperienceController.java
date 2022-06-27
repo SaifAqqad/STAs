@@ -58,8 +58,9 @@ public class ExperienceController {
         @ModelAttribute("authenticatedUser") User user
     ) {
         var profile = Objects.isNull(user) ? null : studentProfileService.getProfileByUser(user);
-        if (experienceRepository.existsByProfileAndId(profile, experience.getId())) {
-            experienceRepository.deleteByProfileAndId(profile, experience.getId());
+        var experienceObj = experienceRepository.getByProfileAndId(profile, experience.getId());
+        if (Objects.nonNull(experienceObj)) {
+            profile.getExperiences().remove(experienceObj);
             redirectAttributes.addFlashAttribute("toast", "Experience deleted successfully");
         } else {
             redirectAttributes.addFlashAttribute("toastColor", "danger");

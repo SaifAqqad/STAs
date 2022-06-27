@@ -63,10 +63,11 @@ public class ProjectController {
         @ModelAttribute("authenticatedUser") User user
     ) {
         var profile = Objects.isNull(user) ? null : studentProfileService.getProfileByUser(user);
-        if (projectRepository.existsByProfileAndId(profile, project.getId())) {
-            projectRepository.deleteByProfileAndId(profile, project.getId());
+        var projectObj = projectRepository.getByProfileAndId(profile, project.getId());
+        if (Objects.nonNull(projectObj)) {
+            profile.getProjects().remove(projectObj);
             String imageName = project.getImageUri().substring(project.getImageUri().lastIndexOf('/') + 1);
-            contentService.removeResource("course", project.getId().toString() + "_" + imageName);
+            contentService.removeResource("project", project.getId().toString() + "_" + imageName);
             redirectAttributes.addFlashAttribute("toast", "Project deleted successfully");
         } else {
             redirectAttributes.addFlashAttribute("toastColor", "danger");

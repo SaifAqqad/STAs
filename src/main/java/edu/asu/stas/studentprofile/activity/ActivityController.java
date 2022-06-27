@@ -63,8 +63,9 @@ public class ActivityController {
         @ModelAttribute("authenticatedUser") User user
     ) {
         var profile = Objects.isNull(user) ? null : studentProfileService.getProfileByUser(user);
-        if (activityRepository.existsByProfileAndId(profile, activity.getId())) {
-            activityRepository.deleteByProfileAndId(profile, activity.getId());
+        var activityObj = activityRepository.getByProfileAndId(profile, activity.getId());
+        if (Objects.nonNull(activityObj)) {
+            profile.getActivities().remove(activityObj);
             String imageName = activity.getImageUri().substring(activity.getImageUri().lastIndexOf('/') + 1);
             contentService.removeResource("activity", activity.getId().toString() + "_" + imageName);
             redirectAttributes.addFlashAttribute("toast", "Activity deleted successfully");
