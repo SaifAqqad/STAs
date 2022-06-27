@@ -23,7 +23,7 @@
     <div id="profile">
         <div class="row">
             <#-- Left column -->
-            <div class="col-md-4 col-lg-3">
+            <div class="col-md-4 col-lg-3 d-flex flex-column">
 
                 <#-- Profile settings -->
                 <@ownOnly>
@@ -231,6 +231,16 @@
                         </@profileCard>
                     </div>
                 </@editOnly>
+
+                <@viewOnly>
+                    <div class="order-first order-md-last d-flex justify-content-center mb-3">
+                        <a href="${springMacroRequestContext.requestUri}?print=true" target="_blank"
+                           class="btn btn-sm btn-outline-primary align-items-center">
+                            <@default.icon name="carbon:document-download" class="me-1" width="18"/>
+                            Export as a CV
+                        </a>
+                    </div>
+                </@viewOnly>
             </div>
 
             <#-- Right column -->

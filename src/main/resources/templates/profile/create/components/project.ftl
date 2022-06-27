@@ -92,7 +92,7 @@
                         </div>
                         <div class="form-floating mt-3">
                             <input class="form-control" type="date" data-project-prop="startDate"
-                                   id="projectStartDate"
+                                   required id="projectStartDate"
                                    placeholder="Start date">
                             <label class="form-label text-muted" for="projectStartDate">Start date</label>
                         </div>

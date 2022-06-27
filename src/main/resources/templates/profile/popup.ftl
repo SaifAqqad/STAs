@@ -369,7 +369,7 @@
                     <label class="form-label text-muted" for="${formId}_url">Link</label>
                 </div>
                 <div class="form-floating mt-3">
-                    <input class="form-control" type="date" name="startDate" id="${formId}_startDate"
+                    <input class="form-control" required type="date" name="startDate" id="${formId}_startDate"
                            placeholder="Start date">
                     <label class="form-label text-muted" for="${formId}_startDate">Start date</label>
                 </div>
