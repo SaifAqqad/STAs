@@ -25,6 +25,7 @@
 
             *:not(a) {
                 print-color-adjust: exact !important;
+                -webkit-print-color-adjust: exact !important;
             }
 
             .card {
@@ -222,7 +223,7 @@
     </script>
 </#if>
 <script>
-    document.addEventListener("DOMContentLoaded", () => window.print());
+    window.addEventListener("load", () => window.print());
 </script>
 </body>
 
