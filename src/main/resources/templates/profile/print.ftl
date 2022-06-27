@@ -57,7 +57,13 @@
 </head>
 
 <body class="bg-white min-vh-100">
-<div id="main" class="container-xl py-3">
+<div id="loadingSpinner" class="w-100 min-h-100 d-flex justify-content-center align-items-center">
+    <div class="spinner-border text-muted me-2" role="status">
+        <span class="visually-hidden">Loading...</span>
+    </div>
+    Generating PDF...
+</div>
+<div id="profile" class="container-xl mb-3">
     <div class="w-100 d-flex flex-column justify-content-between ">
 
         <#-- Profile info -->
@@ -222,13 +228,46 @@
         })()
     </script>
 </#if>
+<script src="<@spring.url "/webjars/html2pdf.js/dist/html2pdf.bundle.min.js"/>"></script>
 <script>
-    window.addEventListener("load", () => window.print());
+    window.addEventListener("load", () => {
+        const loadingSpinner = document.querySelector("#loadingSpinner");
+        const element = document.querySelector("#profile");
+        const options = {
+            margin: 5,
+            filename: '${profile.name}.pdf',
+            image: {type: 'png'},
+            jsPDF: {compress: true, hotfixes: ["px_scaling"]},
+            html2canvas: {
+                width: 780,
+                scale: 2,
+                onclone: (element) => {
+                    const svgElements = Array.from(element.querySelectorAll('svg'));
+                    svgElements.forEach(s => {
+                        const bBox = s.getBBox();
+                        s.setAttribute("width", bBox.width + 20);
+                        s.setAttribute("height", bBox.height + 20);
+                    })
+                }
+            }
+        };
+        setTimeout(() =>
+                html2pdf()
+                    .set(options)
+                    .from(element)
+                    .to("pdf")
+                    .save()
+                    .then(() => loadingSpinner.classList.add("d-none"))
+            , 500)
+    });
 </script>
 </body>
 
 </html>
 <#macro profileCard title="" icon="" subtitle="" text="" link="" id="" class="" limitLines=true preserveLines=false>
+    <#if link?has_content>
+        <a href="${link}" target="_blank" class="link-grey text-hover-dark text-decoration-none">
+    </#if>
     <div class="card card-border-grey w-100 h-100 user-select-none ${class?no_esc}"
          <#if id?has_content>data-id="${id}"</#if>>
         <div class="d-flex flex-column flex-sm-row align-content-between align-items-center w-100">
@@ -236,12 +275,7 @@
                 <#if title?has_content>
                     <h5 class="card-title user-select-none">
                         <#if icon?has_content><@default.icon name=icon class="me-2"/></#if>
-                        <#if link?has_content>
-                            <a href="${link}" target="_blank"
-                               class="link-grey text-hover-dark text-decoration-none">${title}<@default.externalLinkIcon/></a>
-                        <#else>
-                            ${title}
-                        </#if>
+                        ${title}<#if link?has_content><@default.externalLinkIcon/></#if>
                     </h5>
                 </#if>
                 <#if subtitle?has_content>
@@ -254,6 +288,9 @@
             </div>
         </div>
     </div>
+    <#if link?has_content>
+        </a>
+    </#if>
 </#macro>
 
 <#macro profileViewItem text="" name="" icon="" link="" showLinkIcon=false includeUrl=false>

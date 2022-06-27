@@ -119,6 +119,11 @@
             <version>2.3.8</version>
         </dependency>
         <dependency>
+            <groupId>org.webjars.bowergithub.ekoopmans</groupId>
+            <artifactId>html2pdf.js</artifactId>
+            <version>0.10.1</version>
+        </dependency>
+        <dependency>
             <groupId>org.webjars.npm</groupId>
             <artifactId>animate.css</artifactId>
             <version>4.1.1</version>
