@@ -64,8 +64,9 @@ public class CourseController {
         @ModelAttribute("authenticatedUser") User user
     ) {
         var profile = Objects.isNull(user) ? null : studentProfileService.getProfileByUser(user);
-        if (courseRepository.existsByProfileAndId(profile, course.getId())) {
-            courseRepository.deleteByProfileAndId(profile, course.getId());
+        var courseObj = courseRepository.getByProfileAndId(profile, course.getId());
+        if (Objects.nonNull(courseObj)) {
+            profile.getCourses().remove(courseObj);
             String imageName = course.getImageUri().substring(course.getImageUri().lastIndexOf('/') + 1);
             contentService.removeResource("course", course.getId().toString() + "_" + imageName);
             redirectAttributes.addFlashAttribute("toast", "Course deleted successfully");

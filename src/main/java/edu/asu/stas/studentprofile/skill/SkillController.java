@@ -149,8 +149,9 @@ public class SkillController {
         @ModelAttribute("authenticatedUser") User user
     ) {
         var profile = Objects.isNull(user) ? null : studentProfileService.getProfileByUser(user);
-        if (skillRepository.existsByProfileAndId(profile, skill.id)) {
-            skillRepository.deleteByProfileAndId(profile, skill.id);
+        var skillObj = skillRepository.getByProfileAndId(profile, skill.id());
+        if (Objects.nonNull(skillObj)) {
+            profile.getSkills().remove(skillObj);
             redirectAttributes.addFlashAttribute("toast", "Skill deleted successfully");
         } else {
             redirectAttributes.addFlashAttribute("toastColor", "danger");
