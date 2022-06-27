@@ -10,6 +10,7 @@
 "phone"         : "mdi:phone",
 "email"         : "mdi:email",
 "university"    : "mdi:school",
+"university-alt": "fa-solid:university",
 "location"      : "mdi:map-marker",
 "web"           : "mdi:web",
 "externalLink"  : "mdi:open-in-new",
