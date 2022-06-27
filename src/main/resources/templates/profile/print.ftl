@@ -8,12 +8,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <meta name="_csrf" content="${_csrf.token}"/>
-    <meta name="_csrf_header" content="${_csrf.headerName}"/>
     <title>${profile.name} - STAs</title>
-
     <link rel="icon" type="image/svg+xml" href="<@spring.url "/images/favicon.svg"/>">
-    <link rel="manifest" href="<@spring.url "/js/site.webmanifest"/>">
 
     <link rel="preload stylesheet" as="style" media="all" href="<@spring.url "/css/styles.css"/>">
     <link rel="preload stylesheet" as="style" media="all"
@@ -25,6 +21,10 @@
         @media all {
             @page {
                 margin: 0.5cm;
+            }
+
+            *:not(a) {
+                print-color-adjust: exact !important;
             }
 
             .card {
@@ -51,171 +51,162 @@
             .link-grey:hover {
                 color: rgb(108, 117, 125) !important;
             }
-
-            .box-break-clone {
-                box-decoration-break: clone;
-            }
         }
     </style>
 </head>
 
 <body class="bg-white min-vh-100">
 <div id="main" class="container-xl py-3">
-    <div class="w-100 d-flex justify-content-between ">
+    <div class="w-100 d-flex flex-column justify-content-between ">
 
-        <#-- Left column -->
-        <div class="me-3">
-            <#-- Profile info -->
-            <div class="card rounded-2 px-2 py-3 mb-3">
+        <#-- Profile info -->
+        <div class="card rounded-2 px-2 py-3 mb-3" style="border: none !important;">
 
-                <#if profile.imageUri?has_content>
-                    <div class="text-center mx-3">
+            <div class="d-flex justify-content-center">
+
+                <div class="d-flex justify-content-between align-items-center">
+                    <#if profile.imageUri?has_content>
                         <div class="d-flex justify-content-center p-3 pt-1">
                             <div class="img-w-100 rounded-circle object-fit-cover">
                                 <img class="img-w-100 rounded-circle object-fit-cover" src="${profile.imageUri}"
                                      alt="Profile picture"/>
                             </div>
                         </div>
-                        <div class="fs-4" data-prop="name">${profile.name}</div>
-                    </div>
-                <#else>
+                    </#if>
+
                     <div class="text-center mx-3">
                         <div class="fs-3" data-prop="name">${profile.name}</div>
                     </div>
-                </#if>
+                </div>
 
-                <hr class="mx-3">
+                <div class="vr mx-3"></div>
 
-                <div class="px-3">
-                    <@profileViewItem text=profile.location!"" name="location" icon="location"/>
-                    <@profileViewItem text=profile.university!"" name="university" icon="university-alt"/>
-                    <@profileViewItem text=profile.major!"" name="major" icon="university"/>
-                    <@profileViewItem text=profile.contactEmail!"" name="contactEmail" icon="email" link="mailto:${profile.contactEmail}"/>
-                    <@profileViewItem text=profile.contactPhone!"" name="contactPhone" icon="phone" link="tel:${profile.contactPhone}"/>
-                    <div class="profile-view-links">
-                        <#list profile.links as linkName, linkUrl>
-                            <@profileViewItem text=linkName name="link_${linkName}" icon=linkName?lower_case link=linkUrl showLinkIcon=true includeUrl=true/>
-                        </#list>
+                <div>
+                    <div class="px-3">
+                        <@profileViewItem text=profile.major!"" name="major" icon="university"/>
+                        <@profileViewItem text=profile.university!"" name="university" icon="university-alt"/>
+                        <@profileViewItem text=profile.location!"" name="location" icon="location"/>
+                        <@profileViewItem text=profile.contactEmail!"" name="contactEmail" icon="email" link="mailto:${profile.contactEmail}"/>
+                        <@profileViewItem text=profile.contactPhone!"" name="contactPhone" icon="phone" link="tel:${profile.contactPhone}"/>
+                        <div class="profile-view-links">
+                            <#list profile.links as linkName, linkUrl>
+                                <@profileViewItem text=linkUrl name="link_${linkName}" icon=linkName?lower_case link=linkUrl showLinkIcon=true includeUrl=true/>
+                            </#list>
+                        </div>
                     </div>
                 </div>
 
             </div>
 
-            <#-- Skills card -->
-            <#if profile.skills?has_content>
-                <div id="skillsCard" class="mb-3">
-                    <@profileCard>
-                        <h5 class="card-title mb-2"><@default.icon name="mdi:tools" class="me-2"/>Skills</h5>
-                        <#list profile.skills as skill>
-                            <div class="skill rounded-2 p-2 w-100">
-                                <#-- Skill text -->
-                                <div class="mb-1 d-flex justify-content-between text-muted">
-                                    <span>${skill.name}</span>
-                                    <span>${skill.level}%</span>
-                                </div>
-                                <#-- Skill level -->
-                                <div class="progress" style="height: 10px;">
-                                    <div class="progress-bar bg-dark bg-opacity-75" role="progressbar"
-                                         style="width: ${skill.level}%;"
-                                         aria-valuenow="${skill.level}"
-                                         aria-valuemin="0" aria-valuemax="100">
-                                    </div>
+        </div>
+
+        <#-- About card -->
+        <#if profile.about?has_content>
+            <div id="profileAbout" class="w-100 mb-3">
+                <@profileCard>
+                    <h5 class="card-title mb-2"><@default.icon name="personInfo" class="me-2"/>About me</h5>
+                    <div class="md-content card-text" id="aboutContent">
+                    </div>
+                </@profileCard>
+            </div>
+        </#if>
+
+        <#-- Experience card -->
+        <#if profile.experiences?has_content>
+            <div id="profileExperience" class="mb-3">
+                <@profileCard>
+                    <h5 class="card-title mb-2"><@default.icon name="work" class="me-2"/>Experience</h5>
+                    <#list profile.experiences>
+                        <ul class="ms-2 mb-0 list-unstyled timeline">
+                            <#items as experience>
+                                <li class="timeline-item"
+                                    data-id="${experience.id}">
+                                    <div class="pt-1 mb-1 card-title fs-115">${experience.jobTitle}</div>
+                                    <p class="text-muted mb-1">${experience.companyName}</p>
+                                    <span class="text-muted timeline-date">${experience.formattedStartDate} - ${(experience.formattedEndDate)!"Present"} · ${experience.duration}</span>
+                                    <#if experience.description??>
+                                        <p class="text-muted mt-2 preserve-lines">${experience.description}</p>
+                                    </#if>
+                                </li>
+                            </#items>
+                        </ul>
+                    </#list>
+                </@profileCard>
+            </div>
+        </#if>
+
+        <#-- Skills card -->
+        <#if profile.skills?has_content>
+            <div id="skillsCard" class="mb-3">
+                <@profileCard>
+                    <h5 class="card-title mb-2"><@default.icon name="mdi:tools" class="me-2"/>Skills</h5>
+                    <#list profile.skills as skill>
+                        <div class="skill rounded-2 p-2 w-100">
+                            <#-- Skill text -->
+                            <div class="mb-1 d-flex justify-content-between text-muted">
+                                <span>${skill.name}</span>
+                                <span>${skill.level}%</span>
+                            </div>
+                            <#-- Skill level -->
+                            <div class="progress" style="height: 10px;">
+                                <div class="progress-bar bg-dark bg-opacity-75" role="progressbar"
+                                     style="width: ${skill.level}%;"
+                                     aria-valuenow="${skill.level}"
+                                     aria-valuemin="0" aria-valuemax="100">
                                 </div>
                             </div>
+                        </div>
+                    </#list>
+                </@profileCard>
+            </div>
+        </#if>
+
+        <#-- Courses card -->
+        <#if profile.courses?has_content>
+            <div id="profileCourses" class="mb-3">
+                <@profileCard>
+                    <h5 class="card-title mb-2"><@default.icon name="course" class="me-2"/>Courses</h5>
+                    <div>
+                        <#list profile.courses as course >
+                            <#assign courseDescription = default.firstNonEmptyOrDefault("",course.studentComment,course.description) />
+                            <@profileCard title=course.name text=courseDescription link=course.url limitLines=false preserveLines=true
+                            class="w-100 rounded-0 ${course?is_first?then('rounded-top','')} ${course?is_last?then('rounded-bottom','border-bottom-0')}"/>
                         </#list>
-                    </@profileCard>
-                </div>
-            </#if>
-        </div>
+                    </div>
+                </@profileCard>
+            </div>
+        </#if>
 
-        <#-- Right column -->
-        <div class="flex-shrink-1 flex-grow-1">
-
-            <#-- About card -->
-            <#if profile.about?has_content>
-                <div id="profileAbout" class="w-100 mb-3">
-                    <@profileCard>
-                        <h5 class="card-title mb-2"><@default.icon name="personInfo" class="me-2"/>About me</h5>
-                        <div class="md-content card-text" id="aboutContent">
-                        </div>
-                    </@profileCard>
-                </div>
-
-            </#if>
-
-            <#-- Experience card -->
-            <#if profile.experiences?has_content>
-                <div id="profileExperience" class="mb-3">
-                    <@profileCard>
-                        <h5 class="card-title mb-2"><@default.icon name="work" class="me-2"/>Experience</h5>
-                        <#list profile.experiences>
-                            <ul class="ms-2 mb-0 list-unstyled timeline">
-                                <#items as experience>
-                                    <li class="timeline-item"
-                                        data-id="${experience.id}">
-                                        <div class="pt-1 mb-1 card-title fs-115">${experience.jobTitle}</div>
-                                        <p class="text-muted mb-1">${experience.companyName}</p>
-                                        <span class="text-muted timeline-date">${experience.formattedStartDate} - ${(experience.formattedEndDate)!"Present"} · ${experience.duration}</span>
-                                        <#if experience.description??>
-                                            <p class="text-muted mt-2 preserve-lines">${experience.description}</p>
-                                        </#if>
-                                    </li>
-                                </#items>
-                            </ul>
+        <#-- Projects card -->
+        <#if profile.projects?has_content>
+            <div id="profileProjects" class="mb-3">
+                <@profileCard>
+                    <h5 class="card-title mb-2"><@default.icon name="project" class="me-2"/>Projects</h5>
+                    <div>
+                        <#list profile.projects as project >
+                            <@profileCard title=project.name text=project.description link=project.url limitLines=false preserveLines=true
+                            class="w-100 rounded-0 ${project?is_first?then('rounded-top','')} ${project?is_last?then('rounded-bottom','border-bottom-0')}"/>
                         </#list>
-                    </@profileCard>
-                </div>
+                    </div>
+                </@profileCard>
+            </div>
+        </#if>
 
-            </#if>
+        <#-- Activities card -->
+        <#if profile.activities?has_content>
+            <div id="profileActivities" class="mb-3">
+                <@profileCard>
+                    <h5 class="card-title mb-2"><@default.icon name="group" class="me-2"/>Activities</h5>
+                    <div>
+                        <#list profile.activities as activity >
+                            <@profileCard title=activity.name text=activity.description link=activity.url limitLines=false preserveLines=true
+                            class="w-100 rounded-0 ${activity?is_first?then('rounded-top','')} ${activity?is_last?then('rounded-bottom','border-bottom-0')}"/>
+                        </#list>
+                    </div>
+                </@profileCard>
+            </div>
+        </#if>
 
-            <#-- Courses card -->
-            <#if profile.courses?has_content>
-                <div id="profileCourses" class="mb-3">
-                    <@profileCard>
-                        <h5 class="card-title mb-2"><@default.icon name="course" class="me-2"/>Courses</h5>
-                        <div>
-                            <#list profile.courses as course >
-                                <#assign courseDescription = default.firstNonEmptyOrDefault("",course.studentComment,course.description) />
-                                <@profileCard title=course.name text=courseDescription link=course.url limitLines=false preserveLines=true
-                                class="w-100 rounded-0 ${course?is_first?then('rounded-top','')} ${course?is_last?then('rounded-bottom','border-bottom-0')}"/>
-                            </#list>
-                        </div>
-                    </@profileCard>
-                </div>
-            </#if>
-
-            <#-- Projects card -->
-            <#if profile.projects?has_content>
-                <div id="profileProjects" class="mb-3">
-                    <@profileCard>
-                        <h5 class="card-title mb-2"><@default.icon name="project" class="me-2"/>Projects</h5>
-                        <div>
-                            <#list profile.projects as project >
-                                <@profileCard title=project.name text=project.description link=project.url limitLines=false preserveLines=true
-                                class="w-100 rounded-0 ${project?is_first?then('rounded-top','')} ${project?is_last?then('rounded-bottom','border-bottom-0')}"/>
-                            </#list>
-                        </div>
-                    </@profileCard>
-                </div>
-            </#if>
-
-            <#-- Activities card -->
-            <#if profile.activities?has_content>
-                <div id="profileActivities" class="mb-3">
-                    <@profileCard>
-                        <h5 class="card-title mb-2"><@default.icon name="group" class="me-2"/>Activities</h5>
-                        <div>
-                            <#list profile.activities as activity >
-                                <@profileCard title=activity.name text=activity.description link=activity.url limitLines=false preserveLines=true
-                                class="w-100 rounded-0 ${activity?is_first?then('rounded-top','')} ${activity?is_last?then('rounded-bottom','border-bottom-0')}"/>
-                            </#list>
-                        </div>
-                    </@profileCard>
-                </div>
-            </#if>
-
-
-        </div>
     </div>
 </div>
 <#-- About card scripts -->
@@ -230,11 +221,14 @@
         })()
     </script>
 </#if>
+<script>
+    document.addEventListener("DOMContentLoaded", () => window.print());
+</script>
 </body>
 
 </html>
 <#macro profileCard title="" icon="" subtitle="" text="" link="" id="" class="" limitLines=true preserveLines=false>
-    <div class="box-break-clone card card-border-grey w-100 h-100 user-select-none ${class?no_esc}"
+    <div class="card card-border-grey w-100 h-100 user-select-none ${class?no_esc}"
          <#if id?has_content>data-id="${id}"</#if>>
         <div class="d-flex flex-column flex-sm-row align-content-between align-items-center w-100">
             <div class="card-body d-flex flex-column flex-grow-1 w-100">
