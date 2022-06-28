@@ -111,6 +111,14 @@
                 });
                 return response.ok;
             }
+
+            static async enable(id) {
+                const response = await fetch(User.baseEndpoint + "/" + id + "/enable-user", {
+                    headers: {[User.csrfHeader]: User.csrfToken},
+                    method: "POST",
+                });
+                return response.ok;
+            }
         });
         let currentPage = 0, totalPages = 0, pageSize = 10;
 
@@ -171,6 +179,28 @@
             const stateTag = document.createElement('span');
             stateTag.classList.add('badge', 'fw-normal', 'rounded-pill', user["enabled"] ? 'bg-success' : 'bg-danger');
             stateTag.textContent = user["enabled"] ? "Enabled" : "Disabled";
+            if (!user["enabled"]) {
+                stateTag.classList.add('clickable');
+                stateTag.addEventListener('click', async () => modbox.confirm({
+                    title: "Enable user account?",
+                    body: "Are you sure you want to enable the user's account?",
+                    center: true,
+                    okButton: {
+                        label: 'Yes'
+                    },
+                    closeButton: {
+                        label: 'No'
+                    },
+                    relatedTarget: stateTag,
+                }).then(async () => {
+                    setLoading(true);
+                    if (await User.enable(user["userId"]))
+                        await fetchCurrentPage();
+                    setLoading(false);
+                }).catch(() => {
+                }));
+                new bootstrap.Tooltip(stateTag, {title: "Enable user"});
+            }
             state.appendChild(stateTag);
 
             const twoFA = row.insertCell()
@@ -190,7 +220,7 @@
                     closeButton: {
                         label: 'No'
                     },
-                    relatedTarget: deleteButton,
+                    relatedTarget: tag2FA,
                 }).then(async () => {
                     setLoading(true);
                     if (await User.disable2FA(user["userId"]))
@@ -198,7 +228,6 @@
                     setLoading(false);
                 }).catch(() => {
                 }));
-
                 new bootstrap.Tooltip(tag2FA, {title: "Disable 2FA"});
             }
 
