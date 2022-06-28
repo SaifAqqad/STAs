@@ -174,6 +174,20 @@ public class UserService implements UserDetailsService, OAuth2UserService<OAuth2
         return true;
     }
 
+
+    public void enableUser(Long userId) {
+        // enable the user's account
+        User user = userRepository.findById(userId).orElseThrow();
+        user.setEnabled(true);
+        userRepository.save(user);
+        // if there's an existing verification token, delete it
+        UserToken verificationToken = userTokenRepository.findByUserAndType(user, UserToken.Type.VERIFICATION);
+        if (Objects.nonNull(verificationToken)) {
+            userTokenRepository.delete(verificationToken);
+        }
+    }
+
+
     public void updateUserByAccountDetails(User user, AccountDetails accountDetails) {
         user.setFirstName(accountDetails.getFirstName().trim());
         user.setLastName(accountDetails.getLastName().trim());

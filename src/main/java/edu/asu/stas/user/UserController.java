@@ -70,5 +70,17 @@ public class UserController {
         return ResponseEntity.ok().build();
     }
 
+    @PostMapping("/users/{userId}/enable-user")
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<Void> enableUser(
+        @PathVariable("userId") Long userId
+    ) {
+        if (!userService.existsById(userId)) {
+            return ResponseEntity.notFound().build();
+        }
+        userService.enableUser(userId);
+        return ResponseEntity.ok().build();
+    }
+
 
 }
