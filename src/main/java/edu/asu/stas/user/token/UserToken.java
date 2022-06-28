@@ -2,6 +2,7 @@ package edu.asu.stas.user.token;
 
 import edu.asu.stas.user.User;
 import lombok.*;
+import net.minidev.json.annotate.JsonIgnore;
 
 import javax.persistence.*;
 import java.time.LocalDateTime;
@@ -28,6 +29,7 @@ public class UserToken {
 
     @ManyToOne(optional = false)
     @NonNull
+    @JsonIgnore
     private User user;
 
     public enum Type {
