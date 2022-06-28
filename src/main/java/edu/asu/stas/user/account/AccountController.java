@@ -36,8 +36,10 @@ public class AccountController {
     // adds the authenticated user's accountDetails to the model (when needed)
     @ModelAttribute
     public void accountDetails(Model model) {
-        User user = (User) model.getAttribute("authenticatedUser");
-        model.addAttribute("accountDetails", Objects.nonNull(user) ? new AccountDetails(user) : null);
+        if (!model.containsAttribute("accountDetails")) {
+            User user = (User) model.getAttribute("authenticatedUser");
+            model.addAttribute("accountDetails", Objects.nonNull(user) ? new AccountDetails(user) : null);
+        }
     }
 
     @GetMapping("/account")
