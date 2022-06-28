@@ -5,6 +5,7 @@
 
 
 You will need the following:
+
 * [Git](https://git-scm.com/) and [gh](https://cli.github.com/)
 * [JDK 17  (Eclipse Temurin)](https://adoptium.net/)
 * [MySQL Community Server](https://dev.mysql.com/downloads/mysql/)
@@ -49,27 +50,39 @@ To install them, run the following in powershell
     ```powershell
     gh repo clone SaifAqqad/STAs
     ```
+
 <hr>
-    
+
 </details>
 
-### Build STAs
-```powershell
-mvn clean install
-```
-<hr>
-
 ### Run STAs from the terminal:
+
 ```powershell
 mvn spring-boot:run
 ```
+
 #### to add the seed data
+
 ```powershell
 mvn spring-boot:run "-Dspring-boot.run.arguments=--addSeedData"
 ```
+
+<hr>
+
+### Build STAs as an executable jar
+
+```powershell
+mvn clean package
+```
+
+```powershell
+java -jar ./path/to/STAs.jar --addSeedData
+```
+
 <hr>
 
 ### Run MySQL service:
+
 ```powershell
 sudo sc.exe start mysql
 ```
@@ -77,9 +90,11 @@ sudo sc.exe start mysql
 * <sub>MySQL default port: `3306`</sub>
 * <sub>MySQL default username: `root`</sub>
 * <sub>MySQL default password: `<blank>`</sub>
+
 <hr>
 
 ### Run MailDev:
+
 ```powershell
 maildev
 ```

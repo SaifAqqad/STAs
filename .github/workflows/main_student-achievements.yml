@@ -20,18 +20,18 @@ jobs:
         uses: actions/setup-java@v1
         with:
           java-version: '17'
-          
+
       - name: Get Gist
         id: get
         uses: andymckay/get-gist-action@master
         with:
           gistURL: '${{ secrets.PRODUCTION_PROPERTIES_GIST }}'
-      
+
       - name: Retrieve Secret
         id: run
         run: |
           cp -fv ${{ steps.get.outputs.file }} "$GITHUB_WORKSPACE/src/main/resources/application.properties"
-        
+
       - name: Build with Maven
         run: mvn clean install
 
@@ -51,6 +51,11 @@ jobs:
     steps:
       - name: Download artifact from build job
         uses: actions/download-artifact@v2
+        with:
+          name: java-app
+
+      - name: Delete artifact
+        uses: geekyeggo/delete-artifact@v1
         with:
           name: java-app
 
