@@ -30,8 +30,12 @@
 
             .card {
                 background-color: white !important;
-                border: 1px solid #CED4DA !important;
+                border: none !important;
                 box-shadow: none !important;
+            }
+
+            .card .card {
+                border: 1px solid #CED4DA !important;
             }
 
             .timeline {
@@ -52,6 +56,10 @@
             .link-grey:hover {
                 color: rgb(108, 117, 125) !important;
             }
+
+            .avoid-break-inside {
+                page-break-inside: avoid;
+            }
         }
     </style>
 </head>
@@ -64,7 +72,7 @@
     Generating PDF...
 </div>
 <div id="profile" class="container-xl mb-3">
-    <div class="w-100 d-flex flex-column justify-content-between ">
+    <div class="w-100">
 
         <#-- Profile info -->
         <div class="card rounded-2 px-2 py-3 mb-3" style="border: none !important;">
@@ -111,7 +119,8 @@
         <#if profile.about?has_content>
             <div id="profileAbout" class="w-100 mb-3">
                 <@profileCard>
-                    <h5 class="card-title mb-2"><@default.icon name="personInfo" class="me-2"/>About me</h5>
+                    <h5 class="avoid-break-inside card-title mb-2"><@default.icon name="personInfo" class="me-2"/>About
+                        me</h5>
                     <div class="md-content card-text" id="aboutContent">
                     </div>
                 </@profileCard>
@@ -122,11 +131,12 @@
         <#if profile.experiences?has_content>
             <div id="profileExperience" class="mb-3">
                 <@profileCard>
-                    <h5 class="card-title mb-2"><@default.icon name="work" class="me-2"/>Experience</h5>
+                    <h5 class="avoid-break-inside card-title mb-2"><@default.icon name="work" class="me-2"/>
+                        Experience</h5>
                     <#list profile.experiences>
                         <ul class="ms-2 mb-0 list-unstyled timeline">
                             <#items as experience>
-                                <li class="timeline-item"
+                                <li class="timeline-item avoid-break-inside"
                                     data-id="${experience.id}">
                                     <div class="pt-1 mb-1 card-title fs-115">${experience.jobTitle}</div>
                                     <p class="text-muted mb-1">${experience.companyName}</p>
@@ -146,9 +156,10 @@
         <#if profile.skills?has_content>
             <div id="skillsCard" class="mb-3">
                 <@profileCard>
-                    <h5 class="card-title mb-2"><@default.icon name="mdi:tools" class="me-2"/>Skills</h5>
+                    <h5 class="avoid-break-inside card-title mb-2"><@default.icon name="mdi:tools" class="me-2"/>
+                        Skills</h5>
                     <#list profile.skills as skill>
-                        <div class="skill rounded-2 p-2 w-100">
+                        <div class="avoid-break-inside skill rounded-2 p-2 w-100">
                             <#-- Skill text -->
                             <div class="mb-1 d-flex justify-content-between text-muted">
                                 <span>${skill.name}</span>
@@ -172,12 +183,13 @@
         <#if profile.courses?has_content>
             <div id="profileCourses" class="mb-3">
                 <@profileCard>
-                    <h5 class="card-title mb-2"><@default.icon name="course" class="me-2"/>Courses</h5>
+                    <h5 class="avoid-break-inside card-title mb-2"><@default.icon name="course" class="me-2"/>
+                        Courses</h5>
                     <div>
                         <#list profile.courses as course >
                             <#assign courseDescription = default.firstNonEmptyOrDefault("",course.studentComment,course.description) />
                             <@profileCard title=course.name text=courseDescription link=course.url limitLines=false preserveLines=true
-                            class="w-100 rounded-0 ${course?is_first?then('rounded-top','')} ${course?is_last?then('rounded-bottom','border-bottom-0')}"/>
+                            class="avoid-break-inside w-100 rounded-0 ${course?is_first?then('rounded-top','')} ${course?is_last?then('rounded-bottom','border-bottom-0')}"/>
                         </#list>
                     </div>
                 </@profileCard>
@@ -188,11 +200,12 @@
         <#if profile.projects?has_content>
             <div id="profileProjects" class="mb-3">
                 <@profileCard>
-                    <h5 class="card-title mb-2"><@default.icon name="project" class="me-2"/>Projects</h5>
+                    <h5 class="avoid-break-inside card-title mb-2"><@default.icon name="project" class="me-2"/>
+                        Projects</h5>
                     <div>
                         <#list profile.projects as project >
                             <@profileCard title=project.name text=project.description link=project.url limitLines=false preserveLines=true
-                            class="w-100 rounded-0 ${project?is_first?then('rounded-top','')} ${project?is_last?then('rounded-bottom','border-bottom-0')}"/>
+                            class="avoid-break-inside w-100 rounded-0 ${project?is_first?then('rounded-top','')} ${project?is_last?then('rounded-bottom','border-bottom-0')}"/>
                         </#list>
                     </div>
                 </@profileCard>
@@ -203,11 +216,12 @@
         <#if profile.activities?has_content>
             <div id="profileActivities" class="mb-3">
                 <@profileCard>
-                    <h5 class="card-title mb-2"><@default.icon name="group" class="me-2"/>Activities</h5>
+                    <h5 class="avoid-break-inside card-title mb-2"><@default.icon name="group" class="me-2"/>
+                        Activities</h5>
                     <div>
                         <#list profile.activities as activity >
                             <@profileCard title=activity.name text=activity.description link=activity.url limitLines=false preserveLines=true
-                            class="w-100 rounded-0 ${activity?is_first?then('rounded-top','')} ${activity?is_last?then('rounded-bottom','border-bottom-0')}"/>
+                            class="avoid-break-inside w-100 rounded-0 ${activity?is_first?then('rounded-top','')} ${activity?is_last?then('rounded-bottom','border-bottom-0')}"/>
                         </#list>
                     </div>
                 </@profileCard>
@@ -237,9 +251,10 @@
             margin: 5,
             filename: '${profile.name}.pdf',
             image: {type: 'png'},
+            pagebreak: {mode: '', avoid: '.avoid-break-inside'},
             jsPDF: {compress: true, hotfixes: ["px_scaling"]},
             html2canvas: {
-                width: 780,
+                letterRendering: true,
                 scale: 2,
                 onclone: (element) => {
                     const svgElements = Array.from(element.querySelectorAll('svg'));
@@ -271,9 +286,9 @@
     <div class="card card-border-grey w-100 h-100 user-select-none ${class?no_esc}"
          <#if id?has_content>data-id="${id}"</#if>>
         <div class="d-flex flex-column flex-sm-row align-content-between align-items-center w-100">
-            <div class="card-body d-flex flex-column flex-grow-1 w-100">
+            <div class="px-4 py-3 w-100">
                 <#if title?has_content>
-                    <h5 class="card-title user-select-none">
+                    <h5 class="avoid-break-inside card-title user-select-none">
                         <#if icon?has_content><@default.icon name=icon class="me-2"/></#if>
                         ${title}<#if link?has_content><@default.externalLinkIcon/></#if>
                     </h5>
