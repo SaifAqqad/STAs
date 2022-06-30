@@ -698,7 +698,7 @@ overviewPopupDetails={
 </html>
 
 <#macro profileCard title="" icon="" subtitle="" text="" id="" img="" img_alt="" class="" limitLines=true preserveLines=false>
-    <div class="card card-border-grey w-100 h-100 user-select-none ${class?no_esc}"
+    <div class="card card-border-grey d-flex flex-column justify-content-center w-100 h-100 user-select-none ${class?no_esc}"
          <#if id?has_content>data-id="${id}"</#if>>
         <div class="d-flex flex-column flex-sm-row align-content-between align-items-center w-100">
             <#if img?has_content>
@@ -707,7 +707,7 @@ overviewPopupDetails={
                          alt="${img_alt}">
                 </div>
             </#if>
-            <div class="card-body d-flex flex-column flex-grow-1 w-100">
+            <div class="card-body flex-grow-1 w-100">
                 <#if title?has_content>
                     <h5 class="card-title user-select-none"><#if icon?has_content><@default.icon name=icon class="me-2"/></#if>${title}</h5>
                 </#if>
